@@ -13,13 +13,16 @@ model_type = 'BWAC'
 ## INGEST DATA (IMS, ProspectoRx)
 
 
+## SET UP DATA STRUCTURE
+df_gfm = pd.DataFrame()
+df_gfm['Year'] = list(range(2015, 2030, 1))
+df_gfm = df_gfm.set_index('Year')
 
 ## FORECAST ASSUMPTIONS
-df_gfm = pd.DataFrame()
 df_gfm['Total Market Growth'] = 0.1
 df_gfm['Gx Penetration'] = 0.5
 df_gfm['N Gx Players'] = 3
-
+df_gfm.at[2015,'N Gx Players'] = 2
 
 
 
