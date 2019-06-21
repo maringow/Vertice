@@ -5,17 +5,17 @@ import datetime as dt
 import pandas as pd
 
 
-## read user input
+## READ USER INPUT
 
 # Placeholders, to be potentially replaced by inputs
 model_type = 'BWAC'
 
 
-## ingest data (IMS, ProspectoRx)
+## INGEST DATA (IMS, ProspectoRx)
 
 
 
-## FINANCIAL CALCULATIONS
+## PERFORM FINANCIAL CALCULATIONS
 # For each year
 #    Perform year-wise financial calculations
 # Perform present-value calculations (NPV, IRR, etc.)
@@ -32,5 +32,5 @@ sales = pd.Series(index=years)
 
 
 
-## output
+## GENERATE OUTPUT
 
