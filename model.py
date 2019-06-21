@@ -22,12 +22,27 @@ model_type = 'BWAC'
 ## DEFINE ANALOG TABLES
 # Placeholder, likely to be replaced by pointing to Excel reference file
 
-# Set up analogs by Number of Gx Players
+# Set up analogs by Number of Gx Players, from 1 to 10
+df_analog = pd.DataFrame(index=range(0,11))
+df_analog['Retail Net Price Pct BWAC'] = \
+     [1.00, 0.60, 0.35, 0.25, 0.20, 0.10, 0.05, 0.02, 0.01, 0.01, 0.01]
+df_analog['Retail Pct Market Share'] = \
+     [0.00, 1.00, 0.50, 0.30, 0.25, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03]
+df_analog['Clinic Net Price Pct BWAC'] = \
+     [1.00, 0.70, 0.55, 0.40, 0.25, 0.15, 0.10, 0.04, 0.01, 0.01, 0.01]
+df_analog['Clinic Pct Market Share'] = \
+     [0.00, 1.00, 0.50, 0.30, 0.25, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03]
+df_analog['Hospital Net Price Pct BWAC'] = \
+     [1.00, 0.80, 0.65, 0.45, 0.35, 0.20, 0.10, 0.04, 0.01, 0.01, 0.01]
+df_analog['Hospital Pct Market Share'] = \
+     [0.00, 1.00, 0.50, 0.30, 0.25, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03]
+df_analog['Pct Profit Share'] = \
+     [0.50, 0.50, 0.50, 0.25, 0.25, 0.25, 0.20, 0.20, 0.20, 0.20, 0.20]
 
 
 
 ##----------------------------------------------------------------------
-## SET UP DATA STRUCTURE
+##  SET UP DATA STRUCTURE
 df_gfm = pd.DataFrame()
 df_gfm['Year'] = list(range(2015, 2030, 1))
 df_gfm = df_gfm.set_index('Year')
@@ -45,7 +60,7 @@ df_gfm['GTN Chargebacks'] = 0.25
 df_gfm['GTN Other'] = 0.10
 
 # Calculations on Forecast Assumptions
-df_gfm['Vertice Gx Market Share'] =
+#df_gfm['Vertice Gx Market Share'] =
 
 
 
