@@ -5,6 +5,7 @@ import datetime as dt
 import pandas as pd
 
 
+##----------------------------------------------------------------------
 ## READ USER INPUT
 # Placeholders, to be potentially replaced by inputs
 model_type = 'BWAC'
@@ -14,6 +15,14 @@ model_type = 'BWAC'
 ##----------------------------------------------------------------------
 ## INGEST DATA (IMS, ProspectoRx)
 
+
+
+
+##----------------------------------------------------------------------
+## DEFINE ANALOG TABLES
+# Placeholder, likely to be replaced by pointing to Excel reference file
+
+# Set up analogs by Number of Gx Players
 
 
 
@@ -39,6 +48,8 @@ df_gfm['GTN Other'] = 0.10
 df_gfm['Vertice Gx Market Share'] =
 
 
+
+##----------------------------------------------------------------------
 ## PERFORM FINANCIAL CALCULATIONS
 # For each year
 #    Perform year-wise financial calculations
