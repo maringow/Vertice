@@ -8,8 +8,12 @@ import pandas as pd
 ##----------------------------------------------------------------------
 ## READ USER INPUT
 # Placeholders, to be potentially replaced by inputs
-model_type = 'BWAC'
 
+# model_type: {BWAC, GWAC}
+input_model_type = 'BWAC'
+
+# channel: {Retail, Hospital, Clinic}
+input_channel = 'Retail'
 
 
 ##----------------------------------------------------------------------
@@ -26,15 +30,15 @@ model_type = 'BWAC'
 df_analog = pd.DataFrame(index=range(0,11))
 df_analog['Retail Net Price Pct BWAC'] = \
      [1.00, 0.60, 0.35, 0.25, 0.20, 0.10, 0.05, 0.02, 0.01, 0.01, 0.01]
-df_analog['Retail Pct Market Share'] = \
+df_analog['Retail Market Share'] = \
      [0.00, 1.00, 0.50, 0.30, 0.25, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03]
 df_analog['Clinic Net Price Pct BWAC'] = \
      [1.00, 0.70, 0.55, 0.40, 0.25, 0.15, 0.10, 0.04, 0.01, 0.01, 0.01]
-df_analog['Clinic Pct Market Share'] = \
+df_analog['Clinic Market Share'] = \
      [0.00, 1.00, 0.50, 0.30, 0.25, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03]
 df_analog['Hospital Net Price Pct BWAC'] = \
      [1.00, 0.80, 0.65, 0.45, 0.35, 0.20, 0.10, 0.04, 0.01, 0.01, 0.01]
-df_analog['Hospital Pct Market Share'] = \
+df_analog['Hospital Market Share'] = \
      [0.00, 1.00, 0.50, 0.30, 0.25, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03]
 df_analog['Pct Profit Share'] = \
      [0.50, 0.50, 0.50, 0.25, 0.25, 0.25, 0.20, 0.20, 0.20, 0.20, 0.20]
@@ -59,7 +63,8 @@ df_gfm.at[2015,'N Gx Players'] = 2
 df_gfm['GTN Chargebacks'] = 0.25
 df_gfm['GTN Other'] = 0.10
 
-# Calculations on Forecast Assumptions
+# Calculate market share using channel-specific analog table
+col_name = [input_channel + ' Market Share']
 #df_gfm['Vertice Gx Market Share'] =
 
 
