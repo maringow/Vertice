@@ -10,8 +10,16 @@ import pandas as pd
 # Placeholders, to be potentially replaced by inputs
 model_type = 'BWAC'
 
-
 ## INGEST DATA (IMS, ProspectoRx)
+
+
+
+## FORECAST ASSUMPTIONS
+df_gfm = pd.DataFrame()
+df_gfm['Total Market Growth'] = 0.1
+df_gfm['Gx Penetration'] = 0.5
+df_gfm['N Gx Players'] = 3
+
 
 
 
