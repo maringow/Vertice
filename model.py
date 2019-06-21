@@ -4,6 +4,9 @@ import matplotlib as mpl
 import datetime as dt
 import pandas as pd
 
+# import user excel
+# 
+
 
 ##----------------------------------------------------------------------
 ## READ USER INPUT
@@ -15,8 +18,19 @@ model_type = 'BWAC'
 ##----------------------------------------------------------------------
 ## INGEST DATA (IMS, ProspectoRx)
 
+# idea - we should get the list of brand names from IMS to populate the user's input selections (Excel dropdown?)
 
+# ingest IMS
+# df_IMS = pd.read_csv('')
 
+# parse NDC, dosage, and
+
+# volume = pd.read_csv(xxx)
+
+# parse NDC
+# join price and volume on NDC
+
+price = pd.read_csv('C:\\Users\\mgow\\Documents\Clients\\5. Vertice\\Model Inputs\\gleevec_prospectorx.csv')
 
 ##----------------------------------------------------------------------
 ## DEFINE ANALOG TABLES
