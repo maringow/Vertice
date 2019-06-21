@@ -6,24 +6,37 @@ import pandas as pd
 
 
 ## READ USER INPUT
-
 # Placeholders, to be potentially replaced by inputs
 model_type = 'BWAC'
 
+
+
+##----------------------------------------------------------------------
 ## INGEST DATA (IMS, ProspectoRx)
 
 
+
+
+##----------------------------------------------------------------------
 ## SET UP DATA STRUCTURE
 df_gfm = pd.DataFrame()
 df_gfm['Year'] = list(range(2015, 2030, 1))
 df_gfm = df_gfm.set_index('Year')
 
-## FORECAST ASSUMPTIONS
-df_gfm['Total Market Growth'] = 0.1
-df_gfm['Gx Penetration'] = 0.5
-df_gfm['N Gx Players'] = 3
-df_gfm.at[2015,'N Gx Players'] = 2
 
+##----------------------------------------------------------------------
+## DEFINE FORECAST ASSUMPTIONS
+# Scratch calcs... some of these will likely be replaced by user input
+df_gfm['Total Market Growth Rate'] = 0.10
+df_gfm['Gx Penetration'] = 0.50
+df_gfm['N Gx Players'] = 3
+df_gfm['WAC Increase Rate'] = 0.05
+df_gfm.at[2015,'N Gx Players'] = 2
+df_gfm['GTN Chargebacks'] = 0.25
+df_gfm['GTN Other'] = 0.10
+
+# Calculations on Forecast Assumptions
+df_gfm['Vertice Gx Market Share'] =
 
 
 ## PERFORM FINANCIAL CALCULATIONS
@@ -43,5 +56,6 @@ sales = pd.Series(index=years)
 
 
 
+##----------------------------------------------------------------------
 ## GENERATE OUTPUT
 
