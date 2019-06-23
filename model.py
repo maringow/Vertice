@@ -63,9 +63,9 @@ df_gfm.at[2015,'N Gx Players'] = 2
 df_gfm['GTN Chargebacks'] = 0.25
 df_gfm['GTN Other'] = 0.10
 
-# Calculate market share using channel-specific analog table
+# Look up market share using channel-specific analog table
 col_name = [input_channel + ' Market Share']
-#df_gfm['Vertice Gx Market Share'] =
+df_gfm['Gx Market Share'] = df_analog.loc[df_gfm['N Gx Players'],col_name].values
 
 
 
