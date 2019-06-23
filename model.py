@@ -44,7 +44,6 @@ df_analog['Pct Profit Share'] = \
      [0.50, 0.50, 0.50, 0.25, 0.25, 0.25, 0.20, 0.20, 0.20, 0.20, 0.20]
 
 
-
 ##----------------------------------------------------------------------
 ##  SET UP DATA STRUCTURE
 df_gfm = pd.DataFrame()
@@ -55,18 +54,28 @@ df_gfm = df_gfm.set_index('Year')
 ##----------------------------------------------------------------------
 ## DEFINE FORECAST ASSUMPTIONS
 # Scratch calcs... some of these will likely be replaced by user input
-df_gfm['Total Market Growth Rate'] = 0.10
+df_gfm['Total Market Growth Pct'] = 0.10
 df_gfm['Gx Penetration'] = 0.50
+df_gfm['WAC Increase Pct'] = 0.05
+df_gfm['GTN Chargebacks Pct'] = 0.25
+df_gfm['GTN Other Pct'] = 0.10
+df_gfm['Price Discount of Current Gx Net'] = 0.0
+
 df_gfm['N Gx Players'] = 3
-df_gfm['WAC Increase Rate'] = 0.05
 df_gfm.at[2015,'N Gx Players'] = 2
-df_gfm['GTN Chargebacks'] = 0.25
-df_gfm['GTN Other'] = 0.10
 
 # Look up market share using channel-specific analog table
 col_name = [input_channel + ' Market Share']
 df_gfm['Gx Market Share'] = df_analog.loc[df_gfm['N Gx Players'],col_name].values
 
+# Assign Vertice price as % of either BWAC or GWAC
+if input_model_type == 'BWAC':
+     col_name = [input_channel + ' Net Price Pct BWAC']
+     df_gfm['Vertice Price as Pct of WAC'] = df_analog.loc[df_gfm['N Gx Players'],col_name].values
+else:
+     df_gfm['Vertice Price as Pct of WAC'] = \
+          (1 - df_gfm['GTN Chargebacks Pct'] - df_gfm['GTN Other Pct']) * \
+          (1 - df_gfm['Price Discount of Current Gx Net'])
 
 
 ##----------------------------------------------------------------------
@@ -81,9 +90,6 @@ discount_rate = 0.15
 tax_rate = 0.21
 
 
-# Placeholder series, to be replaced later
-years = list(range(2015, 2030, 1))
-sales = pd.Series(index=years)
 
 
 
