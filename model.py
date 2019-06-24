@@ -32,20 +32,22 @@ molecule_2_units_2015_2018 = [35.4e3, 36.7e3, 28.5e3, 43.1e3]
 molecule_3_units_2015_2018 = [40.0e3, 39.7e3, 35.8e3, 42.4e3]
 
 
-
 # ingest IMS and price data
-price = pd.read_csv('C:\\Users\\mgow\\Documents\Clients\\5. Vertice\\Model Inputs\\gleevec_prospectorx.csv')
-volume = pd.read_csv('C:\\Users\\mgow\\Documents\Clients\\5. Vertice\\Model Inputs\\gleevec_IMS.csv')
+IMS = pd.read_csv('gleevec_IMS.csv')
+prospectoRx = pd.read_csv('gleevec_prospectorx.csv')
 
 # parse NDC from IMS file
-print(re.split('\s', volume['NDC'][0])[0])
-volume.rename(index=str, columns={'NDC': 'NDC_ext'}, inplace=True)
-volume['NDC'] = ''
-for index, row in volume.iterrows():
-    volume['NDC'][index] = re.split('\s', volume['NDC_ext'][index])[0]
+IMS.rename(index=str, columns={'NDC': 'NDC_ext'}, inplace=True)
+IMS['NDC'] = ''
+for index, row in IMS.iterrows():
+    IMS['NDC'][index] = re.split('\s', IMS['NDC_ext'][index])[0]
+IMS['NDC'] = pd.to_numeric(IMS['NDC'])
 
-# join price and volume on NDC
-# df.merge()
+# join price and IMS on NDC
+prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
+IMS.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
+
+
 
 
 # parse brand name, strength, dosage
