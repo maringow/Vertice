@@ -19,9 +19,18 @@ input_channel = 'Retail'
 ##----------------------------------------------------------------------
 ## INGEST DATA (IMS, ProspectoRx)
 
-# Fake molecule-level sales & units data
+# Fake molecule-level sales & units data (priced @ $100-150/100mg)
+molecule_1 = 'abc 100mg'
+molecule_2 = 'abc 200mg'
+molecule_3 = 'abc 6x50mg'
 
+molecule_1_sales_2015_2018 = [25.0e6, 26.0e6, 28.0e6, 29.5e6]
+molecule_2_sales_2015_2018 = [ 8.5e6,  9.1e6,  7.2e6, 11.0e6]
+molecule_3_sales_2015_2018 = [13.2e6, 13.1e6, 11.8e6, 14.0e6]
 
+molecule_1_units_2015_2018 = [166.7e3, 167.7e3, 177.2e3, 182.1e3]
+molecule_2_units_2015_2018 = [35.4e3, 36.7e3, 28.5e3, 43.1e3]
+molecule_3_units_2015_2018 = [40.0e3, 39.7e3, 35.8e3, 42.4e3]
 
 ##----------------------------------------------------------------------
 ## DEFINE ANALOG TABLES
@@ -55,7 +64,7 @@ df_analog['Pct Profit Share'] = \
 # Set up df_detail data frame
 df_detail = pd.DataFrame()
 df_detail['Year'] = list(range(2015, 2030, 1))
-df_detail['Molecule'] = ''
+#df_detail['Molecule'] = ''
 
 # Set up df_gfm data frame
 df_gfm = pd.DataFrame()
