@@ -56,7 +56,7 @@ for index, row in volume.iterrows():
 ## DEFINE ANALOG TABLES
 # Placeholder, likely to be replaced by pointing to Excel reference file
 
-# Set up analogs by Number of Gx Players, from 1 to 10
+# Set up analogs by Number of Gx Players, from 0 to 10
 df_analog = pd.DataFrame(index=range(0, 11))
 df_analog['Retail Net Price Pct BWAC'] = \
     [1.00, 0.60, 0.35, 0.25, 0.20, 0.10, 0.05, 0.02, 0.01, 0.01, 0.01]
@@ -78,7 +78,7 @@ df_analog['Pct Profit Share'] = \
 # Proposed: Two data structures
 #   df_detail: Year-wise AND molecule-wise data frame, that reproduces Wes's detailed matrix calcs
 #              The data frame starts with data from IMS, following Wes's approach
-#   df_gfm: Year-wise data frame for "cross-unit" assumptions and aggregated results
+#   df_gfm: Year-wise data frame for "cross-molecule" assumptions and aggregated results
 
 # Set up df_detail data frame
 # TODO Finish initializing data frame
@@ -86,6 +86,8 @@ df_detail = pd.DataFrame()
 df_detail['Year'] = list(range(2015, 2030, 1))
 df_detail = df_detail.set_index(['Year'])
 df_detail['Molecule'] = molecule_1
+# Multiindex... maybe...
+
 
 # Set up df_gfm data frame
 df_gfm = pd.DataFrame()
@@ -102,8 +104,10 @@ df_gfm['GTN Chargebacks Pct'] = 0.25
 df_gfm['GTN Other Pct'] = 0.10
 df_gfm['Price Discount of Current Gx Net'] = 0.0
 
+# Hard-coded # of Gx Players (for now)
 df_gfm['N Gx Players'] = 3
 df_gfm.at[2015, 'N Gx Players'] = 2
+df_gfm.at[2020, 'N Gx Players'] = 4
 
 # Look up market share using channel-specific analog table
 col_name = [input_channel + ' Market Share']
