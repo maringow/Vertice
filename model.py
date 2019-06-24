@@ -59,18 +59,19 @@ index_arrays = [year_range, NDCs]
 multiIndex = pd.MultiIndex.from_product(index_arrays, names=['Year', 'NDC'])
 df_detail = pd.DataFrame(index=multiIndex, columns=['Units', 'Price', 'Sales', 'COGS'])
 
-df_detail['Units'].loc[2016][merged_data['NDC']] = merged_data['2016_Units']
-df_detail['Units'].loc[2017][merged_data['NDC']] = merged_data['2017_Units']
-df_detail['Units'].loc[2018][merged_data['NDC']] = merged_data['2018_Units']
-df_detail['Units'].loc[2019][merged_data['NDC']] = merged_data['2019_Units']
+df_detail['Units'].loc[2016][merged_data['NDC']] = pd.to_numeric(merged_data['2016_Units'].str.replace(',', ''))
+df_detail['Units'].loc[2017][merged_data['NDC']] = pd.to_numeric(merged_data['2017_Units'].str.replace(',', ''))
+df_detail['Units'].loc[2018][merged_data['NDC']] = pd.to_numeric(merged_data['2018_Units'].str.replace(',', ''))
+df_detail['Units'].loc[2019][merged_data['NDC']] = pd.to_numeric(merged_data['2019_Units'].str.replace(',', ''))
 # need to allow for 2020 units so that code doesn't break in January
+# also need to make this code more concise
 
 df_detail['Price'].loc[2016][merged_data['NDC']] = merged_data['WACPrice']
 df_detail['Price'].loc[2017][merged_data['NDC']] = merged_data['WACPrice']
 df_detail['Price'].loc[2018][merged_data['NDC']] = merged_data['WACPrice']
 df_detail['Price'].loc[2019][merged_data['NDC']] = merged_data['WACPrice']
 
-df_detail['Sales'] = pd.to_numeric(df_detail['Units'].str.replace(',', '')) * df_detail['Price']
+df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
 
 ##----------------------------------------------------------------------
 ## DEFINE ANALOG TABLES
