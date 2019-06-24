@@ -19,6 +19,7 @@ input_channel = 'Retail'
 ##----------------------------------------------------------------------
 ## INGEST DATA (IMS, ProspectoRx)
 
+# Fake molecule-level sales & units data
 
 
 
@@ -46,6 +47,17 @@ df_analog['Pct Profit Share'] = \
 
 ##----------------------------------------------------------------------
 ##  SET UP DATA STRUCTURE
+# Proposed: Two data structures
+#   df_detail: Year-wise AND molecule-wise data frame, that reproduces Wes's detailed matrix calcs
+#              The data frame starts with data from IMS, following Wes's approach
+#   df_gfm: Year-wise data frame for "cross-unit" assumptions and aggregated results
+
+# Set up df_detail data frame
+df_detail = pd.DataFrame()
+df_detail['Year'] = list(range(2015, 2030, 1))
+df_detail['Molecule'] = ''
+
+# Set up df_gfm data frame
 df_gfm = pd.DataFrame()
 df_gfm['Year'] = list(range(2015, 2030, 1))
 df_gfm = df_gfm.set_index('Year')
