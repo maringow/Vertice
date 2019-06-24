@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib as mpl
 import datetime as dt
 import pandas as pd
+import re
 
 ##----------------------------------------------------------------------
 ## READ USER INPUT
@@ -36,9 +37,15 @@ molecule_3_units_2015_2018 = [40.0e3, 39.7e3, 35.8e3, 42.4e3]
 price = pd.read_csv('C:\\Users\\mgow\\Documents\Clients\\5. Vertice\\Model Inputs\\gleevec_prospectorx.csv')
 volume = pd.read_csv('C:\\Users\\mgow\\Documents\Clients\\5. Vertice\\Model Inputs\\gleevec_IMS.csv')
 
-# parse NDC
-# join price and volume on NDC
+# parse NDC from IMS file
+print(re.split('\s', volume['NDC'][0])[0])
+volume.rename(index=str, columns={'NDC': 'NDC_ext'}, inplace=True)
+volume['NDC'] = ''
+for index, row in volume.iterrows():
+    volume['NDC'][index] = re.split('\s', volume['NDC_ext'][index])[0]
 
+# join price and volume on NDC
+# df.merge()
 
 
 # parse brand name, strength, dosage
