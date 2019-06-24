@@ -36,6 +36,10 @@ molecule_3_units_2015_2018 = [40.0e3, 39.7e3, 35.8e3, 42.4e3]
 IMS = pd.read_csv('gleevec_IMS.csv')
 prospectoRx = pd.read_csv('gleevec_prospectorx.csv')
 
+# pull records that are therapeutic equivalents to selected brand name
+#   parse brand name, strength, dosage
+#   select IMS records that match user brand name input, strength, and dosage form
+
 # parse NDC from IMS file
 IMS.rename(index=str, columns={'NDC': 'NDC_ext'}, inplace=True)
 IMS['NDC'] = ''
@@ -47,11 +51,16 @@ IMS['NDC'] = pd.to_numeric(IMS['NDC'])
 prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
 IMS.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
 
+# build MultiIndex on Year and NDC
+year_range = [str(i) for i in np.array(range(2016, 2030))]
+NDCs = [str(i) for i in IMS['NDC'].unique()]
+
+index_arrays = [year_range, NDCs]
+multiIndex = pd.MultiIndex.from_product(index_arrays, names=['Year', 'NDC'])
+df_detail = pd.DataFrame(index=multiIndex)
 
 
 
-# parse brand name, strength, dosage
-# select IMS records that match user brand name input, strength, and dosage form
 
 
 ##----------------------------------------------------------------------
