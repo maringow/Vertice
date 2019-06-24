@@ -70,8 +70,7 @@ df_detail['Price'].loc[2017][merged_data['NDC']] = merged_data['WACPrice']
 df_detail['Price'].loc[2018][merged_data['NDC']] = merged_data['WACPrice']
 df_detail['Price'].loc[2019][merged_data['NDC']] = merged_data['WACPrice']
 
-#df_detail['Sales'] = [df_detail['Units'] * df_detail['Price'] for i in df_detail]
-
+# df_detail['Sales'] = pd.to_numeric(df_detail['Units']) * df_detail['Price']   ## need to convert string values
 
 
 
