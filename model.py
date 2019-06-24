@@ -72,8 +72,6 @@ df_detail['Price'].loc[2019][merged_data['NDC']] = merged_data['WACPrice']
 
 df_detail['Sales'] = pd.to_numeric(df_detail['Units'].str.replace(',', '')) * df_detail['Price']
 
-print(df_detail)
-
 ##----------------------------------------------------------------------
 ## DEFINE ANALOG TABLES
 # Placeholder, likely to be replaced by pointing to Excel reference file
