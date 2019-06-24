@@ -49,7 +49,7 @@ IMS['NDC'] = pd.to_numeric(IMS['NDC'])
 
 # join price and IMS on NDC
 prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
-IMS.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
+merged_data = IMS.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
 
 # build MultiIndex on Year and NDC
 year_range = [int(i) for i in np.array(range(2016, 2030))]
@@ -57,7 +57,20 @@ NDCs = [int(i) for i in IMS['NDC'].unique()]
 
 index_arrays = [year_range, NDCs]
 multiIndex = pd.MultiIndex.from_product(index_arrays, names=['Year', 'NDC'])
-df_detail = pd.DataFrame(index=multiIndex)
+df_detail = pd.DataFrame(index=multiIndex, columns=['Units', 'Price', 'Sales', 'COGS'])
+
+df_detail['Units'].loc[2016][merged_data['NDC']] = merged_data['2016_Units']
+df_detail['Units'].loc[2017][merged_data['NDC']] = merged_data['2017_Units']
+df_detail['Units'].loc[2018][merged_data['NDC']] = merged_data['2018_Units']
+df_detail['Units'].loc[2019][merged_data['NDC']] = merged_data['2019_Units']
+# need to allow for 2020 units so that code doesn't break in January
+
+df_detail['Price'].loc[2016][merged_data['NDC']] = merged_data['WACPrice']
+df_detail['Price'].loc[2017][merged_data['NDC']] = merged_data['WACPrice']
+df_detail['Price'].loc[2018][merged_data['NDC']] = merged_data['WACPrice']
+df_detail['Price'].loc[2019][merged_data['NDC']] = merged_data['WACPrice']
+
+#df_detail['Sales'] = [df_detail['Units'] * df_detail['Price'] for i in df_detail]
 
 
 
