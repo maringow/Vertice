@@ -62,9 +62,11 @@ df_analog['Pct Profit Share'] = \
 #   df_gfm: Year-wise data frame for "cross-unit" assumptions and aggregated results
 
 # Set up df_detail data frame
+# TODO Finish initializing data frame
 df_detail = pd.DataFrame()
 df_detail['Year'] = list(range(2015, 2030, 1))
-#df_detail['Molecule'] = ''
+df_detail = df_detail.set_index(['Year'])
+df_detail['Molecule'] = molecule_1
 
 # Set up df_gfm data frame
 df_gfm = pd.DataFrame()
