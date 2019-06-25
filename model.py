@@ -23,8 +23,8 @@ wb = xl.load_workbook(filename='Model Inputs.xlsx', read_only=True)
 sheet = wb['Input']
 
 # assign variables from Excel cells
-branded_name = sheet['B5'].value
-print(branded_name)
+brand_name = sheet['B5'].value
+print(brand_name)
 
 
 ##----------------------------------------------------------------------
@@ -47,12 +47,13 @@ df_gfm = df_gfm.set_index('Year')
 ## INGEST DATA (IMS, ProspectoRx)
 
 # ingest IMS and price data
-IMS = pd.read_csv('gleevec_IMS.csv')
+IMS = pd.read_csv('sample_8_molecules_w_product.csv')
 prospectoRx = pd.read_csv('gleevec_prospectorx.csv')
 
 # pull records that are therapeutic equivalents of selected brand name drug
-
-# find Combined Molecule and Prod Form 3 of selected brand name drug; store in lists
+# find Combined Molecule and Prod Form 3 of selected brand name drug; store in lists in case there are multiple
+combined_molecules = IMS.loc[IMS['Product Sum'] == brand_name]['Combined Molecule'].unique()
+dosage_forms = IMS.loc[IMS['Product Sum'] == brand_name]['Prod Form3'].unique()
 
 # find all IMS records that match the Combined Molecule and Prod Form 3
 
@@ -62,8 +63,9 @@ prospectoRx = pd.read_csv('gleevec_prospectorx.csv')
 IMS.rename(index=str, columns={'NDC': 'NDC_ext'}, inplace=True)
 IMS['NDC'] = ''
 for index, row in IMS.iterrows():
-    IMS['NDC'][index] = re.split('\s', IMS['NDC_ext'][index])[0]
+    IMS['NDC'][index] = re.sub('[^0-9]', '', re.split('\s', IMS['NDC_ext'][index])[0])
 IMS['NDC'] = pd.to_numeric(IMS['NDC'])
+IMS['NDC'].fillna(999, inplace=True)
 
 # join price and IMS on NDC
 prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
