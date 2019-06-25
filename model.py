@@ -22,10 +22,14 @@ input_channel = 'Retail'
 wb = xl.load_workbook(filename='Model Inputs.xlsx', read_only=True)
 sheet = wb['Input']
 
-# assign variables from Excel cells
-brand_name = sheet['B5'].value
-print(brand_name)
+# assign single-value variables from Excel cells into parameters dict
+parameters = ({'brand_name': sheet['B5'].value},
+              {'brand_status': sheet['B6'].value},
+              {'channel': sheet['B7'].value}
+              )
+print(parameters)
 
+# assign year-based variables into df df_gfm
 
 ##----------------------------------------------------------------------
 ##  SET UP MAIN DATA STRUCTURES
