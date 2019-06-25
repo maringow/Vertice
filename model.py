@@ -4,6 +4,7 @@ import matplotlib as mpl
 import datetime as dt
 import pandas as pd
 import re
+import openpyxl as xl
 
 ##----------------------------------------------------------------------
 ## READ USER INPUT
@@ -14,6 +15,14 @@ input_model_type = 'BWAC'
 
 # channel: {Retail, Hospital, Clinic}
 input_channel = 'Retail'
+
+wb = xl.load_workbook(filename='Model Input.xlsx')
+sheet = wb['Sheet1']
+
+branded_name = sheet['B3']
+print(branded_name)
+
+
 
 ##----------------------------------------------------------------------
 ## INGEST DATA (IMS, ProspectoRx)
@@ -49,7 +58,7 @@ IMS['NDC'] = pd.to_numeric(IMS['NDC'])
 
 # join price and IMS on NDC
 prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
-merged_data = IMS.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
+df_merged_data = IMS.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
 
 # build MultiIndex on Year and NDC
 year_range = [int(i) for i in np.array(range(2016, 2030))]
@@ -59,17 +68,17 @@ index_arrays = [year_range, NDCs]
 multiIndex = pd.MultiIndex.from_product(index_arrays, names=['Year', 'NDC'])
 df_detail = pd.DataFrame(index=multiIndex, columns=['Units', 'Price', 'Sales', 'COGS'])
 
-df_detail['Units'].loc[2016][merged_data['NDC']] = pd.to_numeric(merged_data['2016_Units'].str.replace(',', ''))
-df_detail['Units'].loc[2017][merged_data['NDC']] = pd.to_numeric(merged_data['2017_Units'].str.replace(',', ''))
-df_detail['Units'].loc[2018][merged_data['NDC']] = pd.to_numeric(merged_data['2018_Units'].str.replace(',', ''))
-df_detail['Units'].loc[2019][merged_data['NDC']] = pd.to_numeric(merged_data['2019_Units'].str.replace(',', ''))
+df_detail['Units'].loc[2016][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2016_Units'].str.replace(',', ''))
+df_detail['Units'].loc[2017][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2017_Units'].str.replace(',', ''))
+df_detail['Units'].loc[2018][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2018_Units'].str.replace(',', ''))
+df_detail['Units'].loc[2019][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2019_Units'].str.replace(',', ''))
 # need to allow for 2020 units so that code doesn't break in January
 # also need to make this code more concise
 
-df_detail['Price'].loc[2016][merged_data['NDC']] = merged_data['WACPrice']
-df_detail['Price'].loc[2017][merged_data['NDC']] = merged_data['WACPrice']
-df_detail['Price'].loc[2018][merged_data['NDC']] = merged_data['WACPrice']
-df_detail['Price'].loc[2019][merged_data['NDC']] = merged_data['WACPrice']
+df_detail['Price'].loc[2016][df_merged_data['NDC']] = df_merged_data['WACPrice']
+df_detail['Price'].loc[2017][df_merged_data['NDC']] = df_merged_data['WACPrice']
+df_detail['Price'].loc[2018][df_merged_data['NDC']] = df_merged_data['WACPrice']
+df_detail['Price'].loc[2019][df_merged_data['NDC']] = df_merged_data['WACPrice']
 
 df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
 
