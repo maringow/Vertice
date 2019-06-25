@@ -16,10 +16,14 @@ input_model_type = 'BWAC'
 # channel: {Retail, Hospital, Clinic}
 input_channel = 'Retail'
 
-wb = xl.load_workbook(filename='Model Input.xlsx')
-sheet = wb['Sheet1']
 
-branded_name = sheet['B3']
+
+# read in user input Excel file
+wb = xl.load_workbook(filename='Model Inputs.xlsx')
+sheet = wb['Input']
+
+# assign variables from Excel cells
+branded_name = sheet['B3'].value
 print(branded_name)
 
 
