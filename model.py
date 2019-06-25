@@ -90,7 +90,7 @@ multiIndex = pd.MultiIndex.from_product(index_arrays, names=['Year', 'NDC'])
 df_detail = pd.DataFrame(index=multiIndex, columns=['Units', 'Price', 'Sales', 'COGS'])
 
 # TODO maybe turn this into a while loop over list of columns names - checking if they exist in the df
-# TODO need to allow for 2020 units so that code doesn't break in January
+#     need to allow for 2020 units so that code doesn't break in January
 df_detail['Units'].loc[2016][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2016_Units'].str.replace(',', ''))
 df_detail['Units'].loc[2017][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2017_Units'].str.replace(',', ''))
 df_detail['Units'].loc[2018][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2018_Units'].str.replace(',', ''))
