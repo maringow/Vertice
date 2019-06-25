@@ -104,14 +104,13 @@ df_analog['Pct Profit Share'] = \
     [0.50, 0.50, 0.50, 0.25, 0.25, 0.25, 0.20, 0.20, 0.20, 0.20, 0.20]
 
 ##----------------------------------------------------------------------
-##  SET UP DATA STRUCTURE
+##  SET UP MAIN DATA STRUCTURES
 # Proposed: Two data structures
 #   df_detail: Year-wise AND molecule-wise data frame, that reproduces Wes's detailed matrix calcs
 #              The data frame starts with data from IMS, following Wes's approach
 #   df_gfm: Year-wise data frame for "cross-molecule" assumptions and aggregated results
 
 # Set up df_detail data frame
-# TODO Finish initializing data frame
 df_detail = pd.DataFrame()
 df_detail['Year'] = list(range(2015, 2030, 1))
 df_detail = df_detail.set_index(['Year'])
