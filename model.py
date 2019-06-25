@@ -26,7 +26,7 @@ sheet = wb['Input']
 parameters = {'brand_name': sheet['B5'].value,
               'brand_status': sheet['B6'].value,
               'channel': sheet['B7'].value
-              }  ## more to be added
+              }  # more to be added
 
 
 # assign year-based variables into df df_gfm
@@ -49,13 +49,13 @@ df_gfm = df_gfm.set_index('Year')
 
 
 ##----------------------------------------------------------------------
-## INGEST DATA (IMS, ProspectoRx)
+## INGEST DATA (IMS, ProspectoRx) AND FIND THERAPEUTIC EQUIVALENTS
 
 # ingest IMS and price data
 IMS = pd.read_csv('sample_8_molecules_w_product.csv')
 prospectoRx = pd.read_csv('gleevec_prospectorx.csv')
 
-## pull records that are therapeutic equivalents of selected brand name drug
+# pull records that are therapeutic equivalents of selected brand name drug
 # find Combined Molecule and Prod Form 3 of selected brand name drug; store in lists in case there are multiple
 combined_molecules = IMS.loc[IMS['Product Sum'] == parameters['brand_name']]['Combined Molecule'].unique()
 dosage_forms = IMS.loc[IMS['Product Sum'] == parameters['brand_name']]['Prod Form3'].unique()
@@ -76,9 +76,8 @@ df_equivalents['NDC'].fillna(999, inplace=True)  ## if NDC is "NDC NOT AVAILABLE
 prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
 df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
 
-# if no price match on NDC is found, use the lowest price for the same strength and package units
+# TODO if no price match on NDC is found, use the lowest price for the same strength and package units
 #     if no record with the same strength and package units, use the lowest overall price
-
 
 
 # build MultiIndex on Year and NDC
@@ -90,13 +89,13 @@ multiIndex = pd.MultiIndex.from_product(index_arrays, names=['Year', 'NDC'])
 # create df with multiindex
 df_detail = pd.DataFrame(index=multiIndex, columns=['Units', 'Price', 'Sales', 'COGS'])
 
-
+# TODO maybe turn this into a while loop over list of columns names - checking if they exist in the df
+# TODO need to allow for 2020 units so that code doesn't break in January
 df_detail['Units'].loc[2016][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2016_Units'].str.replace(',', ''))
 df_detail['Units'].loc[2017][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2017_Units'].str.replace(',', ''))
 df_detail['Units'].loc[2018][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2018_Units'].str.replace(',', ''))
 df_detail['Units'].loc[2019][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2019_Units'].str.replace(',', ''))
-# need to allow for 2020 units so that code doesn't break in January
-# also should make this code more concise
+
 
 df_detail['Price'].loc[2016][df_merged_data['NDC']] = df_merged_data['WACPrice']
 df_detail['Price'].loc[2017][df_merged_data['NDC']] = df_merged_data['WACPrice']
