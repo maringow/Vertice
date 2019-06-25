@@ -27,23 +27,27 @@ branded_name = sheet['B3'].value
 print(branded_name)
 
 
+##----------------------------------------------------------------------
+##  SET UP MAIN DATA STRUCTURES
+# Main data structures
+#   df_detail: Year-wise AND NDC-wise data frame, that reproduces Wes's detailed matrix calcs
+#              The data frame starts with data from IMS, following Wes's approach
+#   df_gfm: Year-wise data frame for "cross-molecule" assumptions and aggregated results
+
+# Set up df_detail data frame
+df_detail = pd.DataFrame()
+df_detail['Year'] = list(range(2015, 2030, 1))
+df_detail = df_detail.set_index(['Year'])
+
+
+# Set up df_gfm data frame
+df_gfm = pd.DataFrame()
+df_gfm['Year'] = list(range(2015, 2030, 1))
+df_gfm = df_gfm.set_index('Year')
+
 
 ##----------------------------------------------------------------------
 ## INGEST DATA (IMS, ProspectoRx)
-
-# Fake molecule-level sales & units data (priced @ $100-150/100mg)
-molecule_1 = 'abc 100mg'
-molecule_2 = 'abc 200mg'
-molecule_3 = 'abc 6x50mg'
-
-molecule_1_sales_2015_2018 = [25.0e6, 26.0e6, 28.0e6, 29.5e6]
-molecule_2_sales_2015_2018 = [8.5e6, 9.1e6, 7.2e6, 11.0e6]
-molecule_3_sales_2015_2018 = [13.2e6, 13.1e6, 11.8e6, 14.0e6]
-
-molecule_1_units_2015_2018 = [166.7e3, 167.7e3, 177.2e3, 182.1e3]
-molecule_2_units_2015_2018 = [35.4e3, 36.7e3, 28.5e3, 43.1e3]
-molecule_3_units_2015_2018 = [40.0e3, 39.7e3, 35.8e3, 42.4e3]
-
 
 # ingest IMS and price data
 IMS = pd.read_csv('gleevec_IMS.csv')
@@ -107,26 +111,6 @@ df_analog['Hospital Market Share'] = \
 df_analog['Pct Profit Share'] = \
     [0.50, 0.50, 0.50, 0.25, 0.25, 0.25, 0.20, 0.20, 0.20, 0.20, 0.20]
 
-##----------------------------------------------------------------------
-##  SET UP DATA STRUCTURE
-# Proposed: Two data structures
-#   df_detail: Year-wise AND molecule-wise data frame, that reproduces Wes's detailed matrix calcs
-#              The data frame starts with data from IMS, following Wes's approach
-#   df_gfm: Year-wise data frame for "cross-molecule" assumptions and aggregated results
-
-# Set up df_detail data frame
-# TODO Finish initializing data frame
-df_detail = pd.DataFrame()
-df_detail['Year'] = list(range(2015, 2030, 1))
-df_detail = df_detail.set_index(['Year'])
-df_detail['Molecule'] = molecule_1
-# Multiindex... maybe...
-
-
-# Set up df_gfm data frame
-df_gfm = pd.DataFrame()
-df_gfm['Year'] = list(range(2015, 2030, 1))
-df_gfm = df_gfm.set_index('Year')
 
 ##----------------------------------------------------------------------
 ## DEFINE FORECAST ASSUMPTIONS
