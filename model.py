@@ -55,28 +55,26 @@ prospectoRx = pd.read_csv('gleevec_prospectorx.csv')
 combined_molecules = IMS.loc[IMS['Product Sum'] == brand_name]['Combined Molecule'].unique()
 dosage_forms = IMS.loc[IMS['Product Sum'] == brand_name]['Prod Form3'].unique()
 
-
 # find all IMS records that match the Combined Molecule and Prod Form 3
 df_equivalents = IMS.loc[(IMS['Combined Molecule'].isin(combined_molecules)) & (IMS['Prod Form3'].isin(dosage_forms))]
-
 print(df_equivalents)
 
-# parse NDC from IMS file
-IMS.rename(index=str, columns={'NDC': 'NDC_ext'}, inplace=True)
-IMS['NDC'] = ''
-for index, row in IMS.iterrows():
-    IMS['NDC'][index] = re.sub('[^0-9]', '', re.split('\s', IMS['NDC_ext'][index])[0])
-IMS['NDC'] = pd.to_numeric(IMS['NDC'])
-IMS['NDC'].fillna(999, inplace=True)
+# parse NDC from equivalents dataframe (from IMS file)
+df_equivalents.rename(index=str, columns={'NDC': 'NDC_ext'}, inplace=True)
+df_equivalents['NDC'] = ''
+for index, row in df_equivalents.iterrows():
+    df_equivalents['NDC'][index] = re.sub('[^0-9]', '', re.split('\s', df_equivalents['NDC_ext'][index])[0])
+df_equivalents['NDC'] = pd.to_numeric(df_equivalents['NDC'])
+df_equivalents['NDC'].fillna(999, inplace=True)
 
-# join price and IMS on NDC
+# join price and therapeutic equivalents on NDC
 prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
-df_merged_data = IMS.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
+df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
 
 
 # build MultiIndex on Year and NDC
 year_range = [int(i) for i in np.array(range(2016, 2030))]
-NDCs = [int(i) for i in IMS['NDC'].unique()]
+NDCs = [int(i) for i in df_equivalents['NDC'].unique()]
 index_arrays = [year_range, NDCs]
 multiIndex = pd.MultiIndex.from_product(index_arrays, names=['Year', 'NDC'])
 
