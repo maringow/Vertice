@@ -19,11 +19,11 @@ input_channel = 'Retail'
 
 
 # read in user input Excel file
-wb = xl.load_workbook(filename='Model Inputs.xlsx')
+wb = xl.load_workbook(filename='Model Inputs.xlsx', read_only=True)
 sheet = wb['Input']
 
 # assign variables from Excel cells
-branded_name = sheet['B3'].value
+branded_name = sheet['B5'].value
 print(branded_name)
 
 
@@ -35,15 +35,6 @@ print(branded_name)
 #   df_gfm: Year-wise data frame for "cross-molecule" assumptions and aggregated results
 
 # Set up df_detail data frame
-
-# build MultiIndex on Year and NDC
-year_range = [int(i) for i in np.array(range(2016, 2030))]
-NDCs = [int(i) for i in IMS['NDC'].unique()]
-index_arrays = [year_range, NDCs]
-multiIndex = pd.MultiIndex.from_product(index_arrays, names=['Year', 'NDC'])
-
-# create df with multiindex
-df_detail = pd.DataFrame(index=multiIndex, columns=['Units', 'Price', 'Sales', 'COGS'])
 
 
 # Set up df_gfm data frame
@@ -59,9 +50,13 @@ df_gfm = df_gfm.set_index('Year')
 IMS = pd.read_csv('gleevec_IMS.csv')
 prospectoRx = pd.read_csv('gleevec_prospectorx.csv')
 
-# pull records that are therapeutic equivalents to selected brand name
-#   parse brand name, strength, dosage
-#   select IMS records that match user brand name input, strength, and dosage form
+# pull records that are therapeutic equivalents of selected brand name drug
+
+# find Combined Molecule and Prod Form 3 of selected brand name drug; store in lists
+
+# find all IMS records that match the Combined Molecule and Prod Form 3
+
+
 
 # parse NDC from IMS file
 IMS.rename(index=str, columns={'NDC': 'NDC_ext'}, inplace=True)
@@ -75,13 +70,22 @@ prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True
 df_merged_data = IMS.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
 
 
+# build MultiIndex on Year and NDC
+year_range = [int(i) for i in np.array(range(2016, 2030))]
+NDCs = [int(i) for i in IMS['NDC'].unique()]
+index_arrays = [year_range, NDCs]
+multiIndex = pd.MultiIndex.from_product(index_arrays, names=['Year', 'NDC'])
+
+# create df with multiindex
+df_detail = pd.DataFrame(index=multiIndex, columns=['Units', 'Price', 'Sales', 'COGS'])
+
 
 df_detail['Units'].loc[2016][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2016_Units'].str.replace(',', ''))
 df_detail['Units'].loc[2017][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2017_Units'].str.replace(',', ''))
 df_detail['Units'].loc[2018][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2018_Units'].str.replace(',', ''))
 df_detail['Units'].loc[2019][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2019_Units'].str.replace(',', ''))
 # need to allow for 2020 units so that code doesn't break in January
-# also need to make this code more concise
+# also should make this code more concise
 
 df_detail['Price'].loc[2016][df_merged_data['NDC']] = df_merged_data['WACPrice']
 df_detail['Price'].loc[2017][df_merged_data['NDC']] = df_merged_data['WACPrice']
