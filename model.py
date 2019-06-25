@@ -18,18 +18,19 @@ input_channel = 'Retail'
 
 
 
-# read in user input Excel file
+# read user input Excel file
 wb = xl.load_workbook(filename='Model Inputs.xlsx', read_only=True)
 sheet = wb['Input']
 
 # assign single-value variables from Excel cells into parameters dict
-parameters = ({'brand_name': sheet['B5'].value},
-              {'brand_status': sheet['B6'].value},
-              {'channel': sheet['B7'].value}
-              )
-print(parameters)
+parameters = {'brand_name': sheet['B5'].value,
+              'brand_status': sheet['B6'].value,
+              'channel': sheet['B7'].value
+              }  ## more to be added
+
 
 # assign year-based variables into df df_gfm
+#df_gmf = pd.dataframe()
 
 ##----------------------------------------------------------------------
 ##  SET UP MAIN DATA STRUCTURES
@@ -66,14 +67,18 @@ print(df_equivalents)
 # parse NDC from equivalents dataframe (from IMS file)
 df_equivalents.rename(index=str, columns={'NDC': 'NDC_ext'}, inplace=True)
 df_equivalents['NDC'] = ''
-for index, row in df_equivalents.iterrows():
+for index, row in df_equivalents.iterrows():  ## split out anything after first space and remove non-numeric chars
     df_equivalents['NDC'][index] = re.sub('[^0-9]', '', re.split('\s', df_equivalents['NDC_ext'][index])[0])
 df_equivalents['NDC'] = pd.to_numeric(df_equivalents['NDC'])
-df_equivalents['NDC'].fillna(999, inplace=True)
+df_equivalents['NDC'].fillna(999, inplace=True)  ## if NDC is "NDC NOT AVAILABLE" or other invalid value, fill with 999
 
 # join price and therapeutic equivalents on NDC
 prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
 df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
+
+# if no price match on NDC is found, use the lowest price for the same strength and package units
+#     if no record with the same strength and package units, use the lowest overall price
+
 
 
 # build MultiIndex on Year and NDC
