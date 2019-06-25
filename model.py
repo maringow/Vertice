@@ -35,9 +35,15 @@ print(branded_name)
 #   df_gfm: Year-wise data frame for "cross-molecule" assumptions and aggregated results
 
 # Set up df_detail data frame
-df_detail = pd.DataFrame()
-df_detail['Year'] = list(range(2015, 2030, 1))
-df_detail = df_detail.set_index(['Year'])
+
+# build MultiIndex on Year and NDC
+year_range = [int(i) for i in np.array(range(2016, 2030))]
+NDCs = [int(i) for i in IMS['NDC'].unique()]
+index_arrays = [year_range, NDCs]
+multiIndex = pd.MultiIndex.from_product(index_arrays, names=['Year', 'NDC'])
+
+# create df with multiindex
+df_detail = pd.DataFrame(index=multiIndex, columns=['Units', 'Price', 'Sales', 'COGS'])
 
 
 # Set up df_gfm data frame
@@ -68,13 +74,7 @@ IMS['NDC'] = pd.to_numeric(IMS['NDC'])
 prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
 df_merged_data = IMS.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
 
-# build MultiIndex on Year and NDC
-year_range = [int(i) for i in np.array(range(2016, 2030))]
-NDCs = [int(i) for i in IMS['NDC'].unique()]
 
-index_arrays = [year_range, NDCs]
-multiIndex = pd.MultiIndex.from_product(index_arrays, names=['Year', 'NDC'])
-df_detail = pd.DataFrame(index=multiIndex, columns=['Units', 'Price', 'Sales', 'COGS'])
 
 df_detail['Units'].loc[2016][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2016_Units'].str.replace(',', ''))
 df_detail['Units'].loc[2017][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2017_Units'].str.replace(',', ''))
