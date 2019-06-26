@@ -79,8 +79,7 @@ df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='lef
 # TODO if no price match on NDC is found, use the lowest price for the same strength and package units
 #     if no record with the same strength and package units, use the lowest overall price
 
-
-# build MultiIndex on Year and NDC
+# build hierarchical index on Year and NDC
 year_range = [int(i) for i in np.array(range(2016, 2030))]
 NDCs = [int(i) for i in df_equivalents['NDC'].unique()]
 index_arrays = [year_range, NDCs]
@@ -89,12 +88,22 @@ multiIndex = pd.MultiIndex.from_product(index_arrays, names=['Year', 'NDC'])
 # create df with multiindex
 df_detail = pd.DataFrame(index=multiIndex, columns=['Units', 'Price', 'Sales', 'COGS'])
 
-# TODO maybe turn this into a while loop over list of columns names - checking if they exist in the df
-#     need to allow for 2020 units so that code doesn't break in January
-df_detail['Units'].loc[2016][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2016_Units'].str.replace(',', ''))
-df_detail['Units'].loc[2017][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2017_Units'].str.replace(',', ''))
-df_detail['Units'].loc[2018][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2018_Units'].str.replace(',', ''))
-df_detail['Units'].loc[2019][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2019_Units'].str.replace(',', ''))
+# create list of Units columns from IMS data
+columns = [[2016, '2016_Units'], [2017, '2017_Units'], [2018, '2018_Units'], [2019, '2019_Units'],
+           [2020, '2020_Units'], [2021, '2021_Units'], [2022, '2022_Units']]
+
+# iterate over columns list as long as they are in the data (to allow for future years) and map units into df_detail
+for year in columns:
+    if year[1] in df_merged_data.columns:
+        df_detail['Units'].loc[year[0]][df_merged_data['NDC']] = pd.to_numeric(
+            df_merged_data[year[1]].str.replace(',', ''))
+    else:
+        break
+
+# df_detail['Units'].loc[2016][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2016_Units'].str.replace(',', ''))
+# df_detail['Units'].loc[2017][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2017_Units'].str.replace(',', ''))
+# df_detail['Units'].loc[2018][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2018_Units'].str.replace(',', ''))
+# df_detail['Units'].loc[2019][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2019_Units'].str.replace(',', ''))
 
 
 df_detail['Price'].loc[2016][df_merged_data['NDC']] = df_merged_data['WACPrice']
