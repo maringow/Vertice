@@ -92,25 +92,19 @@ df_detail = pd.DataFrame(index=multiIndex, columns=['Units', 'Price', 'Sales', '
 columns = [[2016, '2016_Units'], [2017, '2017_Units'], [2018, '2018_Units'], [2019, '2019_Units'],
            [2020, '2020_Units'], [2021, '2021_Units'], [2022, '2022_Units']]
 
-# iterate over columns list as long as they are in the data (to allow for future years) and map units into df_detail
+# iterate over columns list as long as they are found in the IMS data and map units and price into df_detail
 for year in columns:
     if year[1] in df_merged_data.columns:
         df_detail['Units'].loc[year[0]][df_merged_data['NDC']] = pd.to_numeric(
             df_merged_data[year[1]].str.replace(',', ''))
+        df_detail['Price'].loc[year[0]][df_merged_data['NDC']] = df_merged_data['WACPrice']
     else:
         break
 
-# df_detail['Units'].loc[2016][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2016_Units'].str.replace(',', ''))
-# df_detail['Units'].loc[2017][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2017_Units'].str.replace(',', ''))
-# df_detail['Units'].loc[2018][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2018_Units'].str.replace(',', ''))
-# df_detail['Units'].loc[2019][df_merged_data['NDC']] = pd.to_numeric(df_merged_data['2019_Units'].str.replace(',', ''))
+# TODO add a check here that data has successfully populated df_detail Units and Price - this
+#  will catch column name changes
 
-
-df_detail['Price'].loc[2016][df_merged_data['NDC']] = df_merged_data['WACPrice']
-df_detail['Price'].loc[2017][df_merged_data['NDC']] = df_merged_data['WACPrice']
-df_detail['Price'].loc[2018][df_merged_data['NDC']] = df_merged_data['WACPrice']
-df_detail['Price'].loc[2019][df_merged_data['NDC']] = df_merged_data['WACPrice']
-
+# calculate Sales as Units * Price
 df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
 
 ##----------------------------------------------------------------------
