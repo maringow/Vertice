@@ -29,23 +29,32 @@ IMS = pd.read_csv('sample_8_molecules_w_product.csv')
 prospectoRx = pd.read_csv('gleevec_prospectorx.csv')
 
 
-
-
 ##----------------------------------------------------------------------
 ## BUILD GUI COMPONENTS AND OPEN DISPLAY
+
+# define function to collect field entries and store as variables
+def collect_entry_fields(event):
+    global brand
+    brand = brand_combo.get()
+
 
 # get valid brands from IMS file
 brands = sorted(IMS['Product Sum'].unique())
 
-# create label and combobox for brand selection
+# add label and combobox for brand selection
 brand_label = Label(window, text='Select a brand name drug: ')
 brand_label.pack()
 brand_combo = ttk.Combobox(window, values=brands)
 brand_combo.pack()
-brand = brand_combo.get()
-print(brand)
+brand_combo.bind("<<ComboboxSelected>>", collect_entry_fields)
+
+
+# add Finish button
+finish_button = Button(window, text='Finish', command=window.quit)
+finish_button.pack(pady=10)
+
 
 # open window
 window.mainloop()
 
-
+print('Brand: {}'.format(brand))
