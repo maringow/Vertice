@@ -9,63 +9,45 @@ import tkinter
 from tkinter import *
 from tkinter import ttk
 
+
 ##----------------------------------------------------------------------
-## READ USER INPUT
-# Placeholders, to be potentially replaced by inputs
+## DEFINE GUI WINDOW
 
-# model_type: {BWAC, GWAC}
-input_model_type = 'BWAC'
-
-# channel: {Retail, Hospital, Clinic}
-input_channel = 'Retail'
-
-
-
-# read user input Excel file
-wb = xl.load_workbook(filename='Model Inputs.xlsx', read_only=True)
-sheet = wb['Input']
-
-# assign single-value variables from Excel cells into parameters dict
-parameters = {'brand_name': sheet['B5'].value,
-              'brand_status': sheet['B6'].value,
-              'channel': sheet['B7'].value
-              }  # more to be added
-
-
-# assign year-based variables into df df_gfm
-#df_gmf = pd.dataframe()
-
-
-
-
-
-
-
+window = Tk()
+##Creates the window from the imported Tkinter module
+window.geometry("600x400")
+##Creates the size of the window
+window.title("Test")
+##Adds a title to the Windows GUI for the window
 
 
 
 ##----------------------------------------------------------------------
-##  SET UP MAIN DATA STRUCTURES
-# Main data structures
-#   df_detail: Year-wise AND NDC-wise data frame, that reproduces Wes's detailed matrix calcs
-#              The data frame starts with data from IMS, following Wes's approach
-#   df_gfm: Year-wise data frame for "cross-molecule" assumptions and aggregated results
-
-# Set up df_detail data frame
-
-
-# Set up df_gfm data frame
-df_gfm = pd.DataFrame()
-df_gfm['Year'] = list(range(2015, 2030, 1))
-df_gfm = df_gfm.set_index('Year')
-
-
-##----------------------------------------------------------------------
-## INGEST DATA (IMS, ProspectoRx) AND FIND THERAPEUTIC EQUIVALENTS
+## INGEST DATA (IMS, ProspectoRx)
 
 # ingest IMS and price data
 IMS = pd.read_csv('sample_8_molecules_w_product.csv')
 prospectoRx = pd.read_csv('gleevec_prospectorx.csv')
+
+
+
+
+##----------------------------------------------------------------------
+## BUILD GUI COMPONENTS AND OPEN DISPLAY
+
+
+brands =
+
+combobox = ttk.Combobox(window, values=brands)
+combobox.pack(side='left')
+
+# open window
+window.mainloop()
+
+
+
+##----------------------------------------------------------------------
+## FIND THERAPEUTIC EQUIVALENTS
 
 # pull records that are therapeutic equivalents of selected brand name drug
 # find Combined Molecule and Prod Form 3 of selected brand name drug; store in lists in case there are multiple
