@@ -58,3 +58,14 @@ finish_button.pack(pady=10)
 window.mainloop()
 
 print('Brand: {}'.format(brand))
+
+
+
+
+# pull records that are therapeutic equivalents of selected brand name drug
+# find Combined Molecule and Prod Form 3 of selected brand name drug; store in lists in case there are multiple
+combined_molecules = IMS.loc[IMS['Product Sum'] == brand]['Combined Molecule'].unique()
+dosage_forms = IMS.loc[IMS['Product Sum'] == brand]['Prod Form3'].unique()
+
+
+print(combined_molecules)
