@@ -85,14 +85,15 @@ title.pack(pady=10)
 
 
 # create label for brand selection and number of equivalents found
-
 selection_label = Label(window2, text='{} therapeutic equivalents found for {}'
                         .format(len(df_equivalents), parameters['brand_name']))
 selection_label.pack(pady=10)
 
 
-# add entry boxes for API units using list of therapeutic equivalents from above
-
+# add labels and entry boxes for API units using list of therapeutic equivalents from above
+for index, row in df_equivalents.iterrows():
+    NDC_label = Label(window2, text=df_equivalents['NDC'][index])
+    NDC_label.pack(pady=10)
 
 
 # add Finish button
