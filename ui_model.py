@@ -85,7 +85,7 @@ title.pack(pady=10)
 
 
 # create label for brand selection and number of equivalents found
-selection_label = Label(window2, text='{} therapeutic equivalents found for {}'
+selection_label = Label(window2, text='{} therapeutic equivalents found in IMS for {}'
                         .format(len(df_equivalents), parameters['brand_name']))
 selection_label.pack(pady=10)
 
@@ -103,12 +103,15 @@ cost_per_unit_entry.pack()
 
 
 # add entry boxes for API units for each pack type found in therapeutic equivalents
+API_costs_label = Label(window2, text="Enter number of units for each pack type found: ")
+API_costs_label.pack()
+
 packs = df_equivalents['Pack'].unique()
-print(packs
-      )
-# for p in packs:
-#     NDC_label = Label(window2, text=p)
-#     NDC_label.pack(pady=10)
+for p in packs:
+    pack_label = Label(window2, text=p)
+    pack_label.pack(pady=10)
+    pack_entry = Entry(window2)
+    pack_entry.pack()
 
 
 # add Finish button
