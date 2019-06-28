@@ -52,8 +52,8 @@ brand_combo.bind("<<ComboboxSelected>>", collect_entry_fields)
 
 
 # add Finish button
-finish_button = Button(window1, text='Finish', command=window1.quit)
-finish_button.pack(pady=10)
+continue_button = Button(window1, text='Continue', command=window1.quit)
+continue_button.pack(pady=10)
 
 
 # open window
@@ -84,6 +84,21 @@ title = Label(window2, text='Generics Forecasting Model: User Input')
 title.pack(pady=10)
 
 
+# create label for brand selection and number of equivalents found
+
+selection_label = Label(window2, text='{} therapeutic equivalents found for {}'
+                        .format(len(df_equivalents), parameters['brand_name']))
+selection_label.pack(pady=10)
 
 
 # add entry boxes for API units using list of therapeutic equivalents from above
+
+
+
+# add Finish button
+run_model_button = Button(window2, text='Run Model', command=window2.quit)
+run_model_button.pack(pady=10)
+
+
+# open window
+window2.mainloop()
