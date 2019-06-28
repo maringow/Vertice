@@ -90,10 +90,25 @@ selection_label = Label(window2, text='{} therapeutic equivalents found for {}'
 selection_label.pack(pady=10)
 
 
-# add labels and entry boxes for API units using list of therapeutic equivalents from above
-for index, row in df_equivalents.iterrows():
-    NDC_label = Label(window2, text=df_equivalents['NDC'][index])
-    NDC_label.pack(pady=10)
+# add entry boxes for desired units and API cost per unit
+unit_label = Label(window2, text='Enter units: ')
+unit_label.pack(pady=10)
+unit_entry = Entry(window2)
+unit_entry.pack()
+
+cost_per_unit_label = Label(window2, text='Enter API cost per unit: ')
+cost_per_unit_label.pack(pady=10)
+cost_per_unit_entry = Entry(window2)
+cost_per_unit_entry.pack()
+
+
+# add entry boxes for API units for each pack type found in therapeutic equivalents
+packs = df_equivalents['Pack'].unique()
+print(packs
+      )
+# for p in packs:
+#     NDC_label = Label(window2, text=p)
+#     NDC_label.pack(pady=10)
 
 
 # add Finish button
