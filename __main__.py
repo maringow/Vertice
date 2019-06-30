@@ -49,3 +49,10 @@ window = Tk()
 window2 = gui.ConfirmBrandWindow(window, window1.parameters['brand_name'], combined_molecules,
                                  dosage_forms, len(df_equivalents))
 window.mainloop()
+
+
+##----------------------------------------------------------------------
+## OPEN WINDOW3
+window = Tk()
+window3 = gui.EnterParameters(window)
+window.mainloop()

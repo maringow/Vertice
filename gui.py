@@ -1,6 +1,7 @@
-import __main__
 from tkinter import *
 from tkinter import ttk
+
+
 
 ##----------------------------------------------------------------------
 ## WINDOW 1: SELECT BRAND NAME
@@ -25,7 +26,7 @@ class BrandSelectionWindow:
         self.brand_combo.pack()
         self.brand_combo.bind("<<ComboboxSelected>>", self.collect_entry_fields)
 
-        # add Finish button
+        # add Continue button
         self.continue_button = Button(master, text='Continue', command=master.quit)
         self.continue_button.pack(pady=10)
 
@@ -65,7 +66,7 @@ class ConfirmBrandWindow:
         self.dosage_forms_label.pack()
 
 
-        # add Finish button
+        # add Continue button
         self.continue_button = Button(master, text='Continue', command=master.quit)
         self.continue_button.pack(pady=10)
 
@@ -74,9 +75,20 @@ class ConfirmBrandWindow:
 ## WINDOW 3: ENTER MODEL PARAMETERS
 
 
+class EnterParameters:
 
+    def __init__(self, master):
+        self.master = master
+        master.title("Generics Forecasting Model")
+        master.geometry("600x400")
 
+        # create window header
+        self.title = Label(master, text='Generics Forecasting Model: Enter Model Parameters')
+        self.title.pack(pady=10)
 
+        # add Continue button
+        self.continue_button = Button(master, text='Continue', command=master.quit)
+        self.continue_button.pack(pady=10)
 
 
 ##----------------------------------------------------------------------
