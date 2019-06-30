@@ -29,7 +29,7 @@ class BrandSelectionWindow:
         self.brand_combo.bind("<<ComboboxSelected>>", self.collect_entry_fields)
 
         # add Continue button
-        self.continue_button = Button(master, text='Continue', command=master.quit)
+        self.continue_button = Button(master, text='Continue', command=master.destroy)
         self.continue_button.pack(pady=10)
 
     # function to collect field entries and store as variables
@@ -70,7 +70,7 @@ class ConfirmBrandWindow:
 
 
         # add Continue button
-        self.continue_button = Button(master, text='Continue', command=master.quit)
+        self.continue_button = Button(master, text='Continue', command=master.destroy)
         self.continue_button.pack(pady=10)
 
 
