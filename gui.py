@@ -6,7 +6,7 @@ from tkinter import ttk
 ## WINDOW 1: SELECT BRAND NAME
 
 
-class Window1:
+class BrandSelectionWindow:
     parameters = {}
 
     def __init__(self, master, brands):
@@ -40,14 +40,21 @@ class Window1:
 ## WINDOW 2: CONFIRM BRAND
 
 
-class Window2:
+class ConfirmBrandWindow:
 
-    def __init__(self, master, brands):
+    def __init__(self, master, brand_name, df_equivalents):
         self.master = master
         master.title("Generics Forecasting Model")
         master.geometry("600x400")
 
-        # add label
+        # create window header
+        self.title = Label(master, text='Generics Forecasting Model: Review Therapeutic Equivalents')
+        self.title.pack(pady=10)
+
+        # create label for brand selection and number of equivalents found
+        selection_label = Label(master, text='{} therapeutic equivalents found in IMS for {}'
+                                .format(len(df_equivalents), brand_name))
+        selection_label.pack(pady=10)
 
         # add Finish button
         self.continue_button = Button(master, text='Continue', command=master.quit)

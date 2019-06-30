@@ -25,7 +25,7 @@ brands = sorted(IMS['Product Sum'].unique())
 ##----------------------------------------------------------------------
 ## OPEN WINDOW1
 window = Tk()
-window1 = gui.Window1(window, brands)
+window1 = gui.BrandSelectionWindow(window, brands)
 window.mainloop()
 print('saved variable: {}'.format(window1.parameters['brand_name']))
 
@@ -46,5 +46,5 @@ print(df_equivalents)
 ##----------------------------------------------------------------------
 ## OPEN WINDOW2
 window = Tk()
-window2 = gui.Window2(window, df_equivalents)
+window2 = gui.ConfirmBrandWindow(window, window1.parameters['brand_name'], df_equivalents)
 window.mainloop()
