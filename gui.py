@@ -8,9 +8,11 @@ from tkinter import ttk
 
 
 class BrandSelectionWindow:
-    parameters = {}
+
+    w1_parameters = {}
 
     def __init__(self, master, brands):
+
         self.master = master
         master.title("Generics Forecasting Model")
         master.geometry("600x400")
@@ -33,8 +35,9 @@ class BrandSelectionWindow:
     # function to collect field entries and store as variables
     def collect_entry_fields(self, event):
 
-        self.parameters['brand_name'] = self.brand_combo.get()
-        print(self.parameters['brand_name'])
+        self.w1_parameters['brand_name'] = self.brand_combo.get()
+        print(self.w1_parameters['brand_name'])
+
 
 
 ##----------------------------------------------------------------------
@@ -43,7 +46,7 @@ class BrandSelectionWindow:
 
 class ConfirmBrandWindow:
 
-    def __init__(self, master, brand_name, combined_molecules, dosage_forms, count_TEs):
+    def __init__(self, master, parameters):
         self.master = master
         master.title("Generics Forecasting Model")
         master.geometry("600x400")
@@ -54,15 +57,15 @@ class ConfirmBrandWindow:
 
         # create label for brand selection and number of equivalents found
         self.selection_label = Label(master, text='{} therapeutically equivalent NDCs found in IMS for brand {}'
-                                .format(count_TEs, brand_name))
+                                .format(parameters['count_TEs'], parameters['brand_name']))
         self.selection_label.pack(pady=10)
 
         # create labels for molecule and dosage form used
 
-        self.molecules_label = Label(master, text='Molecules searched: {}'.format(combined_molecules))
+        self.molecules_label = Label(master, text='Molecules searched: {}'.format(parameters['combined_molecules']))
         self.molecules_label.pack(pady=10)
 
-        self.dosage_forms_label = Label(master, text='Dosage forms searched: {}'.format(dosage_forms))
+        self.dosage_forms_label = Label(master, text='Dosage forms searched: {}'.format(parameters['dosage_forms']))
         self.dosage_forms_label.pack()
 
 
@@ -74,10 +77,11 @@ class ConfirmBrandWindow:
 ##----------------------------------------------------------------------
 ## WINDOW 3: ENTER MODEL PARAMETERS
 
-
 class EnterParameters:
 
-    def __init__(self, master):
+    w3_parameters = {}
+
+    def __init__(self, master, parameters):
         self.master = master
         master.title("Generics Forecasting Model")
         master.geometry("600x400")
@@ -86,9 +90,17 @@ class EnterParameters:
         self.title = Label(master, text='Generics Forecasting Model: Enter Model Parameters')
         self.title.pack(pady=10)
 
-        # add Continue button
-        self.continue_button = Button(master, text='Continue', command=master.quit)
+        # add entries for variables
+
+        self.growth_rate_entry = Entry(master)
+
+        # add Save and Continue button
+        self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
         self.continue_button.pack(pady=10)
+
+    def save_and_continue(self):
+        self.w3_parameters['growth_rate'] = self.growth_rate_entry.get()
+        quit()
 
 
 ##----------------------------------------------------------------------
