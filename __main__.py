@@ -64,3 +64,13 @@ window.mainloop()
 parameters.update(window3.w3_parameters)
 
 print('growth rate: {}'.format(parameters['growth_rate']))
+
+
+
+##----------------------------------------------------------------------
+## OPEN WINDOW4
+window = Tk()
+window4 = gui.EnterCOGS(window, df_equivalents)
+window.mainloop()
+
+

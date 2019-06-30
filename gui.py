@@ -91,7 +91,8 @@ class EnterParameters:
         self.title.pack(pady=10)
 
         # add entries for variables
-
+        self.growth_rate_label = Label(master, text='Enter expected volume growth rate: ')
+        self.growth_rate_label.pack(pady=10)
         self.growth_rate_entry = Entry(master)
         self.growth_rate_entry.pack()
 
@@ -101,14 +102,44 @@ class EnterParameters:
 
     def save_and_continue(self):
         self.w3_parameters['growth_rate'] = self.growth_rate_entry.get()
-        print(self.w3_parameters['growth_rate'])
         self.master.destroy()
 
 
 ##----------------------------------------------------------------------
 ## WINDOW 4: ENTER API COGS
 
+# TODO change pack to grid for better formatting
 
+class EnterCOGS:
+    def __init__(self, master, df_equivalents):
+
+        # add entry boxes for desired units and API cost per unit
+        self.unit_label = Label(master, text='Enter units: ')
+        self.unit_label.pack(pady=10)
+        self.unit_entry = Entry(master)
+        self.unit_entry.pack()
+
+        self.cost_per_unit_label = Label(master, text='Enter API cost per unit: ')
+        self.cost_per_unit_label.pack(pady=10)
+        self.cost_per_unit_entry = Entry(master)
+        self.cost_per_unit_entry.pack()
+
+
+        # add entry boxes for API units for each pack type found in therapeutic equivalents
+        self.API_costs_label = Label(master, text="Enter number of units for each pack type found: ")
+        self.API_costs_label.pack()
+
+        self.packs = df_equivalents['Pack'].unique()
+        for p in self.packs:
+            pack_label = Label(master, text=p)
+            pack_label.pack(pady=10)
+            pack_entry = Entry(master)
+            pack_entry.pack()
+
+
+        # add Run Model button
+        run_model_button = Button(master, text='Run Model', command=master.destroy)
+        run_model_button.pack(pady=10)
 
 
 

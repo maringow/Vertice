@@ -114,7 +114,7 @@ for p in packs:
     pack_entry.pack()
 
 
-# add Finish button
+# add Run Model button
 run_model_button = Button(window2, text='Run Model', command=window2.quit)
 run_model_button.pack(pady=10)
 
