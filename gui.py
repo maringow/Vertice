@@ -42,7 +42,7 @@ class BrandSelectionWindow:
 
 class ConfirmBrandWindow:
 
-    def __init__(self, master, brand_name, df_equivalents):
+    def __init__(self, master, brand_name, combined_molecules, dosage_forms, count_TEs):
         self.master = master
         master.title("Generics Forecasting Model")
         master.geometry("600x400")
@@ -52,9 +52,18 @@ class ConfirmBrandWindow:
         self.title.pack(pady=10)
 
         # create label for brand selection and number of equivalents found
-        selection_label = Label(master, text='{} therapeutic equivalents found in IMS for {}'
-                                .format(len(df_equivalents), brand_name))
-        selection_label.pack(pady=10)
+        self.selection_label = Label(master, text='{} therapeutically equivalent NDCs found in IMS for brand {}'
+                                .format(count_TEs, brand_name))
+        self.selection_label.pack(pady=10)
+
+        # create labels for molecule and dosage form used
+
+        self.molecules_label = Label(master, text='Molecules searched: {}'.format(combined_molecules))
+        self.molecules_label.pack(pady=10)
+
+        self.dosage_forms_label = Label(master, text='Dosage forms searched: {}'.format(dosage_forms))
+        self.dosage_forms_label.pack()
+
 
         # add Finish button
         self.continue_button = Button(master, text='Continue', command=master.quit)

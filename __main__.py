@@ -46,5 +46,6 @@ print(df_equivalents)
 ##----------------------------------------------------------------------
 ## OPEN WINDOW2
 window = Tk()
-window2 = gui.ConfirmBrandWindow(window, window1.parameters['brand_name'], df_equivalents)
+window2 = gui.ConfirmBrandWindow(window, window1.parameters['brand_name'], combined_molecules,
+                                 dosage_forms, len(df_equivalents))
 window.mainloop()
