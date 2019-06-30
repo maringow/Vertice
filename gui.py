@@ -57,7 +57,7 @@ class ConfirmBrandWindow:
 
         # create label for brand selection and number of equivalents found
         self.selection_label = Label(master, text='{} therapeutically equivalent NDCs found in IMS for brand {}'
-                                .format(parameters['count_TEs'], parameters['brand_name']))
+                                .format(parameters['count_eqs'], parameters['brand_name']))
         self.selection_label.pack(pady=10)
 
         # create labels for molecule and dosage form used
@@ -93,6 +93,7 @@ class EnterParameters:
         # add entries for variables
 
         self.growth_rate_entry = Entry(master)
+        self.growth_rate_entry.pack()
 
         # add Save and Continue button
         self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
@@ -100,7 +101,8 @@ class EnterParameters:
 
     def save_and_continue(self):
         self.w3_parameters['growth_rate'] = self.growth_rate_entry.get()
-        quit()
+        print(self.w3_parameters['growth_rate'])
+        self.master.destroy()
 
 
 ##----------------------------------------------------------------------

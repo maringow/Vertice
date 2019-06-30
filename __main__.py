@@ -45,8 +45,7 @@ parameters['dosage_forms'] = IMS.loc[IMS['Product Sum'] == parameters['brand_nam
 # find all IMS records that match the Combined Molecule and Prod Form 3
 df_equivalents = IMS.loc[(IMS['Combined Molecule'].isin(parameters['combined_molecules'])) &
                          (IMS['Prod Form3'].isin(parameters['dosage_forms']))]
-print(df_equivalents)
-parameters['count_TEs'] = len(df_equivalents)
+parameters['count_eqs'] = len(df_equivalents)
 
 
 ##----------------------------------------------------------------------
@@ -63,3 +62,5 @@ window3 = gui.EnterParameters(window, parameters)
 window.mainloop()
 
 parameters.update(window3.w3_parameters)
+
+print('growth rate: {}'.format(parameters['growth_rate']))
