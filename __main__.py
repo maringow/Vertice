@@ -19,7 +19,9 @@ IMS = pd.read_csv('sample_8_molecules_w_product.csv')
 prospectoRx = pd.read_csv('gleevec_prospectorx.csv')
 
 # get valid brands from IMS file
-brands = sorted(IMS['Product Sum'].unique())
+brands = sorted(IMS.loc[IMS['Brand/Generic'] == 'BRAND']['Product Sum'].unique())
+
+#IMS.loc[IMS['Product Sum'] == parameters['brand_name']]['Combined Molecule'].unique()
 
 parameters = {}
 
