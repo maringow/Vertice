@@ -127,7 +127,7 @@ class EnterCOGS:
 
         # add entry boxes for API units for each pack type found in therapeutic equivalents
         self.API_costs_label = Label(master, text="Enter number of units for each pack type found: ")
-        self.API_costs_label.grid(row=2)
+        self.API_costs_label.grid(row=2, columnspan=2, pady=10)
 
         i = 3
 
@@ -141,7 +141,7 @@ class EnterCOGS:
 
         # add Run Model button
         run_model_button = Button(master, text='Run Model', command=master.destroy)
-        run_model_button.grid(row=i+1, column=1)
+        run_model_button.grid(row=i+1, column=1, pady=10)
 
 
 

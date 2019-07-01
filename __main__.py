@@ -15,7 +15,7 @@ import gui
 ## INGEST DATA (IMS, ProspectoRx)
 
 # ingest IMS and price data
-IMS = pd.read_csv('sample_8_molecules_w_product.csv')
+IMS = pd.read_csv('full_extract_6.26.csv')
 prospectoRx = pd.read_csv('gleevec_prospectorx.csv')
 
 # get valid brands from IMS file
