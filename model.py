@@ -140,6 +140,26 @@ df_analog['Hospital Market Share'] = \
 df_analog['Pct Profit Share'] = \
     [0.50, 0.50, 0.50, 0.25, 0.25, 0.25, 0.20, 0.20, 0.20, 0.20, 0.20]
 
+##----------------------------------------------------------------------
+##  SET UP DATA STRUCTURE
+# Proposed: Two data structures
+#   df_detail: Year-wise AND molecule-wise data frame, that reproduces Wes's detailed matrix calcs
+#              The data frame starts with data from IMS, following Wes's approach
+#   df_gfm: Year-wise data frame for "cross-molecule" assumptions and aggregated results
+
+# Set up df_detail data frame
+# TODO Finish initializing data frame
+df_detail = pd.DataFrame()
+df_detail['Year'] = list(range(2015, 2030, 1))
+df_detail = df_detail.set_index(['Year'])
+df_detail['Molecule'] = molecule_1
+# Multiindex... maybe...
+
+
+# Set up df_gfm data frame
+df_gfm = pd.DataFrame()
+df_gfm['Year'] = list(range(2015, 2030, 1))
+df_gfm = df_gfm.set_index('Year')
 
 ##----------------------------------------------------------------------
 ## DEFINE FORECAST ASSUMPTIONS
@@ -175,14 +195,38 @@ else:
 #    Perform year-wise financial calculations
 # Perform present-value calculations (NPV, IRR, etc.)
 
-
-# Placeholder variables, to be replaced later
+#Dummy data
 discount_rate = 0.15
 tax_rate = 0.21
+exit_multiple = 7
+df_gfm['FCF'] = [0,0,0,0,-10.2,-0.1,3.3,4.3,5.2,6.1,6.3,7.3,7.2,7.1,7]
+df_gfm['EBIT'] = [0,0,0,0,1.2,0.1,0.3,2.3,3.2,3.1,4.3,4.3,4.2,3.1,5]
 
+#Need to know base year to discount PV to
+present_year = 2018
 
+#IRR
+irr = np.irr(df_gfm.FCF.loc[present_year:])
 
+#NPV
+x = 0
+pv = []
+for i in df_gfm.FCF.loc[present_year:]:
+    pv.append(i/(1+discount_rate)**x)
+    x += 1
+df_gfm['FCF PV'] = 0
+df_gfm['FCF PV'].loc[present_year:] = pv
+npv = df_gfm['FCF PV'].iloc[-1]
 
+#Discounted Payback Period
+df_gfm['Cummulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[present_year:])
+idx = df_gfm[df_gfm['Cummulative Discounted FCF'] <= 0].index.max() #last full year for payback calc
+discounted_payback_period = idx - present_year - df_gfm['Cummulative Discounted FCF'].loc[idx]/df_gfm['FCF PV'].loc[idx+1]
+
+#Exit value in 2021
+exit_value_2021 = df_gfm['EBIT'].loc[2021] * exit_multiple
+
+# TODO need to calculate MOIC
 
 ##----------------------------------------------------------------------
 ## GENERATE OUTPUT
