@@ -195,6 +195,7 @@ writeoff_percent = .012
 DIO = 60
 DSO = 60
 DPO = 30
+tax_rate = 0.21
 df_gfm['Profit Share %'] = np.repeat(0.25,15)
 df_gfm['Milestone Payments'] =  np.repeat(-0.1,15)
 df_gfm['Gross Sales'] =  np.arange(3,6,.2)
@@ -206,6 +207,16 @@ df_gfm['SG&A'] =  np.repeat(-0.01,15)
 df_gfm['R&D Project Expense'] =  np.repeat(-0.01,15)
 df_gfm['Incremental R&D Headcount Expense'] =  np.repeat(-0.01,15)
 df_gfm['R&D infrastructure cost'] =  np.repeat(-0.01,15)
+df_gfm['Total Capitalized'] = 0
+df_gfm['Tax depreciation'] = 0
+df_gfm['Expensed Items - XYZ'] = -.0001
+df_gfm['Other Impacts on P&L - XYZ'] = -.0001
+df_gfm['Net proceeds from Disposals'] = 0
+df_gfm['Write-off of Residual Tax Value'] = 0
+df_gfm['Other Income, Expenses, Except Items'] = 0
+df_gfm['Additional Non-cash Effects'] = 0
+df_gfm['Other Net Current Assets'] = 0
+df_gfm['Capital Avoidance'] = 0
 
 # Calculations for financials
 df_gfm['Distribution'] = -df_gfm['Gross Sales'] * distribution_percent
@@ -220,6 +231,12 @@ df_gfm['Accounts Payable'] = - DPO * (df_gfm['Standard COGS'] + df_gfm['Distribu
 df_gfm['Working Capital'] = df_gfm['Inventory'] + df_gfm['Accounts Receivable'] - df_gfm['Accounts Payable']
 df_gfm['Change in Working Capital'] = df_gfm['Working Capital'] - df_gfm['Working Capital'].shift(1)
 df_gfm['EBIT'] = df_gfm['Gross Profit'] + df_gfm['SG&A'] + df_gfm['R&D'] #doesn't deduct depreciation so technically EBITDA
+df_gfm['Operating Income'] = df_gfm['EBIT'] + df_gfm['Expensed Items - XYZ'] + df_gfm['Other Impacts on P&L - XYZ'] + df_gfm['Net proceeds from Disposals'] + df_gfm['Write-off of Residual Tax Value'] + df_gfm['Other Income, Expenses, Except Items'] - df_gfm['Tax depreciation']
+df_gfm['Profit Tax'] = df_gfm['Operating Income'] * tax_rate
+df_gfm['Total Net Current Asets'] = df_gfm['Working Capital'] + df_gfm['Other Net Current Assets']
+df_gfm['Net Current Assets'] = df_gfm['Working Capital'] + df_gfm['Other Net Current Assets']
+df_gfm['Change in Net Current Assets'] = df_gfm['Net Current Assets'] - df_gfm['Net Current Assets'].shift(1)
+
 
 ##----------------------------------------------------------------------
 ## PERFORM FINANCIAL CALCULATIONS
@@ -229,10 +246,8 @@ df_gfm['EBIT'] = df_gfm['Gross Profit'] + df_gfm['SG&A'] + df_gfm['R&D'] #doesn'
 
 # Dummy data
 discount_rate = 0.15
-tax_rate = 0.21
 exit_multiple = 7
 df_gfm['FCF'] = [0,0,0,0,-10.2,-0.1,3.3,4.3,5.2,6.1,6.3,7.3,7.2,7.1,7]
-df_gfm['EBIT'] = [0,0,0,0,1.2,0.1,0.3,2.3,3.2,3.1,4.3,4.3,4.2,3.1,5]
 
 # Need to know base year to discount PV to
 present_year = 2018
