@@ -51,33 +51,6 @@ parameters['count_eqs'] = len(df_equivalents)
 
 
 ##----------------------------------------------------------------------
-## OPEN WINDOW2
-window = Tk()
-window2 = gui.ConfirmBrandWindow(window, parameters)
-window.mainloop()
-
-
-##----------------------------------------------------------------------
-## OPEN WINDOW3
-window = Tk()
-window3 = gui.EnterParameters(window, parameters)
-window.mainloop()
-
-parameters.update(window3.w3_parameters)
-
-print('growth rate: {}'.format(parameters['growth_rate']))
-
-
-
-##----------------------------------------------------------------------
-## OPEN WINDOW4
-window = Tk()
-window4 = gui.EnterCOGS(window, df_equivalents)
-window.mainloop()
-
-
-
-##----------------------------------------------------------------------
 ## JOIN IMS AND PROSPECTO DATASETS
 
 # parse NDC from equivalents dataframe (from IMS file)
@@ -122,5 +95,36 @@ for year in columns:
 
 # calculate Sales as Units * Price
 df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
+
+
+##----------------------------------------------------------------------
+## WINDOW2: OPEN ConfirmBrand WINDOW AND SAVE
+window = Tk()
+window2 = gui.ConfirmBrandWindow(window, parameters)
+window.mainloop()
+
+
+##----------------------------------------------------------------------
+## WINDOW3: OPEN EnterParameters WINDOW AND SAVE VALUES
+window = Tk()
+window3 = gui.EnterParameters(window, parameters)
+window.mainloop()
+
+parameters.update(window3.w3_parameters)
+
+print('growth rate: {}'.format(parameters['growth_rate']))
+
+
+
+##----------------------------------------------------------------------
+## WINDOW4: OPEN EnterCOGS WINDOW AND SAVE VALUES
+window = Tk()
+window4 = gui.EnterCOGS(window, df_equivalents)
+window.mainloop()
+
+
+
+
+
 
 
