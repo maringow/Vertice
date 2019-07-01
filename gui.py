@@ -115,31 +115,33 @@ class EnterCOGS:
 
         # add entry boxes for desired units and API cost per unit
         self.unit_label = Label(master, text='Enter units: ')
-        self.unit_label.pack(pady=10)
+        self.unit_label.grid(row=0, column=0)
         self.unit_entry = Entry(master)
-        self.unit_entry.pack()
+        self.unit_entry.grid(row=0, column=1)
 
         self.cost_per_unit_label = Label(master, text='Enter API cost per unit: ')
-        self.cost_per_unit_label.pack(pady=10)
+        self.cost_per_unit_label.grid(row=1, column=0)
         self.cost_per_unit_entry = Entry(master)
-        self.cost_per_unit_entry.pack()
+        self.cost_per_unit_entry.grid(row=1, column=1)
 
 
         # add entry boxes for API units for each pack type found in therapeutic equivalents
         self.API_costs_label = Label(master, text="Enter number of units for each pack type found: ")
-        self.API_costs_label.pack()
+        self.API_costs_label.grid(row=2)
+
+        i = 3
 
         self.packs = df_equivalents['Pack'].unique()
         for p in self.packs:
             pack_label = Label(master, text=p)
-            pack_label.pack(pady=10)
+            pack_label.grid(row=i, column=0)
             pack_entry = Entry(master)
-            pack_entry.pack()
-
+            pack_entry.grid(row=i, column=1)
+            i += 1
 
         # add Run Model button
         run_model_button = Button(master, text='Run Model', command=master.destroy)
-        run_model_button.pack(pady=10)
+        run_model_button.grid(row=i+1, column=1)
 
 
 
