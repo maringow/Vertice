@@ -134,7 +134,7 @@ window.mainloop()
 parameters.update(window4.w3_parameters)
 
 ##----------------------------------------------------------------------
-## Read Excel file
+## READ EXCEL
 
 # read user input Excel file
 # TODO parse filename - correct backslashes and add .xlsx if not already there
@@ -178,4 +178,8 @@ parameters.update({'brand_status': sheet['B6'].value,
                             'writeoffs': sheet['B39'].value}
                     })  # more to be added
 
-print(parameters)
+# add excel parameters to df_gfm
+
+
+##----------------------------------------------------------------------
+## RUN MODEL
