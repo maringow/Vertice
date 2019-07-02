@@ -118,13 +118,13 @@ df_merged_data['API_units'] = 0
 # map COGS into df_detail
 for key, value in window3.COGS['units_per_pack'].items():
     df_merged_data['API_units'].loc[df_merged_data['Pack'] == key] = pd.to_numeric(value)
-    print(df_merged_data)
-
 df_merged_data['API_cost'] = df_merged_data['API_units'] * parameters['api_cost_per_unit']
 print(df_merged_data)
 
+
 # set COGS as api cost * volume
-# df_detail['COGS'] =
+# df_detail['COGS'] = df_detail['Units'] * df_merged_data['API_cost'].loc[df_merged_data['NDC'] == df_detail.index.get_level_values('NDC')]
+
 
 
 
@@ -136,5 +136,5 @@ window.mainloop()
 
 parameters.update(window4.w3_parameters)
 
-print('filepath: {}'.format(parameters['excel_filepath']))
+# print('filepath: {}'.format(parameters['excel_filepath']))  # will need to correct backslashes
 
