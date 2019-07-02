@@ -137,6 +137,8 @@ parameters.update(window4.w3_parameters)
 ## Read Excel file
 
 # read user input Excel file
+# TODO parse filename - correct backslashes and add .xlsx if not already there
+
 wb = xl.load_workbook(filename=parameters['excel_filepath'], read_only=True)
 sheet = wb['Input']
 
@@ -154,7 +156,11 @@ parameters.update({'brand_status': sheet['B6'].value,
                    'competition_detail': sheet['B16'].value,
                    'pos': sheet['B17'].value,
                    'comments': sheet['B18'].value,
-                   'volume_growth_rate':
+                   'volume_growth_rate': sheet['B22'].value,
+                   'wac_increase': sheet['B23'].value,
+                   'chargeback': sheet['B24'].value,
+                   'other_gtn': sheet['B25'].value,
+                   'price_discount': sheet['B27'].value
                     })  # more to be added
 
 print(parameters)
