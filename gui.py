@@ -75,9 +75,9 @@ class ConfirmBrand:
 
 
 ##----------------------------------------------------------------------
-## WINDOW 3: ENTER MODEL PARAMETERS
+## WINDOW 3: ENTER EXCEL FILEPATH
 
-class EnterParameters:
+class EnterFilepath:
 
     w3_parameters = {}
 
@@ -86,21 +86,21 @@ class EnterParameters:
         master.title("Generics Forecasting Model")
 
         # create window header
-        self.title = Label(master, text='Generics Forecasting Model: Enter Model Parameters')
+        self.title = Label(master, text='Generics Forecasting Model: Set Excel Filepath')
         self.title.pack(pady=10)
 
         # add entries for variables
-        self.growth_rate_label = Label(master, text='Enter expected volume growth rate: ')
-        self.growth_rate_label.pack(pady=10)
-        self.growth_rate_entry = Entry(master)
-        self.growth_rate_entry.pack()
+        self.filepath_label = Label(master, text='Enter filepath for Excel parameters: ')
+        self.filepath_label.pack(pady=10)
+        self.filepath_entry = Entry(master)
+        self.filepath_entry.pack()
 
         # add Save and Continue button
         self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
         self.continue_button.pack(pady=10)
 
     def save_and_continue(self):
-        self.w3_parameters['growth_rate'] = self.growth_rate_entry.get()
+        self.w3_parameters['excel_filepath'] = self.filepath_entry.get()
         self.master.destroy()
 
 

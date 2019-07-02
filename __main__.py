@@ -104,32 +104,37 @@ window2 = gui.ConfirmBrand(window, parameters)
 window.mainloop()
 
 
-##----------------------------------------------------------------------
-## WINDOW3: OPEN EnterParameters WINDOW AND SAVE VALUES
-window = Tk()
-window3 = gui.EnterParameters(window, parameters)
-window.mainloop()
-
-parameters.update(window3.w3_parameters)
-
-print('growth rate: {}'.format(parameters['growth_rate']))
-
-
 
 ##----------------------------------------------------------------------
-## WINDOW4: OPEN EnterCOGS WINDOW AND SAVE VALUES
+## WINDOW3: OPEN EnterCOGS WINDOW AND SAVE VALUES
 window = Tk()
-window4 = gui.EnterCOGS(window, df_equivalents)
+window3 = gui.EnterCOGS(window, df_equivalents)
 window.mainloop()
 
-parameters['api_units'] = window4.COGS['units']
-parameters['api_cost_per_unit'] = pd.to_numeric(window4.COGS['cost_per_unit'])
+parameters['api_units'] = window3.COGS['units']
+parameters['api_cost_per_unit'] = pd.to_numeric(window3.COGS['cost_per_unit'])
 df_merged_data['API_units'] = 0
 
 # map COGS into df_detail
-for key, value in window4.COGS['units_per_pack'].items():
+for key, value in window3.COGS['units_per_pack'].items():
     df_merged_data['API_units'].loc[df_merged_data['Pack'] == key] = pd.to_numeric(value)
-    print(df_merged_data)
-
 df_merged_data['API_cost'] = df_merged_data['API_units'] * parameters['api_cost_per_unit']
 print(df_merged_data)
+
+
+# set COGS as api cost * volume
+# df_detail['COGS'] = df_detail['Units'] * df_merged_data['API_cost'].loc[df_merged_data['NDC'] == df_detail.index.get_level_values('NDC')]
+
+
+
+
+##----------------------------------------------------------------------
+## WINDOW4: OPEN EnterFilepath WINDOW AND SAVE VALUES
+window = Tk()
+window4 = gui.EnterFilepath(window, parameters)
+window.mainloop()
+
+parameters.update(window4.w3_parameters)
+
+# print('filepath: {}'.format(parameters['excel_filepath']))  # will need to correct backslashes
+
