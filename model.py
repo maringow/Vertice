@@ -191,6 +191,7 @@ else:
 
 # Dummy data (entering costs as negative numbers)
 distribution_percent = .006
+tax_rate = 0.21
 writeoff_percent = .012
 DIO = 60
 DSO = 60
@@ -206,6 +207,30 @@ df_gfm['SG&A'] =  np.repeat(-0.01,15)
 df_gfm['R&D Project Expense'] =  np.repeat(-0.01,15)
 df_gfm['Incremental R&D Headcount Expense'] =  np.repeat(-0.01,15)
 df_gfm['R&D infrastructure cost'] =  np.repeat(-0.01,15)
+df_gfm['Tax depreciation'] = 0
+df_gfm['Net proceeds from Disposals'] = 0
+df_gfm['Write-off of Residual Tax Value'] = 0
+df_gfm['Other Income, Expenses, Except Items'] = 0
+df_gfm['Additional Non-cash Effects'] = 0
+df_gfm['Other Net Current Assets'] = 0
+df_gfm['Capital Avoidance'] = 0
+
+df_gfm['Capitalized Items - Item 1'] = -.0001
+df_gfm['Capitalized Items - Item 2'] = -.0001
+df_gfm['Capitalized Items - Item 3'] = -.0001
+df_gfm['Capitalized Items - Item 4'] = -.0001
+
+df_gfm['Other Expensed Items - Item 1'] = -.0001
+df_gfm['Other Expensed Items - Item 2'] = -.001
+df_gfm['Other Expensed Items - Item 3'] = -.0003
+df_gfm['Other Expensed Items - Item 4'] = -.0004
+
+df_gfm['Other Impacts on P&L - Item 1'] = -.001
+df_gfm['Other Impacts on P&L - Item 2'] = -.0001
+df_gfm['Other Impacts on P&L - Item 3'] = .002
+df_gfm['Other Impacts on P&L - Item 4'] = .003
+
+
 
 # Calculations for financials
 df_gfm['Distribution'] = -df_gfm['Gross Sales'] * distribution_percent
@@ -219,7 +244,15 @@ df_gfm['Accounts Receivable'] = DSO * df_gfm['Net Sales']/360
 df_gfm['Accounts Payable'] = - DPO * (df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs'] + df_gfm['Profit Share'] + df_gfm['Milestone Payments'] + df_gfm['SG&A'])/360
 df_gfm['Working Capital'] = df_gfm['Inventory'] + df_gfm['Accounts Receivable'] - df_gfm['Accounts Payable']
 df_gfm['Change in Working Capital'] = df_gfm['Working Capital'] - df_gfm['Working Capital'].shift(1)
+df_gfm['Change in Working Capital'] = df_gfm['Change in Working Capital'].fillna(0)
 df_gfm['EBIT'] = df_gfm['Gross Profit'] + df_gfm['SG&A'] + df_gfm['R&D'] #doesn't deduct depreciation so technically EBITDA
+df_gfm['Total Capitalized'] = df_gfm['Capitalized Items - Item 1'] + df_gfm['Capitalized Items - Item 2'] + df_gfm['Capitalized Items - Item 3'] +df_gfm['Capitalized Items - Item 4']
+df_gfm['Operating Income'] = df_gfm['EBIT'] + df_gfm['Net proceeds from Disposals'] + df_gfm['Write-off of Residual Tax Value'] + df_gfm['Other Income, Expenses, Except Items'] - df_gfm['Tax depreciation'] + df_gfm['Other Expensed Items - Item 1'] + df_gfm['Other Expensed Items - Item 2'] + df_gfm['Other Expensed Items - Item 3'] + df_gfm['Other Expensed Items - Item 4'] + df_gfm['Other Impacts on P&L - Item 1'] + df_gfm['Other Impacts on P&L - Item 2'] + df_gfm['Other Impacts on P&L - Item 3'] + df_gfm['Other Impacts on P&L - Item 4']
+df_gfm['Profit Tax'] = -df_gfm['Operating Income'] * tax_rate
+df_gfm['Total Net Current Assets'] = df_gfm['Working Capital'] + df_gfm['Other Net Current Assets'] #put in as positive numbers, different than excel
+df_gfm['Change in Net Current Assets'] = df_gfm['Total Net Current Assets'] - df_gfm['Total Net Current Assets'].shift(1)
+df_gfm['Change in Net Current Assets'] = df_gfm['Change in Net Current Assets'].fillna(0)
+df_gfm['FCF'] = df_gfm['Operating Income'] + df_gfm['Profit Tax'] + df_gfm['Tax depreciation'] + df_gfm['Additional Non-cash Effects'] - df_gfm['Change in Net Current Assets'] + df_gfm['Capital Avoidance'] + df_gfm['Total Capitalized'] - df_gfm['Write-off of Residual Tax Value']
 
 ##----------------------------------------------------------------------
 ## PERFORM FINANCIAL CALCULATIONS
@@ -229,10 +262,7 @@ df_gfm['EBIT'] = df_gfm['Gross Profit'] + df_gfm['SG&A'] + df_gfm['R&D'] #doesn'
 
 # Dummy data
 discount_rate = 0.15
-tax_rate = 0.21
 exit_multiple = 7
-df_gfm['FCF'] = [0,0,0,0,-10.2,-0.1,3.3,4.3,5.2,6.1,6.3,7.3,7.2,7.1,7]
-df_gfm['EBIT'] = [0,0,0,0,1.2,0.1,0.3,2.3,3.2,3.1,4.3,4.3,4.2,3.1,5]
 
 # Need to know base year to discount PV to
 present_year = 2018
@@ -258,9 +288,12 @@ discounted_payback_period = idx - present_year - df_gfm['Cummulative Discounted 
 # Exit value in 2021
 exit_value_2021 = df_gfm['EBIT'].loc[2021] * exit_multiple
 
+# MOIC in 2021
+MOIC_2021 = exit_value_2021 / -sum(df_gfm['Total Capitalized'].loc[present_year:2021] + df_gfm['R&D'].loc[present_year:2021] + df_gfm['SG&A'].loc[present_year:2021] + df_gfm['Milestone Payments'].loc[present_year:2021])
+print(MOIC_2021)
+
 del x, idx
 
-# TODO need to calculate MOIC
 
 ##----------------------------------------------------------------------
 ## GENERATE OUTPUT
