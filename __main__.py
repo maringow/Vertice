@@ -72,10 +72,11 @@ df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='lef
 year_range = [int(i) for i in np.array(range(2016, 2030))]
 NDCs = [int(i) for i in df_equivalents['NDC'].unique()]
 index_arrays = [year_range, NDCs]
-multiIndex = pd.MultiIndex.from_product(index_arrays, names=['Year', 'NDC'])
+multiIndex = pd.MultiIndex.from_product(index_arrays, names=['year_index', 'ndc_index'])
 
 # create df with multiindex
-df_detail = pd.DataFrame(index=multiIndex, columns=['Units', 'Price', 'Sales', 'COGS'])
+df_detail = pd.DataFrame(index=multiIndex, columns=['NDC', 'Units', 'Price', 'Sales', 'COGS'])
+df_detail['NDC'] = df_detail.index.get_level_values('ndc_index')
 
 # create list of Units columns from IMS data
 columns = [[2016, '2016_Units'], [2017, '2017_Units'], [2018, '2018_Units'], [2019, '2019_Units'],
@@ -115,18 +116,14 @@ parameters['api_units'] = window3.COGS['units']
 parameters['api_cost_per_unit'] = pd.to_numeric(window3.COGS['cost_per_unit'])
 df_merged_data['API_units'] = 0
 
-# map COGS into df_detail
+# map COGS into df_merged_data and df_detail
 for key, value in window3.COGS['units_per_pack'].items():
     df_merged_data['API_units'].loc[df_merged_data['Pack'] == key] = pd.to_numeric(value)
 df_merged_data['API_cost'] = df_merged_data['API_units'] * parameters['api_cost_per_unit']
-print(df_merged_data)
-
-
-# set COGS as api cost * volume
-# df_detail['COGS'] = df_detail['Units'] * df_merged_data['API_cost'].loc[df_merged_data['NDC'] == df_detail.index.get_level_values('NDC')]
-
-
-
+df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC', 'API_cost']], on='NDC', how='left').set_index(['year_index', 'ndc_index'])
+df_detail['COGS'] = df_detail['Units'] * df_detail['API_cost']
+df_detail.drop(columns=['API_cost'])
+print(df_detail)
 
 ##----------------------------------------------------------------------
 ## WINDOW4: OPEN EnterFilepath WINDOW AND SAVE VALUES
@@ -136,5 +133,28 @@ window.mainloop()
 
 parameters.update(window4.w3_parameters)
 
-# print('filepath: {}'.format(parameters['excel_filepath']))  # will need to correct backslashes
+##----------------------------------------------------------------------
+## Read Excel file
 
+# read user input Excel file
+wb = xl.load_workbook(filename=parameters['excel_filepath'], read_only=True)
+sheet = wb['Input']
+
+# assign single-value variables from Excel cells into parameters dict
+parameters.update({'brand_status': sheet['B6'].value,
+                   'channel': sheet['B7'].value,
+                   'channel_detail': sheet['B8'].value,
+                   'vertice_filing_month': sheet['B9'].value,
+                   'vertice_filing_year': sheet['B10'].value,
+                   'vertice_launch_month': sheet['B11'].value,
+                   'vertice_launch_year': sheet['B12'].value,
+                   'indication': sheet['B13'].value,
+                   'presentation': sheet['B14'].value,
+                   'loe_year': sheet['B15'].value,
+                   'competition_detail': sheet['B16'].value,
+                   'pos': sheet['B17'].value,
+                   'comments': sheet['B18'].value,
+                   'volume_growth_rate':
+                    })  # more to be added
+
+print(parameters)
