@@ -189,26 +189,58 @@ else:
         (1 - df_gfm['GTN Chargebacks Pct'] - df_gfm['GTN Other Pct']) * \
         (1 - df_gfm['Price Discount of Current Gx Net'])
 
+# Dummy data (entering costs as negative numbers)
+distribution_percent = .006
+writeoff_percent = .012
+DIO = 60
+DSO = 60
+DPO = 30
+df_gfm['Profit Share %'] = np.repeat(0.25,15)
+df_gfm['Milestone Payments'] =  np.repeat(-0.1,15)
+df_gfm['Gross Sales'] =  np.arange(3,6,.2)
+df_gfm.at[2015, 'Gross Sales'] = 0
+df_gfm['Net Sales'] =  np.arange(3,6,.2)
+df_gfm.at[2015, 'Net Sales'] = 0
+df_gfm['Standard COGS'] =  -np.arange(.2,1.7,.1)
+df_gfm['SG&A'] =  np.repeat(-0.01,15)
+df_gfm['R&D Project Expense'] =  np.repeat(-0.01,15)
+df_gfm['Incremental R&D Headcount Expense'] =  np.repeat(-0.01,15)
+df_gfm['R&D infrastructure cost'] =  np.repeat(-0.01,15)
+
+# Calculations for financials
+df_gfm['Distribution'] = -df_gfm['Gross Sales'] * distribution_percent
+df_gfm['Write-offs'] = -df_gfm['Gross Sales'] * writeoff_percent
+df_gfm['Profit Share'] = -(df_gfm['Gross Sales'] + df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs']) * df_gfm['Profit Share %']
+df_gfm['COGS'] = df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs'] + df_gfm['Profit Share'] + df_gfm['Milestone Payments']
+df_gfm['Gross Profit'] = df_gfm['Net Sales'] + df_gfm['COGS']
+df_gfm['R&D']  = df_gfm['R&D Project Expense'] + df_gfm['Incremental R&D Headcount Expense'] + df_gfm['R&D infrastructure cost']
+df_gfm['Inventory'] = - DIO * df_gfm['Standard COGS']/360
+df_gfm['Accounts Receivable'] = DSO * df_gfm['Net Sales']/360
+df_gfm['Accounts Payable'] = - DPO * (df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs'] + df_gfm['Profit Share'] + df_gfm['Milestone Payments'] + df_gfm['SG&A'])/360
+df_gfm['Working Capital'] = df_gfm['Inventory'] + df_gfm['Accounts Receivable'] - df_gfm['Accounts Payable']
+df_gfm['Change in Working Capital'] = df_gfm['Working Capital'] - df_gfm['Working Capital'].shift(1)
+df_gfm['EBIT'] = df_gfm['Gross Profit'] + df_gfm['SG&A'] + df_gfm['R&D'] #doesn't deduct depreciation so technically EBITDA
+
 ##----------------------------------------------------------------------
 ## PERFORM FINANCIAL CALCULATIONS
 # For each year
 #    Perform year-wise financial calculations
 # Perform present-value calculations (NPV, IRR, etc.)
 
-#Dummy data
+# Dummy data
 discount_rate = 0.15
 tax_rate = 0.21
 exit_multiple = 7
 df_gfm['FCF'] = [0,0,0,0,-10.2,-0.1,3.3,4.3,5.2,6.1,6.3,7.3,7.2,7.1,7]
 df_gfm['EBIT'] = [0,0,0,0,1.2,0.1,0.3,2.3,3.2,3.1,4.3,4.3,4.2,3.1,5]
 
-#Need to know base year to discount PV to
+# Need to know base year to discount PV to
 present_year = 2018
 
-#IRR
+# IRR
 irr = np.irr(df_gfm.FCF.loc[present_year:])
 
-#NPV
+# NPV
 x = 0
 pv = []
 for i in df_gfm.FCF.loc[present_year:]:
@@ -218,13 +250,15 @@ df_gfm['FCF PV'] = 0
 df_gfm['FCF PV'].loc[present_year:] = pv
 npv = df_gfm['FCF PV'].iloc[-1]
 
-#Discounted Payback Period
+# Discounted Payback Period
 df_gfm['Cummulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[present_year:])
 idx = df_gfm[df_gfm['Cummulative Discounted FCF'] <= 0].index.max() #last full year for payback calc
 discounted_payback_period = idx - present_year - df_gfm['Cummulative Discounted FCF'].loc[idx]/df_gfm['FCF PV'].loc[idx+1]
 
-#Exit value in 2021
+# Exit value in 2021
 exit_value_2021 = df_gfm['EBIT'].loc[2021] * exit_multiple
+
+del x, idx
 
 # TODO need to calculate MOIC
 
