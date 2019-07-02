@@ -29,7 +29,7 @@ parameters = {}
 ##----------------------------------------------------------------------
 ## OPEN WINDOW1 AND SAVE PARAMETERS
 window = Tk()
-window1 = gui.BrandSelectionWindow(window, brands)
+window1 = gui.BrandSelection(window, brands)
 window.mainloop()
 print('saved variable: {}'.format(window1.w1_parameters['brand_name']))
 
@@ -81,7 +81,7 @@ df_detail = pd.DataFrame(index=multiIndex, columns=['Units', 'Price', 'Sales', '
 columns = [[2016, '2016_Units'], [2017, '2017_Units'], [2018, '2018_Units'], [2019, '2019_Units'],
            [2020, '2020_Units'], [2021, '2021_Units'], [2022, '2022_Units']]
 
-# iterate over columns list as long as they are found in the IMS data and map units and price into df_detail
+# map units and price into df_detail
 for year in columns:
     if year[1] in df_merged_data.columns:
         df_detail['Units'].loc[year[0]][df_merged_data['NDC']] = pd.to_numeric(
@@ -100,7 +100,7 @@ df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
 ##----------------------------------------------------------------------
 ## WINDOW2: OPEN ConfirmBrand WINDOW AND SAVE
 window = Tk()
-window2 = gui.ConfirmBrandWindow(window, parameters)
+window2 = gui.ConfirmBrand(window, parameters)
 window.mainloop()
 
 
@@ -122,9 +122,11 @@ window = Tk()
 window4 = gui.EnterCOGS(window, df_equivalents)
 window.mainloop()
 
+COGS = window4.COGS
+print(COGS)
 
-
-
-
-
-
+# # map COGS into df_detail
+# for c in COGS[2:]:
+#     df_detail['COGS'].loc[c[0]] = c[1]
+#
+# print(df_detail)

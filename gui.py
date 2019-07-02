@@ -7,7 +7,7 @@ from tkinter import ttk
 ## WINDOW 1: SELECT BRAND NAME
 
 
-class BrandSelectionWindow:
+class BrandSelection:
 
     w1_parameters = {}
 
@@ -44,7 +44,7 @@ class BrandSelectionWindow:
 ## WINDOW 2: CONFIRM BRAND
 
 
-class ConfirmBrandWindow:
+class ConfirmBrand:
 
     def __init__(self, master, parameters):
         self.master = master
@@ -155,9 +155,10 @@ class EnterCOGS:
     def save_and_run(self):
         self.COGS['units'] = self.unit_entry.get()
         self.COGS['cost_per_unit'] = self.cost_per_unit_entry.get()
+        self.COGS['units_per_pack'] = {}
         j = 0
         for e in self.entries:
-            self.COGS[self.packs[j]] = e.get()
+            self.COGS['units_per_pack'][self.packs[j]] = e.get()
             j += 1
         self.master.destroy()
 
