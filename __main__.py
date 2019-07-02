@@ -160,7 +160,22 @@ parameters.update({'brand_status': sheet['B6'].value,
                    'wac_increase': sheet['B23'].value,
                    'chargeback': sheet['B24'].value,
                    'other_gtn': sheet['B25'].value,
-                   'price_discount': sheet['B27'].value
+                   'price_discount': sheet['B27'].value,
+                   'DIO': sheet['B43'].value,
+                   'DSO': sheet['B44'].value,
+                   'DPO': sheet['B45'].value,
+                   'discount_rate': sheet['B49'].value,
+                   'tax_rate': sheet['B50'].value,
+                   'exit_multiple': sheet['B51'].value,
+                   'cogs': {'excipients': sheet['B31'].value,
+                            'direct_labor': sheet['B32'].value,
+                            'variable_overhead': sheet['B33'].value,
+                            'fixed_overhead': sheet['B34'].value,
+                            'depreciation': sheet['B35'].value,
+                            'cmo_markup': sheet['B36'].value,
+                            'cost_increase': sheet['B37'].value,
+                            'distribution': sheet['B38'].value,
+                            'writeoffs': sheet['B39'].value}
                     })  # more to be added
 
 print(parameters)
