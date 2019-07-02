@@ -91,7 +91,7 @@ for year in columns:
         break
 
 # TODO add a check here that data has successfully populated df_detail Units and Price - this
-#  will catch column name changes
+#    will catch column name changes
 
 # calculate Sales as Units * Price
 df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
@@ -122,11 +122,14 @@ window = Tk()
 window4 = gui.EnterCOGS(window, df_equivalents)
 window.mainloop()
 
-COGS = window4.COGS
-print(COGS)
+parameters['api_units'] = window4.COGS['units']
+parameters['api_cost_per_unit'] = pd.to_numeric(window4.COGS['cost_per_unit'])
+df_merged_data['API_units'] = 0
 
-# # map COGS into df_detail
-# for c in COGS[2:]:
-#     df_detail['COGS'].loc[c[0]] = c[1]
-#
-# print(df_detail)
+# map COGS into df_detail
+for key, value in window4.COGS['units_per_pack'].items():
+    df_merged_data['API_units'].loc[df_merged_data['Pack'] == key] = pd.to_numeric(value)
+    print(df_merged_data)
+
+df_merged_data['API_cost'] = df_merged_data['API_units'] * parameters['api_cost_per_unit']
+print(df_merged_data)
