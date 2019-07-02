@@ -284,10 +284,18 @@ df_gfm['Exit Values'] = df_gfm['EBIT'] * exit_multiple
 exit_value_2021 = df_gfm['Exit Values'].loc[2021]
 
 # MOIC in 2021
-MOIC_2021 = exit_value_2021 / -sum(df_gfm['Total Capitalized'].loc[present_year:2021] + df_gfm['R&D'].loc[present_year:2021] + df_gfm['SG&A'].loc[present_year:2021] + df_gfm['Milestone Payments'].loc[present_year:2021])
-print(MOIC_2021)
+amt_invested = df_gfm['Total Capitalized'] + df_gfm['R&D'] + df_gfm['SG&A'] + df_gfm['Milestone Payments']
+cum_amt_invested =np.cumsum(amt_invested)
+MOIC = []
+for i in range(len(df_gfm['Exit Values'])):
+    if cum_amt_invested.iloc[i] == 0:
+        MOIC.append(0)
+    else:
+        MOIC.append(-df_gfm['Exit Values'].iloc[i] / cum_amt_invested.iloc[i])
+df_gfm["MOIC"] = MOIC
+MOIC_2021 = df_gfm["MOIC"].loc[2021]
 
-del x, pv, idx
+del x, pv, idx, amt_invested, cum_amt_invested, MOIC
 
 ##----------------------------------------------------------------------
 ## GENERATE OUTPUT
