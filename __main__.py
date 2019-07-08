@@ -15,6 +15,8 @@ import gui
 ##----------------------------------------------------------------------
 ## DEFINE ANALOG TABLES
 
+# Moved below and pull numbers from "Model Inputs.xlsx" -Ann
+
 # # Set up analogs by Number of Gx Players, from 0 to 10
 # df_analog = pd.DataFrame(index=range(0, 11))
 # df_analog['Retail Net Price Pct BWAC'] = \
@@ -167,7 +169,7 @@ parameters.update(window4.w3_parameters)
 # Read user input Excel file
 # TODO parse filename - correct backslashes and add .xlsx if not already there
 
-wb = xl.load_workbook(filename=parameters['excel_filepath'], read_only=True, data_only=True)
+wb = xl.load_workbook(filename=parameters['excel_filepath'], read_only=True, data_only=True) #data_only so it doesn't return us the formulas
 sheet = wb['Input']
 
 # Assign single-value variables from Excel cells into parameters dictionary
@@ -262,7 +264,7 @@ df_analog['Clinic Net Price Pct BWAC'] = pull_analog_data(4)
 df_analog['Hospital Net Price Pct BWAC'] = pull_analog_data(6)
 #df_analog['Hospital Market Share'] = pull_analog_data(7)
 df_analog.index.name = "Number of Gx Players"
-df_analog = df_analog.fillna(0) #if there is no data entered in the excel file, it gives NaNs, this converts them to 0s
+df_analog = df_analog.fillna(0)
 
 # Assign Vertice price as % of either BWAC or GWAC
 if parameters['brand_status'] == 'Branded':
@@ -272,12 +274,12 @@ else:
     df_gfm['Vertice Price as % of WAC'] = (1 - parameters['gtn_%']) * (1 - df_gfm['Price Discount of Current Gx Net Price'])
 
 # Dummy data for below financial calcs
-# TODO link df_detail information into these columns
-df_gfm['Gross Sales'] =  np.arange(3,6.2,.2)
+# TODO link df_detail information into these columns once calculated
 df_gfm['Net Sales'] =  np.arange(3,6.2,.2)
 df_gfm['Standard COGS'] =  -np.arange(.2,1.8,.1)
 
 # Financial statement calculations
+df_gfm['Gross Sales'] =  df_gfm['Net Sales'] / (1-parameters['gtn_%'])
 df_gfm['Distribution'] = -df_gfm['Gross Sales'] * parameters['cogs']['distribution']
 df_gfm['Write-offs'] = -df_gfm['Gross Sales'] * parameters['cogs']['writeoffs']
 df_gfm['Profit Share'] = -(df_gfm['Net Sales'] + df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs']) * df_gfm['Profit Share %']
