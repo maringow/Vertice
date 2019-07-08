@@ -169,7 +169,7 @@ print(df_detail)
 ##----------------------------------------------------------------------
 ## WINDOW4: OPEN EnterFilepath WINDOW AND SAVE VALUES
 window = Tk()
-window5 = gui.EnterFilepath(window, parameters)
+window5 = gui.EnterFilepath(window)
 window.mainloop()
 
 parameters.update(window5.parameters)

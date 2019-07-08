@@ -84,6 +84,7 @@ class DosageForms:
         self.continue_button.pack(pady=10)
 
     def save_and_continue(self):
+        # for each checked box, save the dosage form into selected_dosage_forms
         self.selected_dosage_forms = [self.dosage_forms[i] for i in range(len(self.dosage_forms))
                                       if self.var[i].get() == 1]
         self.master.destroy()
@@ -133,7 +134,7 @@ class EnterFilepath:
 
     parameters = {}
 
-    def __init__(self, master, parameters):
+    def __init__(self, master):
         self.master = master
         master.title("Generics Forecasting Model")
 
@@ -152,7 +153,7 @@ class EnterFilepath:
         self.continue_button.pack(pady=10)
 
     def save_and_continue(self):
-        self.w3_parameters['excel_filepath'] = self.filepath_entry.get()
+        self.parameters['excel_filepath'] = self.filepath_entry.get()
         self.master.destroy()
 
 
