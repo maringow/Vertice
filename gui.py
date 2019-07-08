@@ -11,7 +11,7 @@ class BrandSelection:
 
     w1_parameters = {}
 
-    def __init__(self, master, brands):
+    def __init__(self, master, brands, molecules):
 
         self.master = master
         master.title("Generics Forecasting Model")
@@ -26,17 +26,28 @@ class BrandSelection:
         self.brand_label.pack()
         self.brand_combo = ttk.Combobox(master, values=brands)
         self.brand_combo.pack()
-        self.brand_combo.bind("<<ComboboxSelected>>", self.collect_entry_fields)
+        self.brand_combo.bind("<<ComboboxSelected>>", self.get_brand)
+
+        # add label and combobox for molecule selection
+        self.molecule_label = Label(master, text='Select a molecule: ')
+        self.molecule_label.pack()
+        self.molecule_combo = ttk.Combobox(master, values=molecules)
+        self.molecule_combo.pack()
+        self.molecule_combo.bind("<<ComboboxSelected>>", self.get_molecule)
 
         # add Continue button
         self.continue_button = Button(master, text='Continue', command=master.destroy)
         self.continue_button.pack(pady=10)
 
-    # function to collect field entries and store as variables
-    def collect_entry_fields(self, event):
+    def get_brand(self, event):
 
         self.w1_parameters['brand_name'] = self.brand_combo.get()
         print(self.w1_parameters['brand_name'])
+
+    def get_molecule(self, event):
+
+        self.w1_parameters['molecule_name'] = self.molecule_combo.get()
+        print(self.w1_parameters['molecule_name'])
 
 
 

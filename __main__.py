@@ -11,6 +11,28 @@ from tkinter import ttk
 import gui
 
 
+
+##----------------------------------------------------------------------
+## DEFINE ANALOG TABLES
+
+# Set up analogs by Number of Gx Players, from 0 to 10
+df_analog = pd.DataFrame(index=range(0, 11))
+df_analog['Retail Net Price Pct BWAC'] = \
+    [1.00, 0.60, 0.35, 0.25, 0.20, 0.10, 0.05, 0.02, 0.01, 0.01, 0.01]
+df_analog['Retail Market Share'] = \
+    [0.00, 1.00, 0.50, 0.30, 0.25, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03]
+df_analog['Clinic Net Price Pct BWAC'] = \
+    [1.00, 0.70, 0.55, 0.40, 0.25, 0.15, 0.10, 0.04, 0.01, 0.01, 0.01]
+df_analog['Clinic Market Share'] = \
+    [0.00, 1.00, 0.50, 0.30, 0.25, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03]
+df_analog['Hospital Net Price Pct BWAC'] = \
+    [1.00, 0.80, 0.65, 0.45, 0.35, 0.20, 0.10, 0.04, 0.01, 0.01, 0.01]
+df_analog['Hospital Market Share'] = \
+    [0.00, 1.00, 0.50, 0.30, 0.25, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03]
+df_analog['Pct Profit Share'] = \
+    [0.50, 0.50, 0.50, 0.25, 0.25, 0.25, 0.20, 0.20, 0.20, 0.20, 0.20]
+
+
 ##----------------------------------------------------------------------
 ## INGEST DATA (IMS, ProspectoRx)
 
@@ -19,9 +41,9 @@ IMS = pd.read_csv('full_extract_6.26.csv')
 prospectoRx = pd.read_csv('gleevec_prospectorx.csv')
 
 # get valid brands from IMS file
+# TODO remove NaNs from these lists
 brands = sorted(IMS.loc[IMS['Brand/Generic'] == 'BRAND']['Product Sum'].unique())
-
-#IMS.loc[IMS['Product Sum'] == parameters['brand_name']]['Combined Molecule'].unique()
+molecules = IMS['Combined Molecule'].unique().tolist()
 
 parameters = {}
 
@@ -29,9 +51,8 @@ parameters = {}
 ##----------------------------------------------------------------------
 ## OPEN WINDOW1 AND SAVE PARAMETERS
 window = Tk()
-window1 = gui.BrandSelection(window, brands)
+window1 = gui.BrandSelection(window, brands, molecules)
 window.mainloop()
-print('saved variable: {}'.format(window1.w1_parameters['brand_name']))
 
 parameters.update(window1.w1_parameters)
 print(parameters)
@@ -158,7 +179,7 @@ parameters.update({'brand_status': sheet['B6'].value,
                    'comments': sheet['B18'].value,
                    'volume_growth_rate': sheet['B22'].value,
                    'wac_increase': sheet['B23'].value,
-                   'chargeback': sheet['B24'].value,
+                   'chargebacks': sheet['B24'].value,
                    'other_gtn': sheet['B25'].value,
                    'price_discount': sheet['B27'].value,
                    'DIO': sheet['B43'].value,
@@ -178,8 +199,61 @@ parameters.update({'brand_status': sheet['B6'].value,
                             'writeoffs': sheet['B39'].value}
                     })  # more to be added
 
-# add excel parameters to df_gfm
+# set up df_gfm data frame
+df_gfm = pd.DataFrame()
+df_gfm['Year'] = list(range(2015, 2030, 1))
+df_gfm = df_gfm.set_index('Year')
+
+# add excel parameters
+
+df_gfm['N Gx Players'] = 3
+df_gfm.at[2015, 'N Gx Players'] = 2
+df_gfm.at[2020, 'N Gx Players'] = 4
+
+# Look up market share using channel-specific analog table
+col_name = [parameters['channel'] + ' Market Share']
+df_gfm['Gx Market Share'] = df_analog.loc[df_gfm['N Gx Players'], col_name].values
+
+# Assign Vertice price as % of either BWAC or GWAC
+if parameters['brand_status'] == 'BWAC':
+    col_name = [parameters['channel'] + ' Net Price Pct BWAC']
+    df_gfm['Vertice Price as Pct of WAC'] = df_analog.loc[df_gfm['N Gx Players'], col_name].values
+else:
+    df_gfm['Vertice Price as Pct of WAC'] = \
+        (1 - df_gfm['GTN Chargebacks Pct'] - df_gfm['GTN Other Pct']) * \
+        (1 - df_gfm['Price Discount of Current Gx Net'])
+
+df_gfm['Profit Share %'] = np.repeat(0.25,15)
+df_gfm['Milestone Payments'] =  np.repeat(-0.1,15)
+df_gfm['Gross Sales'] =  np.arange(3,6,.2)
+df_gfm.at[2015, 'Gross Sales'] = 0
+df_gfm['Net Sales'] =  np.arange(3,6,.2)
+df_gfm.at[2015, 'Net Sales'] = 0
+df_gfm['Standard COGS'] =  -np.arange(.2,1.7,.1)
+df_gfm['SG&A'] =  np.repeat(-0.01,15)
+df_gfm['R&D Project Expense'] =  np.repeat(-0.01,15)
+df_gfm['Incremental R&D Headcount Expense'] =  np.repeat(-0.01,15)
+df_gfm['R&D infrastructure cost'] =  np.repeat(-0.01,15)
+df_gfm['Tax depreciation'] = 0
+df_gfm['Net proceeds from Disposals'] = 0
+df_gfm['Write-off of Residual Tax Value'] = 0
+df_gfm['Other Income, Expenses, Except Items'] = 0
+df_gfm['Additional Non-cash Effects'] = 0
+df_gfm['Other Net Current Assets'] = 0
+df_gfm['Capital Avoidance'] = 0
+df_gfm['Capitalized Items - Item 1'] = -.0001
+df_gfm['Capitalized Items - Item 2'] = -.0001
+df_gfm['Capitalized Items - Item 3'] = -.0001
+df_gfm['Capitalized Items - Item 4'] = -.0001
+df_gfm['Other Expensed Items - Item 1'] = -.0001
+df_gfm['Other Expensed Items - Item 2'] = -.001
+df_gfm['Other Expensed Items - Item 3'] = -.0003
+df_gfm['Other Expensed Items - Item 4'] = -.0004
+df_gfm['Other Impacts on P&L - Item 1'] = -.001
+df_gfm['Other Impacts on P&L - Item 2'] = -.0001
+df_gfm['Other Impacts on P&L - Item 3'] = .002
+df_gfm['Other Impacts on P&L - Item 4'] = .003
 
 
 ##----------------------------------------------------------------------
-## RUN MODEL
+## FINANCIAL CALCULATIONS
