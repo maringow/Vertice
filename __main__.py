@@ -188,7 +188,6 @@ parameters.update({'brand_status': sheet['B6'].value,
                    'wac_increase': sheet['B23'].value,
                    'chargebacks': sheet['B24'].value,
                    'other_gtn': sheet['B25'].value,
-                   'price_discount': sheet['B27'].value,
                    'DIO': sheet['B43'].value,
                    'DSO': sheet['B44'].value,
                    'DPO': sheet['B45'].value,
@@ -221,15 +220,10 @@ df_gfm.at[2020, 'N Gx Players'] = 4
 col_name = [parameters['channel'] + ' Market Share']
 df_gfm['Gx Market Share'] = df_analog.loc[df_gfm['N Gx Players'], col_name].values
 
-# Assign Vertice price as % of either BWAC or GWAC
-if parameters['brand_status'] == 'BWAC':
-    col_name = [parameters['channel'] + ' Net Price Pct BWAC']
-    df_gfm['Vertice Price as Pct of WAC'] = df_analog.loc[df_gfm['N Gx Players'], col_name].values
-else:
-    df_gfm['Vertice Price as Pct of WAC'] = \
-        (1 - df_gfm['GTN Chargebacks Pct'] - df_gfm['GTN Other Pct']) * \
-        (1 - df_gfm['Price Discount of Current Gx Net'])
 
+
+# read Excel parameters - currently dummy data
+df_gfm['Price Discount of Current Gx Net'] = np.repeat(0.25, 15)
 df_gfm['Profit Share %'] = np.repeat(0.25,15)
 df_gfm['Milestone Payments'] =  np.repeat(-0.1,15)
 df_gfm['Gross Sales'] =  np.arange(3,6,.2)
@@ -237,7 +231,7 @@ df_gfm.at[2015, 'Gross Sales'] = 0
 df_gfm['Net Sales'] =  np.arange(3,6,.2)
 df_gfm.at[2015, 'Net Sales'] = 0
 df_gfm['Standard COGS'] =  -np.arange(.2,1.7,.1)
-df_gfm['SG&A'] =  np.repeat(-0.01,15)
+df_gfm['SG&A'] =  np.repeat(-0,15)
 df_gfm['R&D Project Expense'] =  np.repeat(-0.01,15)
 df_gfm['Incremental R&D Headcount Expense'] =  np.repeat(-0.01,15)
 df_gfm['R&D infrastructure cost'] =  np.repeat(-0.01,15)
@@ -248,19 +242,95 @@ df_gfm['Other Income, Expenses, Except Items'] = 0
 df_gfm['Additional Non-cash Effects'] = 0
 df_gfm['Other Net Current Assets'] = 0
 df_gfm['Capital Avoidance'] = 0
-df_gfm['Capitalized Items - Item 1'] = -.0001
-df_gfm['Capitalized Items - Item 2'] = -.0001
-df_gfm['Capitalized Items - Item 3'] = -.0001
-df_gfm['Capitalized Items - Item 4'] = -.0001
-df_gfm['Other Expensed Items - Item 1'] = -.0001
-df_gfm['Other Expensed Items - Item 2'] = -.001
-df_gfm['Other Expensed Items - Item 3'] = -.0003
-df_gfm['Other Expensed Items - Item 4'] = -.0004
-df_gfm['Other Impacts on P&L - Item 1'] = -.001
-df_gfm['Other Impacts on P&L - Item 2'] = -.0001
-df_gfm['Other Impacts on P&L - Item 3'] = .002
-df_gfm['Other Impacts on P&L - Item 4'] = .003
+df_gfm['Capitalized Items - Item 1'] = 0
+df_gfm['Capitalized Items - Item 2'] = 0
+df_gfm['Capitalized Items - Item 3'] = 0
+df_gfm['Capitalized Items - Item 4'] = 0
+df_gfm['Other Expensed Items - Item 1'] = 0
+df_gfm['Other Expensed Items - Item 2'] = 0
+df_gfm['Other Expensed Items - Item 3'] = 0
+df_gfm['Other Expensed Items - Item 4'] = 0
+df_gfm['Other Impacts on P&L - Item 1'] = 0
+df_gfm['Other Impacts on P&L - Item 2'] = 0
+df_gfm['Other Impacts on P&L - Item 3'] = 0
+df_gfm['Other Impacts on P&L - Item 4'] = 0
 
+# Assign Vertice price as % of either BWAC or GWAC
+if parameters['brand_status'] == 'BWAC':
+    col_name = [parameters['channel'] + ' Net Price Pct BWAC']
+    df_gfm['Vertice Price as Pct of WAC'] = df_analog.loc[df_gfm['N Gx Players'], col_name].values
+else:
+    df_gfm['Vertice Price as Pct of WAC'] = \
+        (1 - parameters['chargebacks'] - parameters['other_gtn']) * \
+        (1 - df_gfm['Price Discount of Current Gx Net'])
+
+# Calculations for financials
+df_gfm['Distribution'] = -df_gfm['Gross Sales'] * parameters['cogs']['distribution']
+df_gfm['Write-offs'] = -df_gfm['Gross Sales'] * parameters['cogs']['writeoffs']
+df_gfm['Profit Share'] = -(df_gfm['Net Sales'] + df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs']) * df_gfm['Profit Share %']
+df_gfm['COGS'] = df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs'] + df_gfm['Profit Share'] + df_gfm['Milestone Payments']
+df_gfm['Gross Profit'] = df_gfm['Net Sales'] + df_gfm['COGS']
+df_gfm['R&D']  = df_gfm['R&D Project Expense'] + df_gfm['Incremental R&D Headcount Expense'] + df_gfm['R&D infrastructure cost']
+df_gfm['Inventory'] = - parameters['DIO'] * df_gfm['Standard COGS']/360
+df_gfm['Accounts Receivable'] = parameters['DSO'] * df_gfm['Net Sales']/360
+df_gfm['Accounts Payable'] = - parameters['DPO'] * (df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs'] + df_gfm['Profit Share'] + df_gfm['Milestone Payments'] + df_gfm['SG&A'])/360
+df_gfm['Working Capital'] = df_gfm['Inventory'] + df_gfm['Accounts Receivable'] - df_gfm['Accounts Payable']
+# df_gfm['Change in Working Capital'] = df_gfm['Working Capital'] - df_gfm['Working Capital'].shift(1)
+# df_gfm['Change in Working Capital'] = df_gfm['Change in Working Capital'].fillna(0)
+df_gfm['EBIT'] = df_gfm['Gross Profit'] + df_gfm['SG&A'] + df_gfm['R&D'] - df_gfm['Tax depreciation'] #essentially "adjusted EBIT" as it doesn't include other impacts, proceeds from disposals, write-offs of residual tax value, etc
+df_gfm['Total Capitalized'] = df_gfm['Capitalized Items - Item 1'] + df_gfm['Capitalized Items - Item 2'] + df_gfm['Capitalized Items - Item 3'] +df_gfm['Capitalized Items - Item 4']
+df_gfm['Operating Income'] = df_gfm['EBIT'] + df_gfm['Net proceeds from Disposals'] + df_gfm['Write-off of Residual Tax Value'] + df_gfm['Other Income, Expenses, Except Items'] + df_gfm['Other Expensed Items - Item 1'] + df_gfm['Other Expensed Items - Item 2'] + df_gfm['Other Expensed Items - Item 3'] + df_gfm['Other Expensed Items - Item 4'] + df_gfm['Other Impacts on P&L - Item 1'] + df_gfm['Other Impacts on P&L - Item 2'] + df_gfm['Other Impacts on P&L - Item 3'] + df_gfm['Other Impacts on P&L - Item 4']
+df_gfm['Profit Tax'] = -df_gfm['Operating Income'] * parameters['tax_rate']
+df_gfm['Total Net Current Assets'] = df_gfm['Working Capital'] + df_gfm['Other Net Current Assets'] #put in as positive numbers, different than excel
+df_gfm['Change in Net Current Assets'] = df_gfm['Total Net Current Assets'] - df_gfm['Total Net Current Assets'].shift(1)
+df_gfm['Change in Net Current Assets'] = df_gfm['Change in Net Current Assets'].fillna(0)
+df_gfm['FCF'] = df_gfm['Operating Income'] + df_gfm['Profit Tax'] + df_gfm['Tax depreciation'] + df_gfm['Additional Non-cash Effects'] - df_gfm['Change in Net Current Assets'] + df_gfm['Capital Avoidance'] + df_gfm['Total Capitalized'] - df_gfm['Write-off of Residual Tax Value']
 
 ##----------------------------------------------------------------------
-## FINANCIAL CALCULATIONS
+## PERFORM FINANCIAL CALCULATIONS
+# For each year
+#    Perform year-wise financial calculations
+# Perform present-value calculations (NPV, IRR, etc.)
+
+present_year = 2018 # Need to know base year to discount PV to
+
+# IRR
+irr = np.irr(df_gfm.FCF.loc[present_year:])
+
+# NPV
+x = 0
+pv = []
+for i in df_gfm.FCF.loc[present_year:]:
+    pv.append(i/(1+parameters['discount_rate'])**x)
+    x += 1
+npv = sum(pv)
+
+# Discounted Payback Period
+df_gfm['FCF PV'] = 0
+df_gfm['FCF PV'].loc[present_year:] = pv
+df_gfm['Cummulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[present_year:])
+df_gfm['Cummulative Discounted FCF'] = df_gfm['Cummulative Discounted FCF'].fillna(0)
+idx = df_gfm[df_gfm['Cummulative Discounted FCF'] <= 0].index.max() #last full year for payback calc
+discounted_payback_period = idx - present_year + 1- df_gfm['Cummulative Discounted FCF'].loc[idx]/df_gfm['FCF PV'].loc[idx+1]
+V_weird_discount_payback_period_calc = idx - present_year + 3.5 - (df_gfm['Cummulative Discounted FCF'].loc[idx+1] / (df_gfm['Cummulative Discounted FCF'].loc[idx+1] - df_gfm['Cummulative Discounted FCF'].loc[idx]))
+
+# Exit values (specificially saves value in 2021)
+df_gfm['Exit Values'] = df_gfm['EBIT'] * parameters['exit_multiple']
+exit_value_2021 = df_gfm['Exit Values'].loc[2021]
+
+# MOIC in 2021
+amt_invested = df_gfm['Total Capitalized'] + df_gfm['R&D'] + df_gfm['SG&A'] + df_gfm['Milestone Payments']
+cum_amt_invested =np.cumsum(amt_invested)
+MOIC = []
+for i in range(len(df_gfm['Exit Values'])):
+    if cum_amt_invested.iloc[i] == 0:
+        MOIC.append(0)
+    else:
+        MOIC.append(-df_gfm['Exit Values'].iloc[i] / cum_amt_invested.iloc[i])
+df_gfm["MOIC"] = MOIC
+MOIC_2021 = df_gfm["MOIC"].loc[2021]
+
+del x, pv, idx, amt_invested, cum_amt_invested, MOIC
+
+##----------------------------------------------------------------------
+## GENERATE OUTPUT
