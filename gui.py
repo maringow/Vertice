@@ -4,7 +4,7 @@ from tkinter import ttk
 
 
 ##----------------------------------------------------------------------
-## WINDOW 1: SELECT BRAND NAME
+## WINDOW: SELECT BRAND NAME
 
 
 class BrandSelection:
@@ -18,7 +18,7 @@ class BrandSelection:
         master.geometry("600x400")
 
         # create window header
-        self.title = Label(master, text='Generics Forecasting Model: Brand Selection')
+        self.title = Label(master, text='Generics Forecasting Model: Brand Selection', font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
         # add label and combobox for brand selection
@@ -27,6 +27,9 @@ class BrandSelection:
         self.brand_combo = ttk.Combobox(master, values=brands)
         self.brand_combo.pack()
         self.brand_combo.bind("<<ComboboxSelected>>", self.get_brand)
+
+        self.or_label = Label(master, text='OR', font='Helvetica 10 bold')
+        self.or_label.pack(pady=10)
 
         # add label and combobox for molecule selection
         self.molecule_label = Label(master, text='Select a molecule: ')
@@ -50,9 +53,30 @@ class BrandSelection:
         print(self.w1_parameters['molecule_name'])
 
 
+##----------------------------------------------------------------------
+## WINDOW: SELECT DOSAGE FORMS
+
+
+class DosageForms:
+
+    def __init__(self, master, dosage_forms):
+        self.master = master
+        master.title("Generics Forecasting Model")
+        master.geometry("600x400")
+
+        # create window header
+        self.title = Label(master, text='Generics Forecasting Model: Select Dosage Forms')
+        self.title.pack(pady=10)
+
+        # add dosage form checkboxes
+
+        # add Continue button
+        self.continue_button = Button(master, text='Continue', command=master.destroy)
+        self.continue_button.pack(pady=10)
+
 
 ##----------------------------------------------------------------------
-## WINDOW 2: CONFIRM BRAND
+## WINDOW: CONFIRM BRAND
 
 
 class ConfirmBrand:
