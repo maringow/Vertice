@@ -42,11 +42,13 @@ class BrandSelection:
 
     def get_brand(self, event):
 
+        self.w1_parameters['search_type'] = 'brand'
         self.w1_parameters['brand_name'] = self.brand_combo.get()
         print(self.w1_parameters['brand_name'])
 
     def get_molecule(self, event):
 
+        self.w1_parameters['search_type'] = 'molecule'
         self.w1_parameters['molecule_name'] = self.molecule_combo.get()
         print(self.w1_parameters['molecule_name'])
 
@@ -66,16 +68,28 @@ class DosageForms:
         self.title = Label(master, text='Generics Forecasting Model: Select Dosage Forms')
         self.title.pack(pady=10)
 
+        self.dosage_forms = dosage_forms
+        self.selected_dosage_forms = []
+        self.var = []
+
         # add dosage form checkboxes
-        for x in dosage_forms:
-            dosage_forms[x] = Variable()
-            box = Checkbutton(self.aster, text=x, variable=dosage_forms[x])
+        for d in range(len(self.dosage_forms)):
+            v=IntVar()
+            box = Checkbutton(self.master, text=self.dosage_forms[d], variable=v)
             box.pack()
+            self.var.append(v)
 
         # add Continue button
-        self.continue_button = Button(master, text='Continue', command=master.destroy)
+        self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
         self.continue_button.pack(pady=10)
 
+    def save_and_continue(self):
+        # for i in range(len(self.dosage_forms)):
+        #     print(self.var[i].get())
+        self.selected_dosage_forms = [self.dosage_forms[i] for i in range(len(self.dosage_forms))
+                                      if self.var[i].get() == 1]
+        print(self.selected_dosage_forms)
+        self.master.destroy()
 
 ##----------------------------------------------------------------------
 ## WINDOW: CONFIRM BRAND
@@ -98,13 +112,11 @@ class ConfirmBrand:
         self.selection_label.pack(pady=10)
 
         # create labels for molecule and dosage form used
-
         self.molecules_label = Label(master, text='Molecules searched: {}'.format(parameters['combined_molecules']))
         self.molecules_label.pack(pady=10)
 
         self.dosage_forms_label = Label(master, text='Dosage forms searched: {}'.format(parameters['dosage_forms']))
         self.dosage_forms_label.pack()
-
 
         # add Continue button
         self.continue_button = Button(master, text='Continue', command=master.destroy)
@@ -116,7 +128,7 @@ class ConfirmBrand:
 
 class EnterFilepath:
 
-    w3_parameters = {}
+    parameters = {}
 
     def __init__(self, master, parameters):
         self.master = master

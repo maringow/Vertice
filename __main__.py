@@ -60,21 +60,33 @@ print(parameters)
 ##----------------------------------------------------------------------
 ## FIND DOSAGE FORMS, OPEN DOSAGE FORM WINDOW AND SAVE SELECTIONS
 
+if parameters['search_type'] == 'brand':
+    parameters['combined_molecules'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']][
+        'Combined Molecule'].unique()
+    parameters['dosage_forms'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']]['Prod Form2'].unique()
+elif parameters['search_type'] == 'molecule':
+    parameters['combined_molecules'] = [parameters['molecule_name']]
+    parameters['dosage_forms'] = IMS.loc[IMS['Combined Molecule'] == parameters['molecule_name']]['Prod Form2'].unique()
+else:
+    print('Please select a brand or molecule to run the model.')
 
+print(parameters['dosage_forms'])
 
-
+window = Tk()
+window2 = gui.DosageForms(window, parameters['dosage_forms'])
+window.mainloop()
 
 ##----------------------------------------------------------------------
 ## FIND THERAPEUTIC EQUIVALENTS
 
 # pull records that are therapeutic equivalents of selected brand name drug
-# find Combined Molecule and Prod Form 3 of selected brand name drug; store in lists in case there are multiple
+# find Combined Molecule and Prod Form2 of selected brand name drug; store in lists in case there are multiple
 parameters['combined_molecules'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']]['Combined Molecule'].unique()
-parameters['dosage_forms'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']]['Prod Form3'].unique()
+parameters['dosage_forms'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']]['Prod Form2'].unique()
 
-# find all IMS records that match the Combined Molecule and Prod Form 3
+# find all IMS records that match the Combined Molecule and Prod Form2
 df_equivalents = IMS.loc[(IMS['Combined Molecule'].isin(parameters['combined_molecules'])) &
-                         (IMS['Prod Form3'].isin(parameters['dosage_forms']))]
+                         (IMS['Prod Form2'].isin(parameters['dosage_forms']))]
 parameters['count_eqs'] = len(df_equivalents)
 
 
@@ -129,23 +141,22 @@ df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
 ##----------------------------------------------------------------------
 ## WINDOW2: OPEN ConfirmBrand WINDOW AND SAVE
 window = Tk()
-window2 = gui.ConfirmBrand(window, parameters)
+window3 = gui.ConfirmBrand(window, parameters)
 window.mainloop()
-
 
 
 ##----------------------------------------------------------------------
 ## WINDOW3: OPEN EnterCOGS WINDOW AND SAVE VALUES
 window = Tk()
-window3 = gui.EnterCOGS(window, df_equivalents)
+window4 = gui.EnterCOGS(window, df_equivalents)
 window.mainloop()
 
-parameters['api_units'] = window3.COGS['units']
-parameters['api_cost_per_unit'] = pd.to_numeric(window3.COGS['cost_per_unit'])
+parameters['api_units'] = window4.COGS['units']
+parameters['api_cost_per_unit'] = pd.to_numeric(window4.COGS['cost_per_unit'])
 df_merged_data['API_units'] = 0
 
 # map COGS into df_merged_data and df_detail
-for key, value in window3.COGS['units_per_pack'].items():
+for key, value in window4.COGS['units_per_pack'].items():
     df_merged_data['API_units'].loc[df_merged_data['Pack'] == key] = pd.to_numeric(value)
 df_merged_data['API_cost'] = df_merged_data['API_units'] * parameters['api_cost_per_unit']
 df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC', 'API_cost']], on='NDC', how='left').set_index(['year_index', 'ndc_index'])
@@ -156,10 +167,10 @@ print(df_detail)
 ##----------------------------------------------------------------------
 ## WINDOW4: OPEN EnterFilepath WINDOW AND SAVE VALUES
 window = Tk()
-window4 = gui.EnterFilepath(window, parameters)
+window5 = gui.EnterFilepath(window, parameters)
 window.mainloop()
 
-parameters.update(window4.w3_parameters)
+parameters.update(window5.parameters)
 
 ##----------------------------------------------------------------------
 ## READ EXCEL
