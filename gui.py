@@ -69,6 +69,10 @@ class DosageForms:
         self.title.pack(pady=10)
 
         # add dosage form checkboxes
+        for x in dosage_forms:
+            dosage_forms[x] = Variable()
+            box = Checkbutton(self.aster, text=x, variable=dosage_forms[x])
+            box.pack()
 
         # add Continue button
         self.continue_button = Button(master, text='Continue', command=master.destroy)

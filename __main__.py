@@ -49,13 +49,20 @@ parameters = {}
 
 
 ##----------------------------------------------------------------------
-## OPEN WINDOW1 AND SAVE PARAMETERS
+## OPEN BRAND SELECTION AND SAVE PARAMETERS
 window = Tk()
 window1 = gui.BrandSelection(window, brands, molecules)
 window.mainloop()
 
 parameters.update(window1.w1_parameters)
 print(parameters)
+
+##----------------------------------------------------------------------
+## FIND DOSAGE FORMS, OPEN DOSAGE FORM WINDOW AND SAVE SELECTIONS
+
+
+
+
 
 ##----------------------------------------------------------------------
 ## FIND THERAPEUTIC EQUIVALENTS
