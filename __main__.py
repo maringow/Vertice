@@ -60,14 +60,15 @@ print(parameters)
 ##----------------------------------------------------------------------
 ## FIND DOSAGE FORMS, OPEN DOSAGE FORM WINDOW AND SAVE SELECTIONS
 
-if parameters['search_type'] == 'brand':
-    parameters['combined_molecules'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']][
-        'Combined Molecule'].unique()
-    parameters['dosage_forms'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']]['Prod Form2'].unique()
-elif parameters['search_type'] == 'molecule':
-    parameters['combined_molecules'] = [parameters['molecule_name']]
-    parameters['dosage_forms'] = IMS.loc[IMS['Combined Molecule'] == parameters['molecule_name']]['Prod Form2'].unique()
-else:
+try:
+    if parameters['search_type'] == 'brand':
+        parameters['combined_molecules'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']][
+            'Combined Molecule'].unique()
+        parameters['dosage_forms'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']]['Prod Form2'].unique()
+    elif parameters['search_type'] == 'molecule':
+        parameters['combined_molecules'] = [parameters['molecule_name']]
+        parameters['dosage_forms'] = IMS.loc[IMS['Combined Molecule'] == parameters['molecule_name']]['Prod Form2'].unique()
+except KeyError:
     print('Please select a brand or molecule to run the model.')
 
 print(parameters['dosage_forms'])

@@ -142,7 +142,7 @@ class EnterFilepath:
         self.filepath_entry.pack()
 
         # add Save and Continue button
-        self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
+        self.continue_button = Button(master, text='Run Model', command=self.save_and_continue)
         self.continue_button.pack(pady=10)
 
     def save_and_continue(self):
@@ -195,7 +195,7 @@ class EnterCOGS:
             i += 1
 
         # add Run Model button
-        run_model_button = Button(master, text='Run Model', command=self.save_and_run)
+        run_model_button = Button(master, text='Continue', command=self.save_and_run)
         run_model_button.grid(row=i+1, column=1, pady=10)
 
     def save_and_run(self):
