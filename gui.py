@@ -2,10 +2,8 @@ from tkinter import *
 from tkinter import ttk
 
 
-
 ##----------------------------------------------------------------------
 ## WINDOW: SELECT BRAND NAME
-
 
 class BrandSelection:
 
@@ -114,7 +112,7 @@ class ConfirmBrand:
 
 
 ##----------------------------------------------------------------------
-## WINDOW 3: ENTER EXCEL FILEPATH
+## WINDOW: ENTER EXCEL FILEPATH
 
 class EnterFilepath:
 
@@ -144,7 +142,7 @@ class EnterFilepath:
 
 
 ##----------------------------------------------------------------------
-## WINDOW 4: ENTER API COGS
+## WINDOW: ENTER API COGS
 
 # TODO change pack to grid for better formatting
 
@@ -155,7 +153,7 @@ class EnterCOGS:
     def __init__(self, master, df_equivalents):
 
         self.master = master
-        master.title("Generics Forecasting Model")
+        master.title('Generics Forecasting Model')
 
         self.title = Label(master, text='Generics Forecasting Model: Enter API COGS')
         self.title.grid(pady=10)
@@ -172,7 +170,7 @@ class EnterCOGS:
         self.cost_per_unit_entry.grid(row=2, column=1)
 
         # add entry boxes for API units for each pack type found in therapeutic equivalents
-        self.API_costs_label = Label(master, text="Enter number of units for each pack type found: ")
+        self.API_costs_label = Label(master, text='Enter number of units for each pack type found: ')
         self.API_costs_label.grid(row=3, columnspan=2, pady=10)
 
         self.entries = []  # save entries created in list so that they can be accessed to store values
@@ -200,10 +198,3 @@ class EnterCOGS:
             self.COGS['units_per_pack'][self.packs[j]] = e.get()
             j += 1
         self.master.destroy()
-
-
-
-
-##----------------------------------------------------------------------
-## WINDOW 5: ENTER FINANCIAL ASSUMPTIONS
-
