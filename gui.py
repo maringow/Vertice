@@ -84,11 +84,8 @@ class DosageForms:
         self.continue_button.pack(pady=10)
 
     def save_and_continue(self):
-        # for i in range(len(self.dosage_forms)):
-        #     print(self.var[i].get())
         self.selected_dosage_forms = [self.dosage_forms[i] for i in range(len(self.dosage_forms))
                                       if self.var[i].get() == 1]
-        print(self.selected_dosage_forms)
         self.master.destroy()
 
 ##----------------------------------------------------------------------

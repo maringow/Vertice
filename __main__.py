@@ -72,17 +72,17 @@ else:
 
 print(parameters['dosage_forms'])
 
-window = Tk()
-window2 = gui.DosageForms(window, parameters['dosage_forms'])
-window.mainloop()
+# if more than one dosage form is found, prompt user to select desired forms
+if len(parameters['dosage_forms']) > 1:
+    window = Tk()
+    window2 = gui.DosageForms(window, parameters['dosage_forms'])
+    window.mainloop()
+    parameters['dosage_forms'] = window2.selected_dosage_forms
+
+print(parameters['dosage_forms'])
 
 ##----------------------------------------------------------------------
 ## FIND THERAPEUTIC EQUIVALENTS
-
-# pull records that are therapeutic equivalents of selected brand name drug
-# find Combined Molecule and Prod Form2 of selected brand name drug; store in lists in case there are multiple
-parameters['combined_molecules'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']]['Combined Molecule'].unique()
-parameters['dosage_forms'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']]['Prod Form2'].unique()
 
 # find all IMS records that match the Combined Molecule and Prod Form2
 df_equivalents = IMS.loc[(IMS['Combined Molecule'].isin(parameters['combined_molecules'])) &
