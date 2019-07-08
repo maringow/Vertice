@@ -90,7 +90,6 @@ df_equivalents = IMS.loc[(IMS['Combined Molecule'].isin(parameters['combined_mol
                          (IMS['Prod Form2'].isin(parameters['dosage_forms']))]
 parameters['count_eqs'] = len(df_equivalents)
 
-
 ##----------------------------------------------------------------------
 ## JOIN IMS AND PROSPECTO DATASETS
 

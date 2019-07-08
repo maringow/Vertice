@@ -103,10 +103,16 @@ class ConfirmBrand:
         self.title = Label(master, text='Generics Forecasting Model: Review Therapeutic Equivalents')
         self.title.pack(pady=10)
 
+
         # create label for brand selection and number of equivalents found
-        self.selection_label = Label(master, text='{} therapeutically equivalent NDCs found in IMS for brand {}'
-                                .format(parameters['count_eqs'], parameters['brand_name']))
-        self.selection_label.pack(pady=10)
+        if parameters['search_type'] == 'brand':
+            self.selection_label = Label(master, text='{} therapeutically equivalent NDCs found in IMS for brand {}'
+                                    .format(parameters['count_eqs'], parameters['brand_name']))
+            self.selection_label.pack(pady=10)
+        elif parameters['search_type'] == 'molecule':
+            self.selection_label = Label(master, text='{} therapeutically equivalent NDCs found in IMS for molecule {}'
+                                    .format(parameters['count_eqs'], parameters['molecule_name']))
+            self.selection_label.pack(pady=10)
 
         # create labels for molecule and dosage form used
         self.molecules_label = Label(master, text='Molecules searched: {}'.format(parameters['combined_molecules']))
