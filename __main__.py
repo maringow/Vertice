@@ -100,20 +100,19 @@ def strip_non_numeric(df_column):
     df_column = pd.to_numeric(df_column)
     return df_column
 
-# parse NDC from equivalents dataframe (from IMS file)
-#df_equivalents.rename(index=str, columns={'NDC': 'NDC_ext'}, inplace=True)
+# parse NDC columns from IMS and ProspectoRx
 df_equivalents['NDC'] = strip_non_numeric(df_equivalents['NDC'].str.split('\s', expand=True)[0])
-# for index, row in df_equivalents.iterrows():  ## split out anything after first space and remove non-numeric chars
-#     df_equivalents['NDC'][index] = re.sub('[^0-9]', '', re.split('\s', df_equivalents['NDC_ext'][index])[0])
-#df_equivalents['NDC'] = pd.to_numeric(df_equivalents['NDC'])
 df_equivalents['NDC'].fillna(999, inplace=True)  ## if NDC is "NDC NOT AVAILABLE" or other invalid value, fill with 999
-
-
-# join price and therapeutic equivalents on NDC
 prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
 prospectoRx['NDC'] = strip_non_numeric(prospectoRx['NDC'])
+
+# join price and therapeutic equivalents on NDC
 df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
 print(df_merged_data)
+
+# fill in blank prices with lowest price of same strength and pack quantity
+
+
 
 # TODO if no price match on NDC is found, use the lowest price for the same strength and package units
 #     if no record with the same strength and package units, use the lowest overall price
@@ -132,6 +131,7 @@ df_detail['NDC'] = df_detail.index.get_level_values('ndc_index')
 columns = [[2016, '2016_Units'], [2017, '2017_Units'], [2018, '2018_Units'], [2019, '2019_Units'],
            [2020, '2020_Units'], [2021, '2021_Units'], [2022, '2022_Units']]
 
+# TODO try to use strip_non_numeric function here to consolidate
 # map units and price into df_detail
 for year in columns:
     if year[1] in df_merged_data.columns:
@@ -150,6 +150,9 @@ df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
 
 ##----------------------------------------------------------------------
 ## WINDOW2: OPEN ConfirmBrand WINDOW AND SAVE
+
+# TODO maybe add volume and price numbers to this - could help user forecast growth and confirm code is working
+
 window = Tk()
 window3 = gui.ConfirmBrand(window, parameters)
 window.mainloop()

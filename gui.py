@@ -160,8 +160,6 @@ class EnterFilepath:
 ##----------------------------------------------------------------------
 ## WINDOW: ENTER API COGS
 
-# TODO change pack to grid for better formatting
-
 class EnterCOGS:
 
     COGS = {}
@@ -175,12 +173,12 @@ class EnterCOGS:
         self.title.grid(pady=10)
 
         # add entry boxes for desired units and API cost per unit
-        self.unit_label = Label(master, text='Enter units: ')
+        self.unit_label = Label(master, text='Enter base unit: ')
         self.unit_label.grid(row=1, column=0)
         self.unit_entry = Entry(master)
         self.unit_entry.grid(row=1, column=1)
 
-        self.cost_per_unit_label = Label(master, text='Enter API cost per unit: ')
+        self.cost_per_unit_label = Label(master, text='Enter API cost per unit ($): ')
         self.cost_per_unit_label.grid(row=2, column=0)
         self.cost_per_unit_entry = Entry(master)
         self.cost_per_unit_entry.grid(row=2, column=1)
