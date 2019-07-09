@@ -40,7 +40,7 @@ import gui
 
 # ingest IMS and price data
 IMS = pd.read_csv('full_extract_6.26.csv')
-prospectoRx = pd.read_csv('gleevec_prospectorx.csv')
+prospectoRx = pd.read_csv('prospecto_all_one_year_20190708.csv')
 
 # get valid brands from IMS file
 # TODO remove NaNs from these lists
@@ -95,6 +95,10 @@ parameters['count_eqs'] = len(df_equivalents)
 ##----------------------------------------------------------------------
 ## JOIN IMS AND PROSPECTO DATASETS
 
+# def parse_NDC(dataframe, NDC_column_name):
+#     for index, row in dataframe.iterrows():
+#         dataframe[NDC_column_name][index] = re.sub('[^0-9]')
+
 # parse NDC from equivalents dataframe (from IMS file)
 df_equivalents.rename(index=str, columns={'NDC': 'NDC_ext'}, inplace=True)
 df_equivalents['NDC'] = ''
@@ -103,8 +107,11 @@ for index, row in df_equivalents.iterrows():  ## split out anything after first 
 df_equivalents['NDC'] = pd.to_numeric(df_equivalents['NDC'])
 df_equivalents['NDC'].fillna(999, inplace=True)  ## if NDC is "NDC NOT AVAILABLE" or other invalid value, fill with 999
 
+
 # join price and therapeutic equivalents on NDC
 prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
+prospectoRx['NDC'] = prospectoRx['NDC'].str.replace('[^0-9]', '')
+prospectoRx['NDC'] = pd.to_numeric(prospectoRx['NDC'])
 df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
 
 # TODO if no price match on NDC is found, use the lowest price for the same strength and package units
