@@ -95,24 +95,25 @@ parameters['count_eqs'] = len(df_equivalents)
 ##----------------------------------------------------------------------
 ## JOIN IMS AND PROSPECTO DATASETS
 
-# def parse_NDC(dataframe, NDC_column_name):
-#     for index, row in dataframe.iterrows():
-#         dataframe[NDC_column_name][index] = re.sub('[^0-9]')
+def strip_non_numeric(df_column):
+    df_column = df_column.str.replace('[^0-9]', '')
+    df_column = pd.to_numeric(df_column)
+    return df_column
 
 # parse NDC from equivalents dataframe (from IMS file)
-df_equivalents.rename(index=str, columns={'NDC': 'NDC_ext'}, inplace=True)
-df_equivalents['NDC'] = ''
-for index, row in df_equivalents.iterrows():  ## split out anything after first space and remove non-numeric chars
-    df_equivalents['NDC'][index] = re.sub('[^0-9]', '', re.split('\s', df_equivalents['NDC_ext'][index])[0])
-df_equivalents['NDC'] = pd.to_numeric(df_equivalents['NDC'])
+#df_equivalents.rename(index=str, columns={'NDC': 'NDC_ext'}, inplace=True)
+df_equivalents['NDC'] = strip_non_numeric(df_equivalents['NDC'].str.split('\s', expand=True)[0])
+# for index, row in df_equivalents.iterrows():  ## split out anything after first space and remove non-numeric chars
+#     df_equivalents['NDC'][index] = re.sub('[^0-9]', '', re.split('\s', df_equivalents['NDC_ext'][index])[0])
+#df_equivalents['NDC'] = pd.to_numeric(df_equivalents['NDC'])
 df_equivalents['NDC'].fillna(999, inplace=True)  ## if NDC is "NDC NOT AVAILABLE" or other invalid value, fill with 999
 
 
 # join price and therapeutic equivalents on NDC
 prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
-prospectoRx['NDC'] = prospectoRx['NDC'].str.replace('[^0-9]', '')
-prospectoRx['NDC'] = pd.to_numeric(prospectoRx['NDC'])
+prospectoRx['NDC'] = strip_non_numeric(prospectoRx['NDC'])
 df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
+print(df_merged_data)
 
 # TODO if no price match on NDC is found, use the lowest price for the same strength and package units
 #     if no record with the same strength and package units, use the lowest overall price
