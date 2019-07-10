@@ -129,8 +129,8 @@ class ConfirmBrand:
                                        format(parameters['count_competitors']))
         self.competitors_label.pack()
 
-        # create label for 3-year growth rate
-        self.growth_label = Label(master, text='Three-year average growth: {}'
+        # create label for 2-year growth rate
+        self.growth_label = Label(master, text='Two-year volume growth rate (CAGR): {}'
                                   .format(parameters['historical_growth_rate']))
         self.growth_label.pack()
 

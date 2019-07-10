@@ -132,10 +132,17 @@ df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
 # TODO maybe add volume and price numbers to this - could help user forecast growth and confirm code is working
 # TODO make count_competitors work past 2019
 
+def get_growth_rate(df):
+    units_by_year = df['Units'].sum(level='year_index')
+    growth_rate = round(((units_by_year.loc[2018] / units_by_year.loc[2016]) ** (1/2) - 1), 2)
+    return growth_rate
+
+
 # set parameters to display in confirmation window
 parameters['count_competitors'] = len(df_equivalents.loc[pd.isnull(df_equivalents['2018_Units']) == False]
                                       ['Manufacturer'].unique())
-parameters['historical_growth_rate'] = .13
+parameters['historical_growth_rate'] = get_growth_rate(df_detail)
+print(parameters['historical_growth_rate'])
 
 # open window
 window = Tk()
