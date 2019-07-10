@@ -91,7 +91,9 @@ df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='lef
 #     if no record with the same strength and package units, use the lowest overall price
 
 # build hierarchical index on Year and NDC
-year_range = [int(i) for i in np.array(range(2016, parameters['last_forecasted_year']+1))]
+year_range = [int(i) for i in np.array(range(2016, 2031))]
+#TODO - use data from excel to make dataframe?
+#year_range = [int(i) for i in np.array(range(2016, parameters['last_forecasted_year']+1))]
 NDCs = [int(i) for i in df_equivalents['NDC'].unique()]
 index_arrays = [year_range, NDCs]
 multiIndex = pd.MultiIndex.from_product(index_arrays, names=['year_index', 'ndc_index'])
