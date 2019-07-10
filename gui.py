@@ -1,7 +1,6 @@
 from tkinter import *
 from tkinter import ttk
 
-
 ##----------------------------------------------------------------------
 ## WINDOW: SELECT BRAND NAME
 
@@ -65,7 +64,7 @@ class DosageForms:
         master.geometry("600x400")
 
         # create window header
-        self.title = Label(master, text='Generics Forecasting Model: Select Dosage Forms')
+        self.title = Label(master, text='Generics Forecasting Model: Select Dosage Forms', font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
         self.dosage_forms = dosage_forms
@@ -92,6 +91,7 @@ class DosageForms:
 ##----------------------------------------------------------------------
 ## WINDOW: CONFIRM BRAND
 
+# TODO make a function for label creation & packing
 
 class ConfirmBrand:
 
@@ -101,26 +101,38 @@ class ConfirmBrand:
         master.geometry("600x400")
 
         # create window header
-        self.title = Label(master, text='Generics Forecasting Model: Review Therapeutic Equivalents')
+        self.title = Label(master, text='Generics Forecasting Model: Review Therapeutic Equivalents',
+                           font='Helvetica 9 bold')
         self.title.pack(pady=10)
-
 
         # create label for brand selection and number of equivalents found
         if parameters['search_type'] == 'brand':
             self.selection_label = Label(master, text='{} therapeutically equivalent NDCs found in IMS for brand {}'
                                     .format(parameters['count_eqs'], parameters['brand_name']))
-            self.selection_label.pack(pady=10)
+            self.selection_label.pack(pady=20)
         elif parameters['search_type'] == 'molecule':
             self.selection_label = Label(master, text='{} therapeutically equivalent NDCs found in IMS for molecule {}'
                                     .format(parameters['count_eqs'], parameters['molecule_name']))
-            self.selection_label.pack(pady=10)
+            self.selection_label.pack(pady=20)
 
         # create labels for molecule and dosage form used
-        self.molecules_label = Label(master, text='Molecules searched: {}'.format(parameters['combined_molecules']))
-        self.molecules_label.pack(pady=10)
+        self.combined_molecules = '; '.join(parameters['combined_molecules'])
+        self.molecules_label = Label(master, text='Molecules searched: {}'.format(self.combined_molecules))
+        self.molecules_label.pack()
 
-        self.dosage_forms_label = Label(master, text='Dosage forms searched: {}'.format(parameters['dosage_forms']))
+        self.dosage_forms = '; '.join(parameters['dosage_forms'])
+        self.dosage_forms_label = Label(master, text='Dosage forms searched: {}'.format(self.dosage_forms))
         self.dosage_forms_label.pack()
+
+        # create label for number of competitors found
+        self.competitors_label = Label(master, text='Number of active competitors found: {}'.
+                                       format(parameters['count_competitors']))
+        self.competitors_label.pack()
+
+        # create label for 3-year growth rate
+        self.growth_label = Label(master, text='Three-year average growth: {}'
+                                  .format(parameters['historical_growth_rate']))
+        self.growth_label.pack()
 
         # add Continue button
         self.continue_button = Button(master, text='Continue', command=master.destroy)
@@ -137,9 +149,10 @@ class EnterFilepath:
     def __init__(self, master):
         self.master = master
         master.title("Generics Forecasting Model")
+        master.geometry("600x400")
 
         # create window header
-        self.title = Label(master, text='Generics Forecasting Model: Set Excel Filepath')
+        self.title = Label(master, text='Generics Forecasting Model: Set Excel Filepath', font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
         # add entries for variables
@@ -169,8 +182,8 @@ class EnterCOGS:
         self.master = master
         master.title('Generics Forecasting Model')
 
-        self.title = Label(master, text='Generics Forecasting Model: Enter API COGS')
-        self.title.grid(pady=10)
+        self.title = Label(master, text='Generics Forecasting Model: Enter API COGS', font='Helvetica 9 bold')
+        self.title.grid(row=0, columnspan=2, pady=10)
 
         # add entry boxes for desired units and API cost per unit
         self.unit_label = Label(master, text='Enter base unit: ')
@@ -193,9 +206,9 @@ class EnterCOGS:
         self.packs = df_equivalents['Pack'].unique()
         for p in self.packs:
             pack_label = Label(master, text=p)
-            pack_label.grid(row=i, column=0)
+            pack_label.grid(row=i, column=0, padx=10)
             pack_entry = Entry(master)
-            pack_entry.grid(row=i, column=1)
+            pack_entry.grid(row=i, column=1, padx=10)
             self.entries.append(pack_entry)
             i += 1
 

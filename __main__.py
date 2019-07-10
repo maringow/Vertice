@@ -91,6 +91,9 @@ print(parameters['dosage_forms'])
 df_equivalents = IMS.loc[(IMS['Combined Molecule'].isin(parameters['combined_molecules'])) &
                          (IMS['Prod Form2'].isin(parameters['dosage_forms']))]
 parameters['count_eqs'] = len(df_equivalents)
+parameters['count_competitors'] = len(df_equivalents['Manufacturer'].unique())
+parameters['historical_growth_rate'] = .13
+
 
 ##----------------------------------------------------------------------
 ## JOIN IMS AND PROSPECTO DATASETS
