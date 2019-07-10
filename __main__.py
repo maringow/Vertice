@@ -282,9 +282,9 @@ for i in range(2016, parameters['last_forecasted_year'] + 1):
     else:
         vol_adj.append(1)
 
-df_vertice_ndc_volumes = df_detail['Units'].mul(vol_adj * df_gfm['Gx Penetration'], level=0, fill_value=0).mul(
-    df_gfm['Number of Gx Players'], level=0, fill_value=0)
-
+df_vertice_ndc_volumes = df_detail['Units'].mul(vol_adj * parameters['pos'] * df_gfm['Gx Penetration'], level=0,
+                                                fill_value=0).mul(df_gfm['Vertice Gx Market Share'], level=0,
+                                                                  fill_value=0)
 # Calculating price (WAC) in future
 for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
     df_detail.loc[i]['Price'] = df_detail.loc[i - 1]['Price'] * (1 + parameters['wac_increase'])
