@@ -163,7 +163,7 @@ class EnterFilepath:
         self.filepath_entry.pack()
 
         # add Save and Continue button
-        self.continue_button = Button(master, text='Run Model', command=self.save_and_continue)
+        self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
         self.continue_button.pack(pady=10)
 
     def save_and_continue(self):
@@ -204,6 +204,12 @@ class EnterCOGS:
         self.entries = []  # save entries created in list so that they can be accessed to store values
         i = 4  # start placing labels below the already assigned rows
 
+        # add frame to allow scrolling
+
+        # add scrollbar
+        self.scroll = Scrollbar(master, orient='vertical')
+        self.scroll.grid(column=3, sticky='ns')
+
         self.packs = df_equivalents['Pack'].unique()
         for p in self.packs:
             pack_label = Label(master, text=p)
@@ -214,7 +220,7 @@ class EnterCOGS:
             i += 1
 
         # add Run Model button
-        run_model_button = Button(master, text='Continue', command=self.save_and_run)
+        run_model_button = Button(master, text='Run Model', command=self.save_and_run)
         run_model_button.grid(row=i+1, column=1, pady=10)
 
     def save_and_run(self):
@@ -226,3 +232,35 @@ class EnterCOGS:
             self.COGS['units_per_pack'][self.packs[j]] = e.get()
             j += 1
         self.master.destroy()
+
+
+
+##----------------------------------------------------------------------
+## WINDOW: PRINT RESULTS
+
+class ShowResults:
+
+    def __init__(self, master, df_equivalents):
+
+        self.master = master
+        master.title('Generics Forecasting Model')
+        master.geometry("600x400")
+
+        self.title = Label(master, text='Generics Forecasting Model: Results Summary', font='Helvetica 9 bold')
+        self.title.pack(pady=10)
+
+        # add labels for financial results
+        self.unit_label = Label(master, text='NPV: 5.2')
+        self.unit_label.pack()
+        self.unit_label = Label(master, text='IRR: 890.4%')
+        self.unit_label.pack()
+        self.unit_label = Label(master, text='Payback: 2.1 years')
+        self.unit_label.pack()
+        self.unit_label = Label(master, text='Exit value: 8.0')
+        self.unit_label.pack()
+        self.unit_label = Label(master, text='MOIC: 42.5')
+        self.unit_label.pack()
+
+        # add Finish button
+        run_model_button = Button(master, text='Finish', command=master.destroy)
+        run_model_button.pack(pady=20)

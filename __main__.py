@@ -151,6 +151,15 @@ window.mainloop()
 
 
 ##----------------------------------------------------------------------
+## WINDOW4: OPEN EnterFilepath WINDOW AND SAVE VALUES
+window = Tk()
+window5 = gui.EnterFilepath(window)
+window.mainloop()
+
+parameters.update(window5.parameters)
+
+
+##----------------------------------------------------------------------
 ## WINDOW3: OPEN EnterCOGS WINDOW AND SAVE VALUES
 window = Tk()
 window4 = gui.EnterCOGS(window, df_equivalents)
@@ -168,14 +177,6 @@ df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC', 'API_cost']
 df_detail['COGS'] = df_detail['Units'] * df_detail['API_cost']
 df_detail.drop(columns=['API_cost'])
 print(df_detail)
-
-##----------------------------------------------------------------------
-## WINDOW4: OPEN EnterFilepath WINDOW AND SAVE VALUES
-window = Tk()
-window5 = gui.EnterFilepath(window)
-window.mainloop()
-
-parameters.update(window5.parameters)
 
 ##----------------------------------------------------------------------
 ## READ EXCEL
@@ -356,9 +357,9 @@ MOIC_2021 = df_gfm["MOIC"].loc[2021]
 
 del x, pv, idx, amt_invested, cum_amt_invested, MOIC
 
-##----------------------------------------------------------------------
-## GENERATE OUTPUT
 
+##----------------------------------------------------------------------
+##SHOW RESULTS
 
 #not actual output, just to compare results with excel model
 print("NPV:        ", round(npv,4))
@@ -367,6 +368,17 @@ print("Payback:    ", round(discounted_payback_period,4))
 print("V's Payback ", round(V_weird_discount_payback_period_calc,4))
 print("Exit Value: ", round(exit_value_2021,4))
 print("MOIC:       ", round(MOIC_2021,4))
+
+
+
+##----------------------------------------------------------------------
+## WRITE TO DB
+
+# open window
+window = Tk()
+window6 = gui.ShowResults(window, parameters)
+window.mainloop()
+
 
 
 # import sqlite3
