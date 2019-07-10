@@ -9,31 +9,6 @@ import tkinter
 from tkinter import *
 from tkinter import ttk
 import gui
-import sqlite3
-from sqlite3 import Error
-
-##----------------------------------------------------------------------
-## DEFINE ANALOG TABLES
-
-# Moved below and pull numbers from "Model Inputs.xlsx" -Ann
-
-# # Set up analogs by Number of Gx Players, from 0 to 10
-# df_analog = pd.DataFrame(index=range(0, 11))
-# df_analog['Retail Net Price Pct BWAC'] = \
-#     [1.00, 0.60, 0.35, 0.25, 0.20, 0.10, 0.05, 0.02, 0.01, 0.01, 0.01]
-# df_analog['Retail Market Share'] = \
-#     [0.00, 1.00, 0.50, 0.30, 0.25, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03]
-# df_analog['Clinic Net Price Pct BWAC'] = \
-#     [1.00, 0.70, 0.55, 0.40, 0.25, 0.15, 0.10, 0.04, 0.01, 0.01, 0.01]
-# df_analog['Clinic Market Share'] = \
-#     [0.00, 1.00, 0.50, 0.30, 0.25, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03]
-# df_analog['Hospital Net Price Pct BWAC'] = \
-#     [1.00, 0.80, 0.65, 0.45, 0.35, 0.20, 0.10, 0.04, 0.01, 0.01, 0.01]
-# df_analog['Hospital Market Share'] = \
-#     [0.00, 1.00, 0.50, 0.30, 0.25, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03]
-# df_analog['Pct Profit Share'] = \
-#     [0.50, 0.50, 0.50, 0.25, 0.25, 0.25, 0.20, 0.20, 0.20, 0.20, 0.20]
-
 
 ##----------------------------------------------------------------------
 ## INGEST DATA (IMS, ProspectoRx)
@@ -98,10 +73,9 @@ parameters['historical_growth_rate'] = .13
 ##----------------------------------------------------------------------
 ## JOIN IMS AND PROSPECTO DATASETS
 
-def strip_non_numeric(df_column):
-    df_column = df_column.str.replace('[^0-9]', '')
-    df_column = pd.to_numeric(df_column)
-    return df_column
+# def parse_NDC(dataframe, NDC_column_name):
+#     for index, row in dataframe.iterrows():
+#         dataframe[NDC_column_name][index] = re.sub('[^0-9]')
 
 # parse NDC columns from IMS and ProspectoRx
 df_equivalents['NDC'] = strip_non_numeric(df_equivalents['NDC'].str.split('\s', expand=True)[0])
@@ -120,7 +94,9 @@ df_merged_data['WACPrice'].fillna(min(df_merged_data['WACPrice']))
 #     if no record with the same strength and package units, use the lowest overall price
 
 # build hierarchical index on Year and NDC
-year_range = [int(i) for i in np.array(range(2016, 2030))]
+year_range = [int(i) for i in np.array(range(2016, 2031))]
+#TODO - use data from excel to make dataframe?
+#year_range = [int(i) for i in np.array(range(2016, parameters['last_forecasted_year']+1))]
 NDCs = [int(i) for i in df_equivalents['NDC'].unique()]
 index_arrays = [year_range, NDCs]
 multiIndex = pd.MultiIndex.from_product(index_arrays, names=['year_index', 'ndc_index'])
@@ -236,12 +212,12 @@ parameters.update({'brand_status': sheet['B6'].value,
 
 # Set up df_gfm data frame
 df_gfm = pd.DataFrame()
-df_gfm['Year'] = list(range(2015, parameters['last_forecasted_year']+1, 1))
+df_gfm['Year'] = list(range(2016, parameters['last_forecasted_year']+1, 1))
 df_gfm = df_gfm.set_index('Year')
 
 # Add excel yearly data
 def pull_yearly_data(row_number): #row you want data from
-    x = [0] * (parameters['present_year'] - 2015) #zeros for years not in 'model input' excel sheet
+    x = [0] * (parameters['present_year'] - 2016) #zeros for years not in 'model input' excel sheet
     for i in range(2, 14):
         x.append(sheet.cell(row = row_number, column = i).value)
     return(x)
@@ -297,10 +273,40 @@ if parameters['brand_status'] == 'Branded':
 else:
     df_gfm['Vertice Price as % of WAC'] = (1 - parameters['gtn_%']) * (1 - df_gfm['Price Discount of Current Gx Net Price'])
 
-# Dummy data for below financial calcs
-# TODO link df_detail information into these columns once calculated
-df_gfm['Net Sales'] =  np.arange(3,6.2,.2)
-df_gfm['Standard COGS'] =  -np.arange(.2,1.8,.1)
+# df_detail calcs currently doesn't account for wac growth, cogs growth, volume growth, and change in penetration rate
+# Keep market unit sales for reference
+df_gfm['Market Volume'] = df_detail['Units'].groupby(level=[0]).sum()  # TODO somehow annualize the volumes???
+
+# Calculating volume of market in future
+for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
+    df_detail.loc[i]['Units'] = df_detail.loc[i - 1]['Units'] * (1 + parameters['volume_growth_rate'])
+
+# Adjust volumes for launch year and if there is a partial year
+vol_adj = []
+for i in range(2016, parameters['last_forecasted_year'] + 1):
+    if i < parameters['vertice_launch_year']:
+        vol_adj.append(0)
+    elif i == parameters['vertice_launch_year']:
+        vol_adj.append((13 - parameters['vertice_launch_month']) / 12)
+    else:
+        vol_adj.append(1)
+
+df_vertice_ndc_volumes = df_detail['Units'].mul(vol_adj * parameters['pos'] * df_gfm['Gx Penetration'], level=0,
+                                                fill_value=0).mul(df_gfm['Vertice Gx Market Share'], level=0,
+                                                                  fill_value=0)
+# Calculating price (WAC) in future
+for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
+    df_detail.loc[i]['Price'] = df_detail.loc[i - 1]['Price'] * (1 + parameters['wac_increase'])
+
+df_vertice_ndc_prices = df_detail['Price'].mul(df_gfm['Vertice Price as % of WAC'], level=0, fill_value=0)
+
+df_gfm['Net Sales'] = (df_vertice_ndc_prices * df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
+
+# Calculating API_cost in future
+for i in range(parameters['present_year'] + 1, parameters['last_forecasted_year'] + 1):
+    df_detail.loc[i]['API_cost'] = df_detail.loc[i - 1]['API_cost'] * (1 + parameters['cogs']['cost_increase'])
+
+df_gfm['Standard COGS'] = (df_detail['API_cost'] * df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
 
 # Financial statement calculations
 df_gfm['Gross Sales'] =  df_gfm['Net Sales'] / (1-parameters['gtn_%'])
@@ -377,5 +383,3 @@ print("Payback:    ", round(discounted_payback_period,4))
 print("V's Payback ", round(V_weird_discount_payback_period_calc,4))
 print("Exit Value: ", round(exit_value_2021,4))
 print("MOIC:       ", round(MOIC_2021,4))
-
-
