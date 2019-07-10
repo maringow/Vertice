@@ -12,28 +12,6 @@ import gui
 import sqlite3
 from sqlite3 import Error
 
-##----------------------------------------------------------------------
-## DEFINE ANALOG TABLES
-
-# Moved below and pull numbers from "Model Inputs.xlsx" -Ann
-
-# # Set up analogs by Number of Gx Players, from 0 to 10
-# df_analog = pd.DataFrame(index=range(0, 11))
-# df_analog['Retail Net Price Pct BWAC'] = \
-#     [1.00, 0.60, 0.35, 0.25, 0.20, 0.10, 0.05, 0.02, 0.01, 0.01, 0.01]
-# df_analog['Retail Market Share'] = \
-#     [0.00, 1.00, 0.50, 0.30, 0.25, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03]
-# df_analog['Clinic Net Price Pct BWAC'] = \
-#     [1.00, 0.70, 0.55, 0.40, 0.25, 0.15, 0.10, 0.04, 0.01, 0.01, 0.01]
-# df_analog['Clinic Market Share'] = \
-#     [0.00, 1.00, 0.50, 0.30, 0.25, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03]
-# df_analog['Hospital Net Price Pct BWAC'] = \
-#     [1.00, 0.80, 0.65, 0.45, 0.35, 0.20, 0.10, 0.04, 0.01, 0.01, 0.01]
-# df_analog['Hospital Market Share'] = \
-#     [0.00, 1.00, 0.50, 0.30, 0.25, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03]
-# df_analog['Pct Profit Share'] = \
-#     [0.50, 0.50, 0.50, 0.25, 0.25, 0.25, 0.20, 0.20, 0.20, 0.20, 0.20]
-
 
 ##----------------------------------------------------------------------
 ## INGEST DATA (IMS, ProspectoRx)
@@ -91,8 +69,6 @@ print(parameters['dosage_forms'])
 df_equivalents = IMS.loc[(IMS['Combined Molecule'].isin(parameters['combined_molecules'])) &
                          (IMS['Prod Form2'].isin(parameters['dosage_forms']))]
 parameters['count_eqs'] = len(df_equivalents)
-parameters['count_competitors'] = len(df_equivalents['Manufacturer'].unique())
-parameters['historical_growth_rate'] = .13
 
 ##----------------------------------------------------------------------
 ## JOIN IMS AND PROSPECTO DATASETS
@@ -154,6 +130,11 @@ df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
 
 # TODO maybe add volume and price numbers to this - could help user forecast growth and confirm code is working
 
+# set parameters to display in confirmation window
+parameters['count_competitors'] = len(df_equivalents['Manufacturer'].unique())
+parameters['historical_growth_rate'] = .13
+
+# open window
 window = Tk()
 window3 = gui.ConfirmBrand(window, parameters)
 window.mainloop()
@@ -341,13 +322,13 @@ npv = sum(pv)
 # Discounted Payback Period
 df_gfm['FCF PV'] = 0
 df_gfm['FCF PV'].loc[parameters['present_year']:] = pv
-df_gfm['Cummulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[parameters['present_year']:])
-df_gfm['Cummulative Discounted FCF'] = df_gfm['Cummulative Discounted FCF'].fillna(0)
-idx = df_gfm[df_gfm['Cummulative Discounted FCF'] <= 0].index.max() #last full year for payback calc
-discounted_payback_period = idx - parameters['present_year'] + 1- df_gfm['Cummulative Discounted FCF'].loc[idx]/df_gfm['FCF PV'].loc[idx+1]
-V_weird_discount_payback_period_calc = idx - parameters['present_year'] + 3.5 - (df_gfm['Cummulative Discounted FCF'].loc[idx+1] / (df_gfm['Cummulative Discounted FCF'].loc[idx+1] - df_gfm['Cummulative Discounted FCF'].loc[idx]))
+df_gfm['Cumulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[parameters['present_year']:])
+df_gfm['Cumulative Discounted FCF'] = df_gfm['Cumulative Discounted FCF'].fillna(0)
+idx = df_gfm[df_gfm['Cumulative Discounted FCF'] <= 0].index.max() #last full year for payback calc
+discounted_payback_period = idx - parameters['present_year'] + 1- df_gfm['Cumulative Discounted FCF'].loc[idx]/df_gfm['FCF PV'].loc[idx+1]
+V_weird_discount_payback_period_calc = idx - parameters['present_year'] + 3.5 - (df_gfm['Cumulative Discounted FCF'].loc[idx+1] / (df_gfm['Cumulative Discounted FCF'].loc[idx+1] - df_gfm['Cumulative Discounted FCF'].loc[idx]))
 
-# Exit values (specificially saves value in 2021)
+# Exit values (specifically saves value in 2021)
 df_gfm['Exit Values'] = df_gfm['EBIT'] * parameters['exit_multiple']
 exit_value_2021 = df_gfm['Exit Values'].loc[2021]
 
@@ -377,4 +358,65 @@ print("V's Payback ", round(V_weird_discount_payback_period_calc,4))
 print("Exit Value: ", round(exit_value_2021,4))
 print("MOIC:       ", round(MOIC_2021,4))
 
+
+# import sqlite3
+# from sqlite3 import Error
+#
+#
+# def create_connection(db_file):
+#     # create a database connection to a SQLite database
+#     try:
+#         conn = sqlite3.connect(db_file)
+#         return conn
+#     except Error as e:
+#         print(e)
+#
+#     return None
+#
+#
+# def create_table(conn, create_table_sql):
+#     try:
+#         c = conn.cursor()
+#         c.execute(create_table_sql)
+#     except Error as e:
+#         print(e)
+#
+#
+# def insert_result(conn, results):
+#     sql = """INSERT INTO model_results(run_id, brand_name, molecule, NPV)
+#             VALUES(?,?,?,?)"""
+#     cur = conn.cursor()
+#     cur.execute(sql, results)
+#     return cur.lastrowid
+#
+#
+# def select_all_results(conn):
+#     cur = conn.cursor()
+#     cur.execute("SELECT * FROM model_results")
+#     rows = cur.fetchall()
+#
+#     for row in rows:
+#         print(row)
+#
+#
+# conn = create_connection('C:\\sqlite\\db\\pythonsqlite.db')
+#
+# create_table_model_results = """CREATE TABLE IF NOT EXISTS model_results (
+#                         id integer PRIMARY KEY,
+#                         run_id integer NOT NULL,
+#                         brand_name text,
+#                         molecule text NOT NULL,
+#                         NPV real
+#                         ); """
+# #create_table(conn, create_table_model_results)
+#
+# result1 = (101, 'WATER', 'H20', 45.6)
+# result2 = (102, 'GLEEVEC', 'IMATINIB', 127.3)
+# insert_result(conn, result1)
+#
+# insert_result(conn, result2)
+#
+# select_all_results(conn)
+#
+# conn.close()
 
