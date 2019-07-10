@@ -47,7 +47,8 @@ try:
         parameters['dosage_forms'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']]['Prod Form2'].unique()
     elif parameters['search_type'] == 'molecule':
         parameters['combined_molecules'] = [parameters['molecule_name']]
-        parameters['dosage_forms'] = IMS.loc[IMS['Combined Molecule'] == parameters['molecule_name']]['Prod Form2'].unique()
+        parameters['dosage_forms'] = IMS.loc[IMS['Combined Molecule'] ==
+                                             parameters['molecule_name']]['Prod Form2'].unique()
 except KeyError:
     print('Please select a brand or molecule to run the model.')
 
@@ -129,9 +130,11 @@ df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
 ## WINDOW2: OPEN ConfirmBrand WINDOW AND SAVE
 
 # TODO maybe add volume and price numbers to this - could help user forecast growth and confirm code is working
+# TODO make count_competitors work past 2019
 
 # set parameters to display in confirmation window
-parameters['count_competitors'] = len(df_equivalents['Manufacturer'].unique())
+parameters['count_competitors'] = len(df_equivalents.loc[pd.isnull(df_equivalents['2018_Units']) == False]
+                                      ['Manufacturer'].unique())
 parameters['historical_growth_rate'] = .13
 
 # open window
