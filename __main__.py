@@ -383,3 +383,66 @@ print("Payback:    ", round(discounted_payback_period,4))
 print("V's Payback ", round(V_weird_discount_payback_period_calc,4))
 print("Exit Value: ", round(exit_value_2021,4))
 print("MOIC:       ", round(MOIC_2021,4))
+
+
+
+
+#
+# def create_connection(db_file):
+#     # create a database connection to a SQLite database
+#     try:
+#         conn = sqlite3.connect(db_file)
+#         return conn
+#     except Error as e:
+#         print(e)
+#
+#     return None
+#
+#
+# def create_table(conn, create_table_sql):
+#     try:
+#         c = conn.cursor()
+#         c.execute(create_table_sql)
+#     except Error as e:
+#         print(e)
+#
+#
+# def insert_result(conn, results):
+#     sql = """INSERT INTO model_results(run_id, brand_name, molecule, NPV)
+#             VALUES(?,?,?,?)"""
+#     cur = conn.cursor()
+#     cur.execute(sql, results)
+#     return cur.lastrowid
+#
+#
+# def select_all_results(conn):
+#     cur = conn.cursor()
+#     cur.execute("SELECT * FROM model_results")
+#     rows = cur.fetchall()
+#
+#     for row in rows:
+#         print(row)
+#
+#
+# conn = create_connection('C:\\sqlite\\db\\pythonsqlite.db')
+#
+# create_table_model_results = """CREATE TABLE IF NOT EXISTS model_results (
+#                         id integer PRIMARY KEY,
+#                         run_id integer NOT NULL,
+#                         brand_name text,
+#                         molecule text NOT NULL,
+#                         NPV real
+#                         ); """
+# #create_table(conn, create_table_model_results)
+#
+# result1 = (101, 'WATER', 'H20', 45.6)
+# result2 = (102, 'GLEEVEC', 'IMATINIB', 127.3)
+# insert_result(conn, result1)
+#
+# insert_result(conn, result2)
+#
+# select_all_results(conn)
+#
+# conn.close()
+#
+
