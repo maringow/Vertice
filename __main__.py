@@ -9,8 +9,8 @@ import tkinter
 from tkinter import *
 from tkinter import ttk
 import gui
-
-
+import sqlite3
+from sqlite3 import Error
 
 ##----------------------------------------------------------------------
 ## DEFINE ANALOG TABLES
@@ -111,8 +111,7 @@ df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='lef
 print(df_merged_data)
 
 # fill in blank prices with lowest price of same strength and pack quantity
-
-
+df_merged_data['WACPrice'].fillna(min(df_merged_data['WACPrice']))
 
 # TODO if no price match on NDC is found, use the lowest price for the same strength and package units
 #     if no record with the same strength and package units, use the lowest overall price
@@ -375,3 +374,5 @@ print("Payback:    ", round(discounted_payback_period,4))
 print("V's Payback ", round(V_weird_discount_payback_period_calc,4))
 print("Exit Value: ", round(exit_value_2021,4))
 print("MOIC:       ", round(MOIC_2021,4))
+
+
