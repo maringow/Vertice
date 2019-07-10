@@ -10,31 +10,6 @@ from tkinter import *
 from tkinter import ttk
 import gui
 
-
-
-##----------------------------------------------------------------------
-## DEFINE ANALOG TABLES
-
-# Moved below and pull numbers from "Model Inputs.xlsx" -Ann
-
-# # Set up analogs by Number of Gx Players, from 0 to 10
-# df_analog = pd.DataFrame(index=range(0, 11))
-# df_analog['Retail Net Price Pct BWAC'] = \
-#     [1.00, 0.60, 0.35, 0.25, 0.20, 0.10, 0.05, 0.02, 0.01, 0.01, 0.01]
-# df_analog['Retail Market Share'] = \
-#     [0.00, 1.00, 0.50, 0.30, 0.25, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03]
-# df_analog['Clinic Net Price Pct BWAC'] = \
-#     [1.00, 0.70, 0.55, 0.40, 0.25, 0.15, 0.10, 0.04, 0.01, 0.01, 0.01]
-# df_analog['Clinic Market Share'] = \
-#     [0.00, 1.00, 0.50, 0.30, 0.25, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03]
-# df_analog['Hospital Net Price Pct BWAC'] = \
-#     [1.00, 0.80, 0.65, 0.45, 0.35, 0.20, 0.10, 0.04, 0.01, 0.01, 0.01]
-# df_analog['Hospital Market Share'] = \
-#     [0.00, 1.00, 0.50, 0.30, 0.25, 0.20, 0.10, 0.08, 0.05, 0.04, 0.03]
-# df_analog['Pct Profit Share'] = \
-#     [0.50, 0.50, 0.50, 0.25, 0.25, 0.25, 0.20, 0.20, 0.20, 0.20, 0.20]
-
-
 ##----------------------------------------------------------------------
 ## INGEST DATA (IMS, ProspectoRx)
 
@@ -48,7 +23,6 @@ brands = sorted(IMS.loc[IMS['Brand/Generic'] == 'BRAND']['Product Sum'].unique()
 molecules = IMS['Combined Molecule'].unique().tolist()
 
 parameters = {}
-
 
 ##----------------------------------------------------------------------
 ## OPEN BRAND SELECTION AND SAVE PARAMETERS
@@ -106,7 +80,6 @@ for index, row in df_equivalents.iterrows():  ## split out anything after first 
     df_equivalents['NDC'][index] = re.sub('[^0-9]', '', re.split('\s', df_equivalents['NDC_ext'][index])[0])
 df_equivalents['NDC'] = pd.to_numeric(df_equivalents['NDC'])
 df_equivalents['NDC'].fillna(999, inplace=True)  ## if NDC is "NDC NOT AVAILABLE" or other invalid value, fill with 999
-
 
 # join price and therapeutic equivalents on NDC
 prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
