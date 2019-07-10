@@ -152,7 +152,7 @@ for key, value in window4.COGS['units_per_pack'].items():
 df_merged_data['API_cost'] = df_merged_data['API_units'] * parameters['api_cost_per_unit']
 df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC', 'API_cost']], on='NDC', how='left').set_index(['year_index', 'ndc_index'])
 df_detail['COGS'] = df_detail['Units'] * df_detail['API_cost']
-df_detail.drop(columns=['API_cost'])
+#df_detail.drop(columns=['API_cost'])
 print(df_detail)
 
 ##----------------------------------------------------------------------
@@ -169,15 +169,15 @@ parameters.update(window5.parameters)
 # Read user input Excel file
 # TODO parse filename - correct backslashes and add .xlsx if not already there
 
-wb = xl.load_workbook(filename=parameters['excel_filepath'], read_only=True, data_only=True) #data_only so it doesn't return us the formulas
+wb = xl.load_workbook(filename=parameters['excel_filepath'], read_only=True, data_only=True) #data_only so it doesn't return the formulas
 sheet = wb['Input']
 
 # Assign single-value variables from Excel cells into parameters dictionary
 parameters.update({'brand_status': sheet['B6'].value,
                    'channel': sheet['B7'].value,
                    'channel_detail': sheet['B8'].value,
-                   'vertice_filing_month': sheet['B9'].value,
-                   'vertice_filing_year': sheet['B10'].value,
+                   #'vertice_filing_month': sheet['B9'].value,
+                   #'vertice_filing_year': sheet['B10'].value,
                    'vertice_launch_month': sheet['B11'].value,
                    'vertice_launch_year': sheet['B12'].value,
                    'indication': sheet['B13'].value,
@@ -267,7 +267,7 @@ df_analog.index.name = "Number of Gx Players"
 df_analog = df_analog.fillna(0)
 
 # Assign Vertice price as % of either BWAC or GWAC
-if parameters['brand_status'] == 'Branded':
+if parameters['brand_status'] == 'Brand':
     col_name = [parameters['channel'] + ' Net Price Pct BWAC']
     df_gfm['Vertice Price as % of WAC'] = df_analog.loc[df_gfm['Number of Gx Players'], col_name].values
 else:
