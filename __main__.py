@@ -17,7 +17,7 @@ from sqlite3 import Error
 ## INGEST DATA (IMS, ProspectoRx)
 
 # ingest IMS and price data
-IMS = pd.read_csv('IMS_demo_file.csv')
+IMS = pd.read_csv('full_extract_6.26.csv')
 prospectoRx = pd.read_csv('prospecto_all_one_year_20190708.csv')
 
 # get valid brands from IMS file
@@ -307,10 +307,13 @@ for i in range(2016, parameters['last_forecasted_year'] + 1):
     else:
         vol_adj.append(1)
 
-df_vertice_ndc_volumes = df_detail['Units'].mul(vol_adj * parameters['pos'] * df_gfm['Gx Penetration'], level=0,
+df_vertice_ndc_volumes = df_detail['Units'].mul(vol_adj * df_gfm['Gx Penetration'], level=0,
                                                  fill_value=0).mul(df_gfm['Vertice Gx Market Share'], level=0,
                                                                    fill_value=0)
-print(df_vertice_ndc_volumes)
+df_vertice_ndc_volumes = df_vertice_ndc_volumes * parameters['pos']
+
+
+
 # Calculating price (WAC) in future
 for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
     df_detail.loc[i]['Price'] = df_detail.loc[i - 1]['Price'] * (1 + parameters['wac_increase'])
@@ -414,10 +417,10 @@ parameters['moic'] = round(MOIC_2021, 2)
 # ##----------------------------------------------------------------------
 # ## WRITE TO DB
 #
-# # open window
-# window = Tk()
-# window6 = gui.ShowResults(window, parameters)
-# window.mainloop()
+# open window
+window = Tk()
+window6 = gui.ShowResults(window, parameters)
+window.mainloop()
 
 
 # import sqlite3
