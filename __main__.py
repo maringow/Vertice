@@ -228,12 +228,12 @@ parameters.update({'brand_status': sheet['B6'].value,
 
 # Set up df_gfm data frame
 df_gfm = pd.DataFrame()
-df_gfm['Year'] = list(range(2015, parameters['last_forecasted_year']+1, 1))
+df_gfm['Year'] = list(range(2016, parameters['last_forecasted_year']+1, 1))
 df_gfm = df_gfm.set_index('Year')
 
 # Add excel yearly data
 def pull_yearly_data(row_number): #row you want data from
-    x = [0] * (parameters['present_year'] - 2015) #zeros for years not in 'model input' excel sheet
+    x = [0] * (parameters['present_year'] - 2016) #zeros for years not in 'model input' excel sheet
     for i in range(2, 14):
         x.append(sheet.cell(row = row_number, column = i).value)
     return(x)
