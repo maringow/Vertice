@@ -17,7 +17,7 @@ from sqlite3 import Error
 ## INGEST DATA (IMS, ProspectoRx)
 
 # ingest IMS and price data
-IMS = pd.read_csv('full_extract_6.26.csv')
+IMS = pd.read_csv('IMS_demo_file.csv')
 prospectoRx = pd.read_csv('prospecto_all_one_year_20190708.csv')
 
 # get valid brands from IMS file
@@ -97,7 +97,6 @@ df_merged_data['WACPrice'].fillna(min(df_merged_data['WACPrice']))
 # build hierarchical index on Year and NDC
 year_range = [int(i) for i in np.array(range(2016, 2031))]
 #TODO - use data from excel to make dataframe?
-#year_range = [int(i) for i in np.array(range(2016, parameters['last_forecasted_year']+1))]
 NDCs = [int(i) for i in df_equivalents['NDC'].unique()]
 index_arrays = [year_range, NDCs]
 multiIndex = pd.MultiIndex.from_product(index_arrays, names=['year_index', 'ndc_index'])
@@ -165,6 +164,7 @@ parameters.update(window5.parameters)
 window = Tk()
 window4 = gui.EnterCOGS(window, df_equivalents)
 window.mainloop()
+
 
 parameters['api_units'] = window4.COGS['units']
 parameters['api_cost_per_unit'] = pd.to_numeric(window4.COGS['cost_per_unit'])
@@ -246,7 +246,7 @@ df_gfm['Profit Share %'] = pull_yearly_data(60)
 df_gfm['Milestone Payments'] =  pull_yearly_data(61)
 df_gfm['SG&A'] = pull_yearly_data(62)
 # df_gfm['R&D Project Expense'] = pull_yearly_data(63)
-# df_gfm['Incremental R&D Headcount Expense'] = pull_yearly_data(64)
+# # df_gfm['Incremental R&D Headcount Expense'] = pull_yearly_data(64)
 # df_gfm['R&D infrastructure cost'] =  pull_yearly_data(65)
 df_gfm['R&D'] =  pull_yearly_data(66)
 # df_gfm['Capitalized Items - Item 1'] = pull_yearly_data(71)
@@ -324,7 +324,7 @@ df_gfm['Net Sales'] = (df_vertice_ndc_prices * df_vertice_ndc_volumes).groupby(l
 for i in range(parameters['present_year'] + 1, parameters['last_forecasted_year'] + 1):
     df_detail.loc[i]['API_cost'] = df_detail.loc[i - 1]['API_cost'] * (1 + parameters['cogs']['cost_increase'])
 
-df_gfm['Standard COGS'] = (df_detail['API_cost'] * df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
+df_gfm['Standard COGS'] = -(df_detail['API_cost'] * df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
 print(df_gfm['Standard COGS'])
 #df_gfm['Standard COGS'] = np.repeat(-3,len(range(2016,2031)))
 
