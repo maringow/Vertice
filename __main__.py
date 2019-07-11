@@ -350,6 +350,7 @@ df_gfm['Total Net Current Assets'] = df_gfm['Working Capital'] + df_gfm['Other N
 df_gfm['Change in Net Current Assets'] = df_gfm['Total Net Current Assets'] - df_gfm['Total Net Current Assets'].shift(1)
 df_gfm['Change in Net Current Assets'] = df_gfm['Change in Net Current Assets'].fillna(0)
 df_gfm['FCF'] = df_gfm['Operating Income'] + df_gfm['Profit Tax'] + df_gfm['Tax depreciation'] + df_gfm['Additional Non-cash Effects'] - df_gfm['Change in Net Current Assets'] + df_gfm['Capital Avoidance'] + df_gfm['Total Capitalized'] - df_gfm['Write-off of Residual Tax Value']
+print(df_gfm['FCF'])
 
 ##----------------------------------------------------------------------
 ## PERFORM FINANCIAL CALCULATIONS
@@ -409,14 +410,14 @@ parameters['irr'] = round(irr, 2)
 parameters['payback'] = round(discounted_payback_period, 2)
 parameters['exit_value'] = round(exit_value_2021, 2)
 parameters['moic'] = round(MOIC_2021, 2)
-
-##----------------------------------------------------------------------
-## WRITE TO DB
-
-# open window
-window = Tk()
-window6 = gui.ShowResults(window, parameters)
-window.mainloop()
+#
+# ##----------------------------------------------------------------------
+# ## WRITE TO DB
+#
+# # open window
+# window = Tk()
+# window6 = gui.ShowResults(window, parameters)
+# window.mainloop()
 
 
 # import sqlite3
