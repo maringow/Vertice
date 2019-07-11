@@ -192,28 +192,31 @@ class EnterCOGS:
         self.standard_cogs_entry = Entry(master)
         self.standard_cogs_entry.grid(row=1, column=1)
 
+        self.or_label = Label(master, text='OR', font='Helvetica 10 bold')
+        self.or_label.grid(row=2, columnspan=2)
+
         self.unit_label = Label(master, text='Enter base unit: ')
-        self.unit_label.grid(row=1, column=0)
+        self.unit_label.grid(row=3, column=0)
         self.unit_entry = Entry(master)
-        self.unit_entry.grid(row=1, column=1)
+        self.unit_entry.grid(row=3, column=1)
 
         self.cost_per_unit_label = Label(master, text='Enter API cost per unit ($): ')
-        self.cost_per_unit_label.grid(row=2, column=0)
+        self.cost_per_unit_label.grid(row=4, column=0)
         self.cost_per_unit_entry = Entry(master)
-        self.cost_per_unit_entry.grid(row=2, column=1)
+        self.cost_per_unit_entry.grid(row=4, column=1)
 
         # add entry boxes for API units for each pack type found in therapeutic equivalents
         self.API_costs_label = Label(master, text='Enter number of units for each pack type found: ')
-        self.API_costs_label.grid(row=3, columnspan=2, pady=10)
+        self.API_costs_label.grid(row=5, columnspan=2, pady=20)
 
         self.entries = []  # save entries created in list so that they can be accessed to store values
-        i = 4  # start placing labels below the already assigned rows
+        i = 6  # start placing labels below the already assigned rows
 
         # add frame to allow scrolling
 
         # add scrollbar
-        self.scroll = Scrollbar(master, orient='vertical')
-        self.scroll.grid(column=3, sticky='ns')
+        #self.scroll = Scrollbar(master, orient='vertical')
+        #self.scroll.grid(column=3, sticky='ns')
 
         self.packs = df_equivalents['Pack'].unique()
         for p in self.packs:
