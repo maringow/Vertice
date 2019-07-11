@@ -311,7 +311,7 @@ df_vertice_ndc_volumes = df_detail['Units'].mul(vol_adj * df_gfm['Gx Penetration
                                                  fill_value=0).mul(df_gfm['Vertice Gx Market Share'], level=0,
                                                                    fill_value=0)
 df_vertice_ndc_volumes = df_vertice_ndc_volumes * parameters['pos']
-
+print(df_vertice_ndc_volumes)
 
 
 # Calculating price (WAC) in future
@@ -329,14 +329,14 @@ for i in range(parameters['present_year'] + 1, parameters['last_forecasted_year'
 
 df_gfm['Standard COGS'] = -(df_detail['API_cost'] * df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
 print(df_gfm['Standard COGS'])
-#df_gfm['Standard COGS'] = np.repeat(-3,len(range(2016,2031)))
+df_gfm['Other Unit COGS'] = -((parameters['cogs']['excipients'] + parameters['cogs']['direct_labor'] + parameters['cogs']['variable_overhead'] + parameters['cogs']['fixed_overhead'] + parameters['cogs']['depreciation'] +  * df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
 
 # Financial statement calculations
 df_gfm['Gross Sales'] =  df_gfm['Net Sales'] / (1-parameters['gtn_%'])
 df_gfm['Distribution'] = -df_gfm['Gross Sales'] * parameters['cogs']['distribution']
 df_gfm['Write-offs'] = -df_gfm['Gross Sales'] * parameters['cogs']['writeoffs']
 df_gfm['Profit Share'] = -(df_gfm['Net Sales'] + df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs']) * df_gfm['Profit Share %']
-df_gfm['COGS'] = df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs'] + df_gfm['Profit Share'] + df_gfm['Milestone Payments']
+df_gfm['COGS'] = df_gfm['Standard COGS'] + df_gfm['Other Unit COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs'] + df_gfm['Profit Share'] + df_gfm['Milestone Payments']
 df_gfm['Gross Profit'] = df_gfm['Net Sales'] + df_gfm['COGS']
 # df_gfm['R&D']  = df_gfm['R&D Project Expense'] + df_gfm['Incremental R&D Headcount Expense'] + df_gfm['R&D infrastructure cost']
 df_gfm['Inventory'] = - parameters['DIO'] * df_gfm['Standard COGS']/360
@@ -396,6 +396,8 @@ df_gfm["MOIC"] = MOIC
 MOIC_2021 = df_gfm["MOIC"].loc[2021]
 
 del x, pv, idx, amt_invested, cum_amt_invested, MOIC
+
+print(df_gfm[['Total Capitalized','R&D','SG&A','Milestone Payments']])
 
 ##----------------------------------------------------------------------
 ##SHOW RESULTS
