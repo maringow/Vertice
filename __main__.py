@@ -351,22 +351,23 @@ df_gfm['FCF'] = df_gfm['Operating Income'] + df_gfm['Profit Tax'] + df_gfm['Tax 
 
 ##----------------------------------------------------------------------
 ## PERFORM FINANCIAL CALCULATIONS
+#TODO delete the hard coded 2030 numbers, just there so it will match the excel
 
 # IRR
-irr = np.irr(df_gfm.FCF.loc[parameters['present_year']:])
+irr = np.irr(df_gfm.FCF.loc[parameters['present_year']:2030])
 
 # NPV
 x = 0
 pv = []
-for i in df_gfm.FCF.loc[parameters['present_year']:]:
+for i in df_gfm.FCF.loc[parameters['present_year']:2030]:
     pv.append(i/(1+parameters['discount_rate'])**x)
     x += 1
 npv = sum(pv)
 
 # Discounted Payback Period
 df_gfm['FCF PV'] = 0
-df_gfm['FCF PV'].loc[parameters['present_year']:] = pv
-df_gfm['Cumulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[parameters['present_year']:])
+df_gfm['FCF PV'].loc[parameters['present_year']:2030] = pv
+df_gfm['Cumulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[parameters['present_year']:2030])
 df_gfm['Cumulative Discounted FCF'] = df_gfm['Cumulative Discounted FCF'].fillna(0)
 idx = df_gfm[df_gfm['Cumulative Discounted FCF'] <= 0].index.max() #last full year for payback calc
 discounted_payback_period = idx - parameters['present_year'] + 1- df_gfm['Cumulative Discounted FCF'].loc[idx]/df_gfm['FCF PV'].loc[idx+1]
@@ -389,7 +390,6 @@ df_gfm["MOIC"] = MOIC
 MOIC_2021 = df_gfm["MOIC"].loc[2021]
 
 del x, pv, idx, amt_invested, cum_amt_invested, MOIC
-
 
 ##----------------------------------------------------------------------
 ##SHOW RESULTS
