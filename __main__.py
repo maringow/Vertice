@@ -351,7 +351,7 @@ df_gfm['FCF'] = df_gfm['Operating Income'] + df_gfm['Profit Tax'] + df_gfm['Tax 
 
 ##----------------------------------------------------------------------
 ## PERFORM FINANCIAL CALCULATIONS
-#TODO delete the hard coded 2030 numbers, just there so it will match the excel
+#TODO delete the 4 hard coded 2030 numbers, just there so it will match the excel
 
 # IRR
 irr = np.irr(df_gfm.FCF.loc[parameters['present_year']:2030])
