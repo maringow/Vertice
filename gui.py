@@ -187,6 +187,11 @@ class EnterCOGS:
         self.title.grid(row=0, columnspan=2, pady=10)
 
         # add entry boxes for desired units and API cost per unit
+        self.standard_cogs_label = Label(master, text='Enter standard COGS in $: ')
+        self.standard_cogs_label.grid(row=1, column=0)
+        self.standard_cogs_entry = Entry(master)
+        self.standard_cogs_entry.grid(row=1, column=1)
+
         self.unit_label = Label(master, text='Enter base unit: ')
         self.unit_label.grid(row=1, column=0)
         self.unit_entry = Entry(master)
@@ -240,7 +245,7 @@ class EnterCOGS:
 
 class ShowResults:
 
-    def __init__(self, master, df_equivalents):
+    def __init__(self, master, parameters):
 
         self.master = master
         master.title('Generics Forecasting Model')
@@ -250,15 +255,15 @@ class ShowResults:
         self.title.pack(pady=10)
 
         # add labels for financial results
-        self.unit_label = Label(master, text='NPV: 5.2')
+        self.unit_label = Label(master, text='NPV: ${} million.'.format(parameters['npv']))
         self.unit_label.pack()
-        self.unit_label = Label(master, text='IRR: 890.4%')
+        self.unit_label = Label(master, text='IRR: {}%'.format(parameters['irr']))
         self.unit_label.pack()
-        self.unit_label = Label(master, text='Payback: 2.1 years')
+        self.unit_label = Label(master, text='Payback: {} years.'.format(parameters['payback']))
         self.unit_label.pack()
-        self.unit_label = Label(master, text='Exit value: 8.0')
+        self.unit_label = Label(master, text='Exit value: ${} million'.format(parameters['exit_value']))
         self.unit_label.pack()
-        self.unit_label = Label(master, text='MOIC: 42.5')
+        self.unit_label = Label(master, text='MOIC: {}x'.format(parameters['moic']))
         self.unit_label.pack()
 
         # add Finish button

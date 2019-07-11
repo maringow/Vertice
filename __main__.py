@@ -369,7 +369,11 @@ print("V's Payback ", round(V_weird_discount_payback_period_calc,4))
 print("Exit Value: ", round(exit_value_2021,4))
 print("MOIC:       ", round(MOIC_2021,4))
 
-
+parameters['npv'] = round(npv, 2)
+parameters['irr'] = round(irr, 2)
+parameters['payback'] = round(discounted_payback_period, 2)
+parameters['exit_value'] = round(exit_value_2021, 2)
+parameters['moic'] = round(MOIC_2021, 2)
 
 ##----------------------------------------------------------------------
 ## WRITE TO DB
@@ -378,7 +382,6 @@ print("MOIC:       ", round(MOIC_2021,4))
 window = Tk()
 window6 = gui.ShowResults(window, parameters)
 window.mainloop()
-
 
 
 # import sqlite3
