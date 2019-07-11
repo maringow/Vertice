@@ -308,14 +308,15 @@ for i in range(2016, parameters['last_forecasted_year'] + 1):
         vol_adj.append(1)
 
 df_vertice_ndc_volumes = df_detail['Units'].mul(vol_adj * parameters['pos'] * df_gfm['Gx Penetration'], level=0,
-                                                fill_value=0).mul(df_gfm['Vertice Gx Market Share'], level=0,
-                                                                  fill_value=0)
-
+                                                 fill_value=0).mul(df_gfm['Vertice Gx Market Share'], level=0,
+                                                                   fill_value=0)
+print(df_vertice_ndc_volumes)
 # Calculating price (WAC) in future
 for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
     df_detail.loc[i]['Price'] = df_detail.loc[i - 1]['Price'] * (1 + parameters['wac_increase'])
 
 df_vertice_ndc_prices = df_detail['Price'].mul(df_gfm['Vertice Price as % of WAC'], level=0, fill_value=0)
+print(df_vertice_ndc_prices)
 
 df_gfm['Net Sales'] = (df_vertice_ndc_prices * df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
 
@@ -324,7 +325,8 @@ for i in range(parameters['present_year'] + 1, parameters['last_forecasted_year'
     df_detail.loc[i]['API_cost'] = df_detail.loc[i - 1]['API_cost'] * (1 + parameters['cogs']['cost_increase'])
 
 df_gfm['Standard COGS'] = (df_detail['API_cost'] * df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
-
+print(df_gfm['Standard COGS'])
+#df_gfm['Standard COGS'] = np.repeat(-3,len(range(2016,2031)))
 
 # Financial statement calculations
 df_gfm['Gross Sales'] =  df_gfm['Net Sales'] / (1-parameters['gtn_%'])
@@ -354,26 +356,26 @@ df_gfm['FCF'] = df_gfm['Operating Income'] + df_gfm['Profit Tax'] + df_gfm['Tax 
 #TODO delete the 4 hard coded 2030 numbers, just there so it will match the excel
 
 # IRR
-irr = np.irr(df_gfm.FCF.loc[parameters['present_year']:2030])
+irr = np.irr(df_gfm.FCF.loc[parameters['present_year']:])
 
 # NPV
 x = 0
 pv = []
-for i in df_gfm.FCF.loc[parameters['present_year']:2030]:
+for i in df_gfm.FCF.loc[parameters['present_year']:]:
     pv.append(i/(1+parameters['discount_rate'])**x)
     x += 1
 npv = sum(pv)
 
 # Discounted Payback Period
 df_gfm['FCF PV'] = 0
-df_gfm['FCF PV'].loc[parameters['present_year']:2030] = pv
-df_gfm['Cumulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[parameters['present_year']:2030])
-df_gfm['Cumulative Discounted FCF'] = df_gfm['Cumulative Discounted FCF'].fillna(0)
-idx = df_gfm[df_gfm['Cumulative Discounted FCF'] <= 0].index.max() #last full year for payback calc
-discounted_payback_period = idx - parameters['present_year'] + 1- df_gfm['Cumulative Discounted FCF'].loc[idx]/df_gfm['FCF PV'].loc[idx+1]
-V_weird_discount_payback_period_calc = idx - parameters['present_year'] + 3.5 - (df_gfm['Cumulative Discounted FCF'].loc[idx+1] / (df_gfm['Cumulative Discounted FCF'].loc[idx+1] - df_gfm['Cumulative Discounted FCF'].loc[idx]))
+df_gfm['FCF PV'].loc[parameters['present_year']:] = pv
+df_gfm['Cummulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[parameters['present_year']:])
+df_gfm['Cummulative Discounted FCF'] = df_gfm['Cummulative Discounted FCF'].fillna(0)
+idx = df_gfm[df_gfm['Cummulative Discounted FCF'] <= 0].index.max() #last full year for payback calc
+discounted_payback_period = idx - parameters['present_year'] + 1- df_gfm['Cummulative Discounted FCF'].loc[idx]/df_gfm['FCF PV'].loc[idx+1]
+V_weird_discount_payback_period_calc = idx - parameters['present_year'] + 3.5 - (df_gfm['Cummulative Discounted FCF'].loc[idx+1] / (df_gfm['Cummulative Discounted FCF'].loc[idx+1] - df_gfm['Cummulative Discounted FCF'].loc[idx]))
 
-# Exit values (specifically saves value in 2021)
+# Exit values (specificially saves value in 2021)
 df_gfm['Exit Values'] = df_gfm['EBIT'] * parameters['exit_multiple']
 exit_value_2021 = df_gfm['Exit Values'].loc[2021]
 
