@@ -329,7 +329,8 @@ for i in range(parameters['present_year'] + 1, parameters['last_forecasted_year'
 
 df_gfm['Standard COGS'] = -(df_detail['API_cost'] * df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
 print(df_gfm['Standard COGS'])
-df_gfm['Other Unit COGS'] = -((parameters['cogs']['excipients'] + parameters['cogs']['direct_labor'] + parameters['cogs']['variable_overhead'] + parameters['cogs']['fixed_overhead'] + parameters['cogs']['depreciation'] +  * df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
+
+df_gfm['Other Unit COGS'] = -((parameters['cogs']['excipients'] + parameters['cogs']['direct_labor'] + parameters['cogs']['variable_overhead'] + parameters['cogs']['fixed_overhead'] + parameters['cogs']['depreciation'] + parameters['cogs']['cmo_markup']) * df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
 
 # Financial statement calculations
 df_gfm['Gross Sales'] =  df_gfm['Net Sales'] / (1-parameters['gtn_%'])
