@@ -192,8 +192,8 @@ class EnterCOGS:
         self.standard_cogs_entry = Entry(master)
         self.standard_cogs_entry.grid(row=1, column=1)
 
-        self.or_label = Label(master, text='OR', font='Helvetica 10 bold')
-        self.or_label.grid(row=2, columnspan=2)
+        self.or_label = Label(master, text='OR enter API cost/unit:', font='Helvetica 9 bold')
+        self.or_label.grid(row=2, columnspan=2, pady=20)
 
         self.unit_label = Label(master, text='Enter base unit: ')
         self.unit_label.grid(row=3, column=0)
