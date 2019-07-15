@@ -381,10 +381,10 @@ if idx == parameters['last_forecasted_year']:
     discounted_payback_period = np.nan
 else:
     discounted_payback_period = idx - parameters['present_year'] + 1- df_gfm['Cummulative Discounted FCF'].loc[idx]/df_gfm['FCF PV'].loc[idx+1]
-if idx == parameters['last_forecasted_year']:
-    discounted_payback_period = np.nan
-else:
-    V_weird_discount_payback_period_calc = idx - parameters['present_year'] + 3.5 - (df_gfm['Cummulative Discounted FCF'].loc[idx+1] / (df_gfm['Cummulative Discounted FCF'].loc[idx+1] - df_gfm['Cummulative Discounted FCF'].loc[idx]))
+# if idx == parameters['last_forecasted_year']:
+#     discounted_payback_period = np.nan
+# else:
+#     V_weird_discount_payback_period_calc = idx - parameters['present_year'] + 3.5 - (df_gfm['Cummulative Discounted FCF'].loc[idx+1] / (df_gfm['Cummulative Discounted FCF'].loc[idx+1] - df_gfm['Cummulative Discounted FCF'].loc[idx]))
 
 # Exit values (specificially saves value in 2021)
 df_gfm['Exit Values'] = df_gfm['EBIT'] * parameters['exit_multiple']
@@ -404,7 +404,7 @@ MOIC_2021 = df_gfm["MOIC"].loc[2023]
 
 del x, pv, idx, amt_invested, cum_amt_invested, MOIC
 
-print(df_gfm[['Net Sales','COGS','FCF','EBIT','Distribution','Write-offs','Profit Share']])
+print(df_gfm[['Net Sales','COGS','FCF','EBIT']])
 
 ##----------------------------------------------------------------------
 ##SHOW RESULTS
@@ -413,7 +413,7 @@ print(df_gfm[['Net Sales','COGS','FCF','EBIT','Distribution','Write-offs','Profi
 print("NPV:        ", round(npv,4))
 print("IRR:        ", round(irr,4))
 print("Payback:    ", round(discounted_payback_period,4))
-print("V's Payback ", round(V_weird_discount_payback_period_calc,4))
+#print("V's Payback ", round(V_weird_discount_payback_period_calc,4))
 print("Exit Value: ", round(exit_value_2021,4))
 print("MOIC:       ", round(MOIC_2021,4))
 
