@@ -13,12 +13,13 @@ import sqlite3
 from sqlite3 import Error
 
 
+
 ##----------------------------------------------------------------------
 ## INGEST DATA (IMS, ProspectoRx)
 
 # ingest IMS and price data
 IMS = pd.read_csv('full_extract_6.26.csv')
-prospectoRx = pd.read_csv('prospecto_all_one_year_20190708.csv')
+prospectoRx = pd.read_csv('prospecto_demo.csv')
 
 # get valid brands from IMS file
 # TODO remove NaNs from these lists
@@ -354,7 +355,12 @@ df_gfm['Total Net Current Assets'] = df_gfm['Working Capital'] + df_gfm['Other N
 df_gfm['Change in Net Current Assets'] = df_gfm['Total Net Current Assets'] - df_gfm['Total Net Current Assets'].shift(1)
 df_gfm['Change in Net Current Assets'] = df_gfm['Change in Net Current Assets'].fillna(0)
 df_gfm['FCF'] = df_gfm['Operating Income'] + df_gfm['Profit Tax'] + df_gfm['Tax depreciation'] + df_gfm['Additional Non-cash Effects'] - df_gfm['Change in Net Current Assets'] + df_gfm['Capital Avoidance'] + df_gfm['Total Capitalized'] - df_gfm['Write-off of Residual Tax Value']
-print(df_gfm['FCF'])
+
+# print('COGS: \n]', df_gfm['Standard COGS'])
+# print('Gross Sales: \n', df_gfm['Gross Sales'])
+# print('Price \n', df_gfm)
+# print('Net Sales \n', df_gfm['Net Sales'])
+# print('FCF \n', df_gfm['FCF'])
 
 ##----------------------------------------------------------------------
 ## PERFORM FINANCIAL CALCULATIONS
@@ -380,11 +386,11 @@ idx = df_gfm[df_gfm['Cummulative Discounted FCF'] <= 0].index.max() #last full y
 discounted_payback_period = idx - parameters['present_year'] + 1- df_gfm['Cummulative Discounted FCF'].loc[idx]/df_gfm['FCF PV'].loc[idx+1]
 V_weird_discount_payback_period_calc = idx - parameters['present_year'] + 3.5 - (df_gfm['Cummulative Discounted FCF'].loc[idx+1] / (df_gfm['Cummulative Discounted FCF'].loc[idx+1] - df_gfm['Cummulative Discounted FCF'].loc[idx]))
 
-# Exit values (specificially saves value in 2021)
+# Exit values (specificially saves value in 2023)
 df_gfm['Exit Values'] = df_gfm['EBIT'] * parameters['exit_multiple']
-exit_value_2021 = df_gfm['Exit Values'].loc[2021]
+exit_value_2021 = df_gfm['Exit Values'].loc[2023]
 
-# MOIC in 2021
+# MOIC in 2023
 amt_invested = df_gfm['Total Capitalized'] + df_gfm['R&D'] + df_gfm['SG&A'] + df_gfm['Milestone Payments']
 cum_amt_invested =np.cumsum(amt_invested)
 MOIC = []
@@ -394,7 +400,7 @@ for i in range(len(df_gfm['Exit Values'])):
     else:
         MOIC.append(-df_gfm['Exit Values'].iloc[i] / cum_amt_invested.iloc[i])
 df_gfm["MOIC"] = MOIC
-MOIC_2021 = df_gfm["MOIC"].loc[2021]
+MOIC_2021 = df_gfm["MOIC"].loc[2023]
 
 del x, pv, idx, amt_invested, cum_amt_invested, MOIC
 
@@ -412,7 +418,7 @@ print("Exit Value: ", round(exit_value_2021,4))
 print("MOIC:       ", round(MOIC_2021,4))
 
 parameters['npv'] = round(npv, 2)
-parameters['irr'] = round(irr, 2)
+parameters['irr'] = round(irr*100, 2)
 parameters['payback'] = round(discounted_payback_period, 2)
 parameters['exit_value'] = round(exit_value_2021, 2)
 parameters['moic'] = round(MOIC_2021, 2)

@@ -125,7 +125,7 @@ class ConfirmBrand:
         self.dosage_forms_label.pack()
 
         # create label for number of competitors found
-        self.competitors_label = Label(master, text='Number of active competitors found: {}'.
+        self.competitors_label = Label(master, text='Number of active competitors found (sales in 2018): {}'.
                                        format(parameters['count_competitors']))
         self.competitors_label.pack()
 
@@ -159,7 +159,7 @@ class EnterFilepath:
         self.filepath_label = Label(master, text='Enter filepath for Excel parameters: ')
         self.filepath_label.pack(pady=10)
         self.filepath_entry = Entry(master)
-        self.filepath_entry.insert(END, 'Model Inputs.xlsx')
+        self.filepath_entry.insert(END, 'Model Inputs Demo.xlsx')
         self.filepath_entry.pack()
 
         # add Save and Continue button
