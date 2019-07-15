@@ -55,8 +55,6 @@ def select_all_forecasts(conn):
         print(row)
 
 
-conn = create_connection('C:\\sqlite\\db\\pythonsqlite.db')
-
 model_results_ddl = """CREATE TABLE IF NOT EXISTS model_results (
                         id integer PRIMARY KEY,
                         run_id integer NOT NULL,
@@ -101,26 +99,7 @@ annual_forecast_ddl = """CREATE TABLE IF NOT EXISTS annual_forecast (
                             ); """
 
 
-create_table(conn, model_results_ddl)
-create_table(conn, annual_forecast_ddl)
 
-result1 = (101, 'WATER', 'H20', 45.6)
-result2 = (102, 'GLEEVEC', 'IMATINIB', 127.3)
-insert_result(conn, result1)
-insert_result(conn, result2)
-
-annual1 = (101, 1000, 2019, 2, .25, 190000, 45000)
-annual2 = (101, 1000, 2020, 3, .25, 250000, 65000)
-insert_forecast(conn, annual1)
-insert_forecast(conn, annual2)
-
+conn = create_connection('C:\\sqlite\\db\\pythonsqlite.db')
 select_all_results(conn)
-select_all_forecasts(conn)
-
-# result3 = (103, 'WATER', 'H20', 45.6)
-# result4 = (104, 'GLEEVEC', 'IMATINIB', 127.3)
-# insert_result(conn, result3)
-# insert_result(conn, result4)
-# select_all_results(conn)
-
 conn.close()
