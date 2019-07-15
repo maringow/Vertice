@@ -64,7 +64,6 @@ model_results_ddl = """CREATE TABLE IF NOT EXISTS model_results (
                         indication text,
                         presentation text,
                         comments text,
-                        gx_competitors integer,
                         vertice_filing_month integer,
                         vertice_filing_year integer,
                         vertice_launch_year integer,
@@ -77,9 +76,7 @@ model_results_ddl = """CREATE TABLE IF NOT EXISTS model_results (
                         per_unit_cogs real,
                         npv real,
                         irr real,
-                        payback real,
-                        exit_value real,
-                        moic real
+                        payback real
                         ); """
 
 
@@ -95,9 +92,10 @@ annual_forecast_ddl = """CREATE TABLE IF NOT EXISTS annual_forecast (
                             net_sales real,
                             cogs real,
                             ebit real,
-                            fcf real
+                            fcf real,
+                            exit_value real,
+                            moic real
                             ); """
-
 
 
 conn = create_connection('C:\\sqlite\\db\\pythonsqlite.db')

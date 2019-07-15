@@ -452,9 +452,17 @@ conn = output.create_connection('C:\\sqlite\\db\\pythonsqlite.db')
 # output.create_table(conn, output.model_results_ddl)
 # output.create_table(conn, output.annual_forecast_ddl)
 
-result = (101, parameters['brand_name'], 'placeholder_molecule', parameters['npv'])
+result = pd.DataFrame(columns=['brand_name', 'molecule_name', 'volume_growth_rate', 'npv'])
+annual_forecast = pd.DataFrame(columns=['forecast_year', 'number_gx_competitors', 'profit_share', 'net_sales', 'cogs'])
 
-output.insert_result(conn, result)
+result.append({'brand_name': 'aaa', 'molecule_name': 'xxx', 'volume_growth_rate': ''})
+result.append({})
+
+for row in result:
+    output.insert_result(conn, row)
+
+for row in annual_forecast:
+    output.insert_forecast(conn, row)
 
 conn.close()
 
