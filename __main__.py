@@ -56,7 +56,11 @@ except KeyError:
 
 print(parameters['dosage_forms'])
 
-# if more than one dosage form is found, prompt user to select desired forms
+
+
+##----------------------------------------------------------------------
+## OPEN DOSAGE FORM SELECTION IF MORE THAN ONE DOSAGE FORM IS FOUND
+
 if len(parameters['dosage_forms']) > 1:
     window = Tk()
     window2 = gui.DosageForms(window, parameters['dosage_forms'])
