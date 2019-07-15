@@ -13,6 +13,7 @@ import sqlite3
 from sqlite3 import Error
 import fincalcs
 import readinputs
+import mergedatasets
 
 
 ##----------------------------------------------------------------------
@@ -65,68 +66,13 @@ if len(parameters['dosage_forms']) > 1:
 print(parameters['dosage_forms'])
 
 ##----------------------------------------------------------------------
-## FIND THERAPEUTIC EQUIVALENTS
+## FIND THERAPEUTIC EQUIVALENTS AND JOIN IMS AND PROSPECTO DATASETS
 
 # find all IMS records that match the Combined Molecule and Prod Form2
-df_equivalents = IMS.loc[(IMS['Combined Molecule'].isin(parameters['combined_molecules'])) &
-                         (IMS['Prod Form2'].isin(parameters['dosage_forms']))]
+df_equivalents = mergedatasets.get_equiv(IMS, parameters)
 parameters['count_eqs'] = len(df_equivalents)
 
-##----------------------------------------------------------------------
-## JOIN IMS AND PROSPECTO DATASETS
-
-def strip_non_numeric(df_column):
-    df_column = df_column.str.replace('[^0-9]', '')
-    df_column = pd.to_numeric(df_column)
-    return df_column
-
-# parse NDC columns from IMS and ProspectoRx
-df_equivalents['NDC'] = strip_non_numeric(df_equivalents['NDC'].str.split('\s', expand=True)[0])
-df_equivalents['NDC'].fillna(999, inplace=True)  ## if NDC is "NDC NOT AVAILABLE" or other invalid value, fill with 999
-prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
-prospectoRx['NDC'] = strip_non_numeric(prospectoRx['NDC'])
-
-# join price and therapeutic equivalents on NDC
-df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
-print(df_merged_data)
-
-# fill in blank prices with lowest price of same strength and pack quantity
-df_merged_data['WACPrice'].fillna(min(df_merged_data['WACPrice']))
-
-# TODO if no price match on NDC is found, use the lowest price for the same strength and package units
-#     if no record with the same strength and package units, use the lowest overall price
-
-# build hierarchical index on Year and NDC
-year_range = [int(i) for i in np.array(range(2016, 2031))]
-#TODO - use data from excel to make dataframe?
-NDCs = [int(i) for i in df_equivalents['NDC'].unique()]
-index_arrays = [year_range, NDCs]
-multiIndex = pd.MultiIndex.from_product(index_arrays, names=['year_index', 'ndc_index'])
-
-# create df with multiindex
-df_detail = pd.DataFrame(index=multiIndex, columns=['NDC', 'Units', 'Price', 'Sales', 'COGS'])
-df_detail['NDC'] = df_detail.index.get_level_values('ndc_index')
-
-# create list of Units columns from IMS data
-columns = [[2016, '2016_Units'], [2017, '2017_Units'], [2018, '2018_Units'], [2019, '2019_Units'],
-           [2020, '2020_Units'], [2021, '2021_Units'], [2022, '2022_Units']]
-
-# TODO try to use strip_non_numeric function here to consolidate
-# map units and price into df_detail
-for year in columns:
-    if year[1] in df_merged_data.columns:
-        df_detail['Units'].loc[year[0]][df_merged_data['NDC']] = pd.to_numeric(
-            df_merged_data[year[1]].str.replace(',', ''))
-        df_detail['Price'].loc[year[0]][df_merged_data['NDC']] = df_merged_data['WACPrice']
-    else:
-        break
-
-# TODO add a check here that data has successfully populated df_detail Units and Price - this
-#    will catch column name changes
-
-# calculate Sales as Units * Price
-df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
-
+df_merged_data, df_detail = mergedatasets.merge_ims_prospecto(df_equivalents, prospectoRx)
 
 ##----------------------------------------------------------------------
 ## WINDOW2: OPEN ConfirmBrand WINDOW AND SAVE
@@ -134,16 +80,10 @@ df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
 # TODO maybe add volume and price numbers to this - could help user forecast growth and confirm code is working
 # TODO make count_competitors work past 2019
 
-def get_growth_rate(df):
-    units_by_year = df['Units'].sum(level='year_index')
-    growth_rate = round(((units_by_year.loc[2018] / units_by_year.loc[2016]) ** (1/2) - 1), 2)
-    return growth_rate
-
-
 # set parameters to display in confirmation window
 parameters['count_competitors'] = len(df_equivalents.loc[pd.isnull(df_equivalents['2018_Units']) == False]
                                       ['Manufacturer'].unique())
-parameters['historical_growth_rate'] = get_growth_rate(df_detail)
+parameters['historical_growth_rate'] = fincalcs.get_growth_rate(df_detail)
 print(parameters['historical_growth_rate'])
 
 # open window
@@ -177,7 +117,7 @@ for key, value in window4.COGS['units_per_pack'].items():
     df_merged_data['API_units'].loc[df_merged_data['Pack'] == key] = pd.to_numeric(value)
 df_merged_data['API_cost'] = df_merged_data['API_units'] * parameters['api_cost_per_unit']
 df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC', 'API_cost']], on='NDC', how='left').set_index(['year_index', 'ndc_index'])
-df_detail['COGS'] = df_detail['Units'] * df_detail['API_cost']
+#df_detail['COGS'] = df_detail['Units'] * df_detail['API_cost']
 #df_detail.drop(columns=['API_cost'])
 print(df_detail)
 
@@ -187,7 +127,7 @@ print(df_detail)
 # Read user input Excel file
 parameters, df_gfm, df_analog = readinputs.read_model_inputs(parameters)
 
-#Financial Calcs (fincalcs.py)
+#Financial Calcs
 irr, npv, discounted_payback_period, mkt_size, mkt_vol, yearly_data = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
 
 ##----------------------------------------------------------------------

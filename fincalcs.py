@@ -1,3 +1,10 @@
+#Function to get 2yr volume CAGR
+def get_growth_rate(df):
+    units_by_year = df['Units'].sum(level='year_index')
+    growth_rate = round(((units_by_year.loc[2018] / units_by_year.loc[2016]) ** (1/2) - 1), 2)
+    return growth_rate
+
+
 #Function to do financial calculations, these are all dependent on previous data
 def financial_calculations(parameters, df_gfm, df_detail, df_analog):
     import pandas as pd
@@ -12,7 +19,7 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
                     1 - df_gfm['Price Discount of Current Gx Net Price'])
 
     # Keep market unit sales for reference
-    df_gfm['Market Volume'] = df_detail['Units'].groupby(level=[0]).sum()  # TODO somehow annualize the volumes???
+    df_gfm['Market Volume'] = df_detail['Units'].groupby(level=[0]).sum()  # TODO annualize the volumes???
     df_gfm['Market Size'] = df_detail['Sales'].groupby(level=[0]).sum()
 
     # Calculating volume of market in future
