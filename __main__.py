@@ -185,29 +185,20 @@ print(df_detail)
 ## READ EXCEL
 
 # Read user input Excel file
-# TODO parse filename - correct backslashes and add .xlsx if not already there
 parameters, df_gfm, df_analog = readinputs.read_model_inputs(parameters)
 
 #Financial Calcs (fincalcs.py)
-irr, npv, discounted_payback_period, mkt_size, mkt_vol, yearly_data = fincalcs.financial_calculations(parameters, df_gfm, df_detail)
+irr, npv, discounted_payback_period, mkt_size, mkt_vol, yearly_data = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
 
 ##----------------------------------------------------------------------
 ##SHOW RESULTS
 
-#not actual output, just to compare results with excel model
-print("NPV:        ", round(npv,4))
-print("IRR:        ", round(irr,4))
-print("Payback:    ", round(discounted_payback_period,4))
-#print("V's Payback ", round(V_weird_discount_payback_period_calc,4))
-print("Exit Value: ", round(exit_value_2021,4))
-print("MOIC:       ", round(MOIC_2021,4))
-
 parameters['npv'] = round(npv, 2)
 parameters['irr'] = round(irr*100, 2)
 parameters['payback'] = round(discounted_payback_period, 2)
-parameters['exit_value'] = round(exit_value_2021, 2)
-parameters['moic'] = round(MOIC_2021, 2)
-#
+parameters['exit_value'] = round(yearly_data.loc[2021]['Exit Values'], 2)
+parameters['moic'] = round(yearly_data.loc[2021]['MOIC'], 2)
+
 # ##----------------------------------------------------------------------
 # ## WRITE TO DB
 #

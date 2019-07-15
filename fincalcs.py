@@ -1,5 +1,8 @@
 #Function to do financial calculations, these are all dependent on previous data
-def financial_calculations(parameters, df_gfm, df_detail):
+def financial_calculations(parameters, df_gfm, df_detail, df_analog):
+    import pandas as pd
+    import numpy as np
+
     # Assign Vertice price as % of either BWAC or GWAC
     if parameters['brand_status'] == 'Brand':
         col_name = [parameters['channel'] + ' Net Price Pct BWAC']

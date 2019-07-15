@@ -1,6 +1,10 @@
 # Read user input Excel file
 # TODO parse filename - correct backslashes and add .xlsx if not already there
 def read_model_inputs(parameters):
+    import openpyxl as xl
+    import pandas as pd
+    import numpy as np
+
     wb = xl.load_workbook(filename=parameters['excel_filepath'], read_only=True, data_only=True) #data_only so it doesn't return the formulas
     sheet = wb['Input']
 
