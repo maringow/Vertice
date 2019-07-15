@@ -21,7 +21,7 @@ def create_table(conn, create_table_sql):
 
 
 def insert_result(conn, results):
-    sql = """INSERT INTO model_results(run_id, brand_name, molecule, NPV)
+    sql = """INSERT INTO model_results(brand_name, molecule, volume_growth_rate, npv)
             VALUES(?,?,?,?)"""
     cur = conn.cursor()
     cur.execute(sql, results)
