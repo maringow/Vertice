@@ -367,12 +367,12 @@ df_gfm['FCF'] = df_gfm['Operating Income'] + df_gfm['Profit Tax'] + df_gfm['Tax 
 #TODO delete the 4 hard coded 2030 numbers, just there so it will match the excel
 
 # IRR
-irr = np.irr(df_gfm.FCF.loc[parameters['present_year']:])
+irr = np.irr(df_gfm.FCF.loc[parameters['present_year']:2030])
 
 # NPV
 x = 0
 pv = []
-for i in df_gfm.FCF.loc[parameters['present_year']:]:
+for i in df_gfm.FCF.loc[parameters['present_year']:2030]:
     pv.append(i/(1+parameters['discount_rate'])**x)
     x += 1
 npv = sum(pv)
@@ -383,8 +383,14 @@ df_gfm['FCF PV'].loc[parameters['present_year']:] = pv
 df_gfm['Cummulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[parameters['present_year']:])
 df_gfm['Cummulative Discounted FCF'] = df_gfm['Cummulative Discounted FCF'].fillna(0)
 idx = df_gfm[df_gfm['Cummulative Discounted FCF'] <= 0].index.max() #last full year for payback calc
-discounted_payback_period = idx - parameters['present_year'] + 1- df_gfm['Cummulative Discounted FCF'].loc[idx]/df_gfm['FCF PV'].loc[idx+1]
-V_weird_discount_payback_period_calc = idx - parameters['present_year'] + 3.5 - (df_gfm['Cummulative Discounted FCF'].loc[idx+1] / (df_gfm['Cummulative Discounted FCF'].loc[idx+1] - df_gfm['Cummulative Discounted FCF'].loc[idx]))
+if idx == parameters['last_forecasted_year']:
+    discounted_payback_period = np.nan
+else:
+    discounted_payback_period = idx - parameters['present_year'] + 1- df_gfm['Cummulative Discounted FCF'].loc[idx]/df_gfm['FCF PV'].loc[idx+1]
+if idx == parameters['last_forecasted_year']:
+    discounted_payback_period = np.nan
+else:
+    V_weird_discount_payback_period_calc = idx - parameters['present_year'] + 3.5 - (df_gfm['Cummulative Discounted FCF'].loc[idx+1] / (df_gfm['Cummulative Discounted FCF'].loc[idx+1] - df_gfm['Cummulative Discounted FCF'].loc[idx]))
 
 # Exit values (specificially saves value in 2023)
 df_gfm['Exit Values'] = df_gfm['EBIT'] * parameters['exit_multiple']
@@ -404,7 +410,7 @@ MOIC_2021 = df_gfm["MOIC"].loc[2023]
 
 del x, pv, idx, amt_invested, cum_amt_invested, MOIC
 
-print(df_gfm[['Total Capitalized','R&D','SG&A','Milestone Payments']])
+print(df_gfm[['Net Sales','COGS','FCF','EBIT','Distribution','Write-offs','Profit Share']])
 
 ##----------------------------------------------------------------------
 ##SHOW RESULTS
