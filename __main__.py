@@ -15,8 +15,8 @@ import output
 import fincalcs
 import readinputs
 import mergedatasets
-#import warnings
-#warnings.filterwarnings('ignore')
+# import warnings
+# warnings.filterwarnings('ignore')
 
 
 ##----------------------------------------------------------------------
@@ -134,8 +134,14 @@ print(df_detail)
 # Read user input Excel file
 parameters, df_gfm, df_analog = readinputs.read_model_inputs(parameters)
 
+print(parameters['volume_growth_rate'])
+print(df_detail['Units'])
+
+
 #Financial Calcs
-irr, npv, discounted_payback_period, mkt_size, mkt_vol, yearly_data = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
+df_gfm, df_detail = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
+
+irr, npv, discounted_payback_period, mkt_size, mkt_vol, yearly_data = fincalcs.valuation_calculations(parameters, df_gfm)
 
 ##----------------------------------------------------------------------
 ##SHOW RESULTS
@@ -160,8 +166,8 @@ window.mainloop()
 
 conn = output.create_connection('C:\\sqlite\\db\\pythonsqlite.db')
 
-# output.create_table(conn, output.model_results_ddl)
-# output.create_table(conn, output.annual_forecast_ddl)
+output.create_table(conn, output.model_results_ddl)
+output.create_table(conn, output.annual_forecast_ddl)
 
 result = pd.DataFrame(columns=['brand_name', 'molecule_name', 'volume_growth_rate', 'npv'])
 annual_forecast = pd.DataFrame(columns=['forecast_year', 'number_gx_competitors', 'profit_share', 'net_sales', 'cogs'])
