@@ -258,11 +258,11 @@ class ShowResults:
         self.title.pack(pady=10)
 
         # add labels for financial results
-        self.unit_label = Label(master, text='NPV: ${} million.'.format(parameters['npv']))
+        self.unit_label = Label(master, text='NPV: ${} million'.format(parameters['npv']))
         self.unit_label.pack()
         self.unit_label = Label(master, text='IRR: {}%'.format(parameters['irr']))
         self.unit_label.pack()
-        self.unit_label = Label(master, text='Payback: {} years.'.format(parameters['payback']))
+        self.unit_label = Label(master, text='Payback: {} years'.format(parameters['payback']))
         self.unit_label.pack()
         self.unit_label = Label(master, text='Exit value: ${} million'.format(parameters['exit_value']))
         self.unit_label.pack()

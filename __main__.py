@@ -14,6 +14,9 @@ from sqlite3 import Error
 import output
 #import warnings
 #warnings.filterwarnings('ignore')
+import fincalcs
+import readinputs
+import mergedatasets
 
 
 ##----------------------------------------------------------------------
@@ -21,7 +24,7 @@ import output
 
 # ingest IMS and price data
 IMS = pd.read_csv('full_extract_6.26.csv')
-prospectoRx = pd.read_csv('prospecto_demo.csv')
+prospectoRx = pd.read_csv('prospecto_all_one_year_20190708.csv')
 
 # get valid brands from IMS file
 # TODO remove NaNs from these lists
@@ -70,68 +73,13 @@ if len(parameters['dosage_forms']) > 1:
 print(parameters['dosage_forms'])
 
 ##----------------------------------------------------------------------
-## FIND THERAPEUTIC EQUIVALENTS
+## FIND THERAPEUTIC EQUIVALENTS AND JOIN IMS AND PROSPECTO DATASETS
 
 # find all IMS records that match the Combined Molecule and Prod Form2
-df_equivalents = IMS.loc[(IMS['Combined Molecule'].isin(parameters['combined_molecules'])) &
-                         (IMS['Prod Form2'].isin(parameters['dosage_forms']))]
+df_equivalents = mergedatasets.get_equiv(IMS, parameters)
 parameters['count_eqs'] = len(df_equivalents)
 
-##----------------------------------------------------------------------
-## JOIN IMS AND PROSPECTO DATASETS
-
-def strip_non_numeric(df_column):
-    df_column = df_column.str.replace('[^0-9]', '')
-    df_column = pd.to_numeric(df_column)
-    return df_column
-
-# parse NDC columns from IMS and ProspectoRx
-df_equivalents['NDC'] = strip_non_numeric(df_equivalents['NDC'].str.split('\s', expand=True)[0])
-df_equivalents['NDC'].fillna(999, inplace=True)  ## if NDC is "NDC NOT AVAILABLE" or other invalid value, fill with 999
-prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
-prospectoRx['NDC'] = strip_non_numeric(prospectoRx['NDC'])
-
-# join price and therapeutic equivalents on NDC
-df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
-print(df_merged_data)
-
-# fill in blank prices with lowest price of same strength and pack quantity
-df_merged_data['WACPrice'].fillna(min(df_merged_data['WACPrice']))
-
-# TODO if no price match on NDC is found, use the lowest price for the same strength and package units
-#     if no record with the same strength and package units, use the lowest overall price
-
-# build hierarchical index on Year and NDC
-year_range = [int(i) for i in np.array(range(2016, 2031))]
-#TODO - use data from excel to make dataframe?
-NDCs = [int(i) for i in df_equivalents['NDC'].unique()]
-index_arrays = [year_range, NDCs]
-multiIndex = pd.MultiIndex.from_product(index_arrays, names=['year_index', 'ndc_index'])
-
-# create df with multiindex
-df_detail = pd.DataFrame(index=multiIndex, columns=['NDC', 'Units', 'Price', 'Sales', 'COGS'])
-df_detail['NDC'] = df_detail.index.get_level_values('ndc_index')
-
-# create list of Units columns from IMS data
-columns = [[2016, '2016_Units'], [2017, '2017_Units'], [2018, '2018_Units'], [2019, '2019_Units'],
-           [2020, '2020_Units'], [2021, '2021_Units'], [2022, '2022_Units']]
-
-# TODO try to use strip_non_numeric function here to consolidate
-# map units and price into df_detail
-for year in columns:
-    if year[1] in df_merged_data.columns:
-        df_detail['Units'].loc[year[0]][df_merged_data['NDC']] = pd.to_numeric(
-            df_merged_data[year[1]].str.replace(',', ''))
-        df_detail['Price'].loc[year[0]][df_merged_data['NDC']] = df_merged_data['WACPrice']
-    else:
-        break
-
-# TODO add a check here that data has successfully populated df_detail Units and Price - this
-#    will catch column name changes
-
-# calculate Sales as Units * Price
-df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
-
+df_merged_data, df_detail = mergedatasets.merge_ims_prospecto(df_equivalents, prospectoRx)
 
 ##----------------------------------------------------------------------
 ## WINDOW2: OPEN ConfirmBrand WINDOW AND SAVE
@@ -139,16 +87,10 @@ df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
 # TODO maybe add volume and price numbers to this - could help user forecast growth and confirm code is working
 # TODO make count_competitors work past 2019
 
-def get_growth_rate(df):
-    units_by_year = df['Units'].sum(level='year_index')
-    growth_rate = round(((units_by_year.loc[2018] / units_by_year.loc[2016]) ** (1/2) - 1), 2)
-    return growth_rate
-
-
 # set parameters to display in confirmation window
 parameters['count_competitors'] = len(df_equivalents.loc[pd.isnull(df_equivalents['2018_Units']) == False]
                                       ['Manufacturer'].unique())
-parameters['historical_growth_rate'] = get_growth_rate(df_detail)
+parameters['historical_growth_rate'] = fincalcs.get_growth_rate(df_detail)
 print(parameters['historical_growth_rate'])
 
 # open window
@@ -182,7 +124,7 @@ for key, value in window4.COGS['units_per_pack'].items():
     df_merged_data['API_units'].loc[df_merged_data['Pack'] == key] = pd.to_numeric(value)
 df_merged_data['API_cost'] = df_merged_data['API_units'] * parameters['api_cost_per_unit']
 df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC', 'API_cost']], on='NDC', how='left').set_index(['year_index', 'ndc_index'])
-df_detail['COGS'] = df_detail['Units'] * df_detail['API_cost']
+#df_detail['COGS'] = df_detail['Units'] * df_detail['API_cost']
 #df_detail.drop(columns=['API_cost'])
 print(df_detail)
 
@@ -190,95 +132,10 @@ print(df_detail)
 ## READ EXCEL
 
 # Read user input Excel file
-# TODO parse filename - correct backslashes and add .xlsx if not already there
+parameters, df_gfm, df_analog = readinputs.read_model_inputs(parameters)
 
-wb = xl.load_workbook(filename=parameters['excel_filepath'], read_only=True, data_only=True) #data_only so it doesn't return the formulas
-sheet = wb['Input']
-
-# Assign single-value variables from Excel cells into parameters dictionary
-parameters.update({'brand_status': sheet['B6'].value,
-                   'channel': sheet['B7'].value,
-                   'channel_detail': sheet['B8'].value,
-                   #'vertice_filing_month': sheet['B9'].value,
-                   #'vertice_filing_year': sheet['B10'].value,
-                   'vertice_launch_month': sheet['B11'].value,
-                   'vertice_launch_year': sheet['B12'].value,
-                   'indication': sheet['B13'].value,
-                   'presentation': sheet['B14'].value,
-                   'loe_year': sheet['B15'].value,
-                   'competition_detail': sheet['B16'].value,
-                   'pos': sheet['B17'].value,
-                   'comments': sheet['B18'].value,
-                   'volume_growth_rate': sheet['B22'].value,
-                   'wac_increase': sheet['B23'].value,
-                   #'chargebacks': sheet['B24'].value,
-                   #'other_gtn': sheet['B25'].value,
-                   'gtn_%': sheet['B26'].value,
-                   'DIO': sheet['B43'].value,
-                   'DSO': sheet['B44'].value,
-                   'DPO': sheet['B45'].value,
-                   'discount_rate': sheet['B49'].value,
-                   'tax_rate': sheet['B50'].value,
-                   'exit_multiple': sheet['B51'].value,
-                   'cogs': {'excipients': sheet['B31'].value,
-                            'direct_labor': sheet['B32'].value,
-                            'variable_overhead': sheet['B33'].value,
-                            'fixed_overhead': sheet['B34'].value,
-                            'depreciation': sheet['B35'].value,
-                            'cmo_markup': sheet['B36'].value,
-                            'cost_increase': sheet['B37'].value,
-                            'distribution': sheet['B38'].value,
-                            'writeoffs': sheet['B39'].value},
-                   'present_year': sheet['B55'].value,
-                   'last_forecasted_year': sheet['M55'].value
-                    })
-
-# Set up df_gfm data frame
-df_gfm = pd.DataFrame()
-df_gfm['Year'] = list(range(2016, parameters['last_forecasted_year']+1, 1))
-df_gfm = df_gfm.set_index('Year')
-
-# Add excel yearly data
-def pull_yearly_data(row_number): #row you want data from
-    x = [0] * (parameters['present_year'] - 2016) #zeros for years not in 'model input' excel sheet
-    for i in range(2, 14):
-        x.append(sheet.cell(row = row_number, column = i).value)
-    return(x)
-
-df_gfm['Gx Penetration'] = pull_yearly_data(56)
-df_gfm['Number of Gx Players'] = pull_yearly_data(57)
-df_gfm['Vertice Gx Market Share'] = pull_yearly_data(58)
-df_gfm['Price Discount of Current Gx Net Price'] = pull_yearly_data(59)
-df_gfm['Profit Share %'] = pull_yearly_data(60)
-df_gfm['Milestone Payments'] =  pull_yearly_data(61)
-df_gfm['SG&A'] = pull_yearly_data(62)
-# df_gfm['R&D Project Expense'] = pull_yearly_data(63)
-# # df_gfm['Incremental R&D Headcount Expense'] = pull_yearly_data(64)
-# df_gfm['R&D infrastructure cost'] =  pull_yearly_data(65)
-df_gfm['R&D'] =  pull_yearly_data(66)
-# df_gfm['Capitalized Items - Item 1'] = pull_yearly_data(71)
-# df_gfm['Capitalized Items - Item 2'] = pull_yearly_data(72)
-# df_gfm['Capitalized Items - Item 3'] = pull_yearly_data(73)
-# df_gfm['Capitalized Items - Item 4'] = pull_yearly_data(74)
-df_gfm['Total Capitalized'] = pull_yearly_data(75)
-df_gfm['Tax depreciation'] = pull_yearly_data(76)
-df_gfm['Additional Impacts on P&L'] = pull_yearly_data(84)
-df_gfm['Net proceeds from Disposals'] = pull_yearly_data(85)
-df_gfm['Write-off of Residual Tax Value'] = pull_yearly_data(86)
-df_gfm['Other Income, Expenses, Except Items'] = pull_yearly_data(87)
-df_gfm['Additional Non-cash Effects'] =  pull_yearly_data(88)
-df_gfm['Other Net Current Assets'] = pull_yearly_data(89)
-df_gfm['Capital Avoidance'] = pull_yearly_data(90)
-df_gfm = df_gfm.fillna(0) #if there is no data entered in the excel file, it gives NaNs, this converts them to 0s
-
-# Adding analog data
-sheet = wb['Analog']
-def pull_analog_data(row_number): #row you want data from
-    x =[]
-    for i in range(2, 12):
-        x.append(sheet.cell(row = row_number, column = i).value)
-    return(x)
-
+#Financial Calcs
+irr, npv, discounted_payback_period, mkt_size, mkt_vol, yearly_data = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
 df_analog = pd.DataFrame(index=range(0, 10))
 df_analog['Retail Net Price Pct BWAC'] = pull_analog_data(2)
 #df_analog['Retail Market Share'] = pull_analog_data(3)
@@ -421,20 +278,12 @@ print(df_gfm[['Net Sales','COGS','FCF','EBIT','Distribution','Write-offs','Profi
 ##----------------------------------------------------------------------
 ##SHOW RESULTS
 
-#not actual output, just to compare results with excel model
-print("NPV:        ", round(npv,4))
-print("IRR:        ", round(irr,4))
-print("Payback:    ", round(discounted_payback_period,4))
-print("V's Payback ", round(V_weird_discount_payback_period_calc,4))
-print("Exit Value: ", round(exit_value_2021,4))
-print("MOIC:       ", round(MOIC_2021,4))
-
 parameters['npv'] = round(npv, 2)
 parameters['irr'] = round(irr*100, 2)
 parameters['payback'] = round(discounted_payback_period, 2)
-parameters['exit_value'] = round(exit_value_2021, 2)
-parameters['moic'] = round(MOIC_2021, 2)
-#
+parameters['exit_value'] = round(yearly_data.loc[2021]['Exit Values'], 2)
+parameters['moic'] = round(yearly_data.loc[2021]['MOIC'], 2)
+
 # ##----------------------------------------------------------------------
 # ## PRINT RESULTS TO WINDOW
 #
