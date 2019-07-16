@@ -139,16 +139,20 @@ print(df_detail['Units'])
 
 
 #Financial Calcs
+parameters['years_discounted'] = 10
+parameters['launch_delay'] = 0
+parameters['cogs_variation'] = 0
+
 df_gfm, df_detail = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
 
-irr, npv, discounted_payback_period, mkt_size, mkt_vol, yearly_data = fincalcs.valuation_calculations(parameters, df_gfm)
+results, yearly_data = fincalcs.valuation_calculations(parameters, df_gfm)
 
 ##----------------------------------------------------------------------
 ##SHOW RESULTS
 
-parameters['npv'] = round(npv, 2)
-parameters['irr'] = round(irr*100, 2)
-parameters['payback'] = round(discounted_payback_period, 2)
+parameters['npv'] = round(results[13], 2)
+parameters['irr'] = round(results[14]*100, 2)
+parameters['payback'] = round(results[15], 2)
 parameters['exit_value'] = round(yearly_data.loc[2021]['Exit Values'], 2)
 parameters['moic'] = round(yearly_data.loc[2021]['MOIC'], 2)
 

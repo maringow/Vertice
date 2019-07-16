@@ -28,6 +28,10 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
         df_detail.loc[i]['Units'] = df_detail.loc[i - 1]['Units'] * (1 + parameters['volume_growth_rate'])
 
     # Adjust volumes for launch year and if there is a partial year
+    parameters['vertice_launch_month'] = parameters['launch_delay'] + parameters['vertice_launch_month']
+    if parameters['vertice_launch_month'] > 12:
+        parameters['vertice_launch_month'] = parameters['vertice_launch_month'] - 12
+        parameters['vertice_launch_year'] = parameters['vertice_launch_year'] + 1
     vol_adj = []
     for i in range(2016, parameters['last_forecasted_year'] + 1):
         if i < parameters['vertice_launch_year']:
@@ -67,6 +71,7 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
                                  'Profit Share %']
     df_gfm['COGS'] = df_gfm['Standard COGS'] + df_gfm['Other Unit COGS'] + df_gfm['Distribution'] + df_gfm[
         'Write-offs'] + df_gfm['Profit Share'] + df_gfm['Milestone Payments']
+    df_gfm['COGS'] = df_gfm['COGS'] * (1 + parameters['cogs_variation'])
     df_gfm['Gross Profit'] = df_gfm['Net Sales'] + df_gfm['COGS']
     df_gfm['Inventory'] = - parameters['DIO'] * df_gfm['Standard COGS'] / 360
     df_gfm['Accounts Receivable'] = parameters['DSO'] * df_gfm['Net Sales'] / 360
@@ -97,12 +102,12 @@ def valuation_calculations(parameters, df_gfm):
     import numpy as np
 
     # IRR
-    irr = np.irr(df_gfm.FCF.loc[parameters['present_year']:2030])
+    irr = np.irr(df_gfm.FCF.loc[parameters['present_year']:parameters['present_year'] + parameters['years_discounted'] + 1])
 
     # NPV
     x = 0
     pv = []
-    for i in df_gfm.FCF.loc[parameters['present_year']:2030]:
+    for i in df_gfm.FCF.loc[parameters['present_year']:parameters['present_year'] + parameters['years_discounted'] + 1]:
         pv.append(i / (1 + parameters['discount_rate']) ** x)
         x += 1
     npv = sum(pv)
@@ -133,11 +138,27 @@ def valuation_calculations(parameters, df_gfm):
             MOIC.append(-df_gfm['Exit Values'].iloc[i] / cum_amt_invested.iloc[i])
     df_gfm["MOIC"] = MOIC
 
-    return (irr,
-            npv,
-            discounted_payback_period,
-            df_gfm['Market Size'].loc[parameters['present_year'] - 1],
-            df_gfm['Market Volume'].loc[parameters['present_year'] - 1],
+    return ([parameters['brand_name'],
+             parameters['combined_molecules'],
+             parameters['channel'],
+             parameters['indication'],
+             parameters['presentation'],
+             parameters['comments'],
+             parameters['vertice_filling_month'],
+             parameters['vertice_filling_year'],
+             parameters['vertice_launch_month'],
+             parameters['vertice_launch_year'],
+             parameters['pos'],
+             df_gfm['Market Volume'].loc[parameters['present_year'] - 1],
+             df_gfm['Market Size'].loc[parameters['present_year'] - 1],
+             parameters['volume_growth_rate'],
+             parameters['wac_increase'],
+             parameters['api_cost_per_unit'],
+             npv,
+             irr,
+             discounted_payback_period],
             # yearly data:
-            df_gfm[['Exit Values', 'MOIC', 'Net Sales', 'COGS', 'EBIT', 'FCF', 'Profit Share']])
+            df_gfm[['Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D', 'Net Sales', 'COGS', 'EBIT',
+                    'FCF', 'Exit Values', 'MOIC']])
+
 
