@@ -198,28 +198,93 @@ except:
     scenario_id = 1
 
 
-### BEGIN LOOP
+### BEGIN LOOP --------------------------------------------------
 # PRODUCE ADJUSTED SCENARIO PARAMETERS (AFTER RUNNING BASE CASE)
+
+#creating the df that will be inserted to the SQL db
+scenario_id = 1
+df_results = pd.DataFrame()
+df_annual_forecast = pd.DataFrame(columns = ['scenario_id','Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D', 'Net Sales', 'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC'])
+
+#add scenario number
+results.append(scenario_id)
+annual_forecast['scenario_id'] = scenario_id
+
+#adding the results to df that will go to SQL
+df_results = df_results.append([results])
+df_annual_forecast = df_annual_forecast.append(annual_forecast)
+
+# a few parameters to scan through, smaller range to save time
+years_to_discount = [10]
+probability_of_success = [.5,1]
+launch_delay_months = [0,12]
+overall_cogs_increase = [-.1,.1]
+wac_price_increase = [0]
+volume_growth = [0,.05]
+
+number_of_gx_players = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                        [2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3]]
+
+for i in years_to_discount:
+    for j in probability_of_success:
+        for k in launch_delay_months:
+            for l in overall_cogs_increase:
+                for m in wac_price_increase:
+                    for n in volume_growth:
+                        for o in number_of_gx_players:
+                            global scenario_id, df_results, df_annual_forecast, parameters, df_gfm, df_detail, df_analog
+                            scenario_id = scenario_id + 1
+
+                            parameters['years_discounted'] = i
+                            parameters['pos'] = j
+                            parameters['launch_delay'] = k
+                            parameters['cogs_variation'] = l
+                            parameters['wac_increase'] = m
+                            parameters['volume_growth_rate'] = n
+                            df_gfm['Number of Gx Players'] = o
+
+                            x, y = financial_calculations(parameters, df_gfm, df_detail, df_analog)
+
+                            v, w = valuation_calculations(parameters, x)
+
+                            # add scenario number to these results
+                            v.append(scenario_id)
+                            w['scenario_id'] = scenario_id
+
+                            # adding results to df that will go to SQL
+                            df_results = df_results.append([v])
+                            df_annual_forecast = df_annual_forecast.append(w)
+
+                            print(scenario_id)
+
+#making scenario_id be the first column
+df_results = df_results[[19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]]
+#creating a forecast year column
+df_annual_forecast['forecast_year'] = df_annual_forecast.index.values
+#ordering the columns to match below
+df_annual_forecast = df_annual_forecast[['scenario_id','forecast_year', 'Number of Gx Players', 'Profit Share','Milestone Payments','R&D','Net Sales','COGS','EBIT','FCF', 'Exit Values', 'MOIC']]
+
+
 # RUN FINANCIAL FUNCTION AND GET BACK 1-ROW "RESULT" and 10-ROW "ANNUAL_FORECAST"
 # ADD SCENARIO_ID TO BOTH
 # APPEND TO OUTSIDE DFS DF_RESULT AND DF_ANNUAL FORECAST
 
 # add scenario_id and append the result row here
 # result['scenario_id'] = scenario_id
-df_result = df_result.append({'scenario_id': 123, 'brand_name': 'abc', 'molecule': 'xyz', 'channel': 'Retail',
-                              'indication': 'sdfsdfa', 'presentation': 'bbb', 'comments': 'ewhgoia ewiveowia ceowav',
-                              'vertice_filing_month': 4, 'vertice_filing_year': 2020,
-                              'vertice_launch_month': 8, 'vertice_launch_year': 2020, 'pos': .8,
-                              'base_year_volume': 324342, 'base_year_sales': 34837347, 'volume_growth_rate': .04,
-                              'wac_price_growth_rate': .02, 'per_unit_cogs': 8.10, 'npv': 5.26, 'irr': 120,
-                              'payback': 1.2}, ignore_index=True)
+# df_result = df_result.append({'scenario_id': 123, 'brand_name': 'abc', 'molecule': 'xyz', 'channel': 'Retail',
+#                               'indication': 'sdfsdfa', 'presentation': 'bbb', 'comments': 'ewhgoia ewiveowia ceowav',
+#                               'vertice_filing_month': 4, 'vertice_filing_year': 2020,
+#                               'vertice_launch_month': 8, 'vertice_launch_year': 2020, 'pos': .8,
+#                               'base_year_volume': 324342, 'base_year_sales': 34837347, 'volume_growth_rate': .04,
+#                               'wac_price_growth_rate': .02, 'per_unit_cogs': 8.10, 'npv': 5.26, 'irr': 120,
+#                               'payback': 1.2}, ignore_index=True)
 
 # add append the annual forecast row here
 # annual_forecast['scenario_id'] = scenario_id
-df_annual_forecast = df_annual_forecast.append({'scenario_id': 101, 'forecast_year': 2019, 'number_gx_competitors': 2,
-                           'profit_share': .25, 'milestone_payments': 500, 'research_development_cost': 300,
-                           'net_sales': 12, 'cogs': 5, 'ebit': 7, 'fcf': 7, 'exit_value': -35, 'moic': -10},
-                          ignore_index=True)
+# df_annual_forecast = df_annual_forecast.append({'scenario_id': 101, 'forecast_year': 2019, 'number_gx_competitors': 2,
+#                            'profit_share': .25, 'milestone_payments': 500, 'research_development_cost': 300,
+#                            'net_sales': 12, 'cogs': 5, 'ebit': 7, 'fcf': 7, 'exit_value': -35, 'moic': -10},
+#                           ignore_index=True)
 
 ### END OF LOOP
 
