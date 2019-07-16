@@ -23,6 +23,7 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
     df_gfm['Market Size'] = df_detail['Sales'].groupby(level=[0]).sum()
 
     # Calculating volume of market in future
+    df_detail['Units'] = df_detail['Units'].fillna(0)
     for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
         df_detail.loc[i]['Units'] = df_detail.loc[i - 1]['Units'] * (1 + parameters['volume_growth_rate'])
 
@@ -88,6 +89,13 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
         'Additional Non-cash Effects'] - df_gfm['Change in Net Current Assets'] + df_gfm['Capital Avoidance'] + df_gfm[
                         'Total Capitalized'] - df_gfm['Write-off of Residual Tax Value']
 
+    return(df_gfm, df_detail)
+
+
+def valuation_calculations(parameters, df_gfm):
+    import pandas as pd
+    import numpy as np
+
     # IRR
     irr = np.irr(df_gfm.FCF.loc[parameters['present_year']:2030])
 
@@ -111,11 +119,10 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
         discounted_payback_period = idx - parameters['present_year'] + 1 - df_gfm['Cummulative Discounted FCF'].loc[
             idx] / df_gfm['FCF PV'].loc[idx + 1]
 
-    # Exit values (specificially saves value in 2021)
+    # Exit values
     df_gfm['Exit Values'] = df_gfm['EBIT'] * parameters['exit_multiple']
-    exit_value_2021 = df_gfm['Exit Values'].loc[2023]
 
-    # MOIC in 2021
+    # MOIC
     amt_invested = df_gfm['Total Capitalized'] + df_gfm['R&D'] + df_gfm['SG&A'] + df_gfm['Milestone Payments']
     cum_amt_invested = np.cumsum(amt_invested)
     MOIC = []
@@ -125,7 +132,6 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
         else:
             MOIC.append(-df_gfm['Exit Values'].iloc[i] / cum_amt_invested.iloc[i])
     df_gfm["MOIC"] = MOIC
-    MOIC_2021 = df_gfm["MOIC"].loc[2023]
 
     return (irr,
             npv,

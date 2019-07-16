@@ -35,7 +35,7 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
     multiIndex = pd.MultiIndex.from_product(index_arrays, names=['year_index', 'ndc_index'])
 
     # create df with multiindex
-    df_detail = pd.DataFrame(index=multiIndex, columns=['NDC', 'Units', 'Price', 'Sales', 'COGS'])
+    df_detail = pd.DataFrame(index=multiIndex, columns=['NDC', 'Units', 'Price', 'Sales'])
     df_detail['NDC'] = df_detail.index.get_level_values('ndc_index')
 
     # create list of Units columns from IMS data
