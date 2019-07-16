@@ -2,6 +2,22 @@
 def get_equiv(IMS, parameters):
     return  IMS.loc[(IMS['Combined Molecule'].isin(parameters['combined_molecules'])) & (IMS['Prod Form2'].isin(parameters['dosage_forms']))]
 
+def get_dosage_forms(parameters, IMS):
+    try:
+        if parameters['search_type'] == 'brand':
+            parameters['combined_molecules'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']][
+                'Combined Molecule'].unique()
+            parameters['dosage_forms'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']]['Prod Form2'].unique()
+        elif parameters['search_type'] == 'molecule':
+            parameters['combined_molecules'] = [parameters['molecule_name']]
+            parameters['dosage_forms'] = IMS.loc[IMS['Combined Molecule'] ==
+                                                 parameters['molecule_name']]['Prod Form2'].unique()
+            parameters['brand_name'] = ''
+    except KeyError:
+        print('Please select a brand or molecule to run the model.')
+
+    return parameters
+
 #join IMS and prospecto data
 def merge_ims_prospecto(df_equivalents, prospectoRx):
     import pandas as pd

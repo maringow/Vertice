@@ -8,13 +8,14 @@ import openpyxl as xl
 import tkinter
 from tkinter import *
 from tkinter import ttk
-import gui
 import sqlite3
 from sqlite3 import Error
-import output
+import gui
+import ingestdata
 import fincalcs
 import readinputs
 import mergedatasets
+import output
 # import warnings
 # warnings.filterwarnings('ignore')
 
@@ -45,19 +46,7 @@ print(parameters)
 ##----------------------------------------------------------------------
 ## FIND DOSAGE FORMS, OPEN DOSAGE FORM WINDOW AND SAVE SELECTIONS
 
-try:
-    if parameters['search_type'] == 'brand':
-        parameters['combined_molecules'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']][
-            'Combined Molecule'].unique()
-        parameters['dosage_forms'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']]['Prod Form2'].unique()
-    elif parameters['search_type'] == 'molecule':
-        parameters['combined_molecules'] = [parameters['molecule_name']]
-        parameters['dosage_forms'] = IMS.loc[IMS['Combined Molecule'] ==
-                                             parameters['molecule_name']]['Prod Form2'].unique()
-        parameters['brand_name'] = ''
-except KeyError:
-    print('Please select a brand or molecule to run the model.')
-
+parameters = mergedatasets.get_dosage_forms(parameters, IMS)
 print(parameters['dosage_forms'])
 
 
@@ -176,7 +165,7 @@ df_annual_forecast = pd.DataFrame(columns = ['scenario_id','Number of Gx Players
 
 #add scenario number
 results.append(scenario_id)
-annual_forecast['scenario_id'] = scenario_id
+annual_forecast['scenario_id'] = 0
 
 #adding the results to df that will go to SQL
 df_result = df_result.append([results])
@@ -233,25 +222,8 @@ df_result = df_result[[19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]]
 # ADD SCENARIO_ID TO BOTH
 # APPEND TO OUTSIDE DFS DF_RESULT AND DF_ANNUAL FORECAST
 
-# add scenario_id and append the result row here
-# result['scenario_id'] = scenario_id
-# df_result = df_result.append({'scenario_id': 123, 'brand_name': 'abc', 'molecule': 'xyz', 'channel': 'Retail',
-#                               'indication': 'sdfsdfa', 'presentation': 'bbb', 'comments': 'ewhgoia ewiveowia ceowav',
-#                               'vertice_filing_month': 4, 'vertice_filing_year': 2020,
-#                               'vertice_launch_month': 8, 'vertice_launch_year': 2020, 'pos': .8,
-#                               'base_year_volume': 324342, 'base_year_sales': 34837347, 'volume_growth_rate': .04,
-#                               'wac_price_growth_rate': .02, 'per_unit_cogs': 8.10, 'npv': 5.26, 'irr': 120,
-#                               'payback': 1.2}, ignore_index=True)
+### FORMATTING THE RESULTS TO PUT INTO DB ----------------------------
 
-# add append the annual forecast row here
-# annual_forecast['scenario_id'] = scenario_id
-# df_annual_forecast = df_annual_forecast.append({'scenario_id': 101, 'forecast_year': 2019, 'number_gx_competitors': 2,
-#                            'profit_share': .25, 'milestone_payments': 500, 'research_development_cost': 300,
-#                            'net_sales': 12, 'cogs': 5, 'ebit': 7, 'fcf': 7, 'exit_value': -35, 'moic': -10},
-#                           ignore_index=True)
-
-### END OF LOOP-------------------------------------------------------
-# FORMATTING THE RESULTS TO PUT INTO DB
 # assign run_ids starting at 0 once loop is over
 run_id = 0
 df_result['run_id'] = run_id
@@ -260,10 +232,10 @@ df_annual_forecast['run_id'] = run_id
 df_result.columns = ['scenario_id', 'brand_name', 'molecule', 'channel', 'indication', 'presentation',
                     'comments', 'vertice_filing_month', 'vertice_filing_year','vertice_launch_month',
                     'vertice_launch_year', 'pos', 'base_year_volume','base_year_sales', 'volume_growth_rate',
-                    'wac_price_growth_rate', 'per_unit_cogs','npv', 'irr', 'payback', 'run_id']
+                    'wac_price_growth_rate', 'per_unit_cogs','npv', 'irr', 'payback']
+
 #creating a forecast year column
 df_annual_forecast['forecast_year'] = df_annual_forecast.index.values
-
 #ordering the columns
 df_result = df_result[['scenario_id', 'run_id', 'brand_name', 'molecule', 'channel', 'indication', 'presentation',
                       'comments', 'vertice_filing_month', 'vertice_filing_year','vertice_launch_month',
@@ -293,8 +265,6 @@ except:
     scenario_id = 1
 
 #adding the max run_id and scenario_id to the 0-base numbers
-print(df_result['run_id'])
-
 df_result['run_id'] = df_result['run_id'] + run_id
 df_annual_forecast['run_id'] = df_annual_forecast['run_id'] + run_id
 df_result['scenario_id'] = df_result['scenario_id'] + scenario_id
