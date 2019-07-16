@@ -271,8 +271,8 @@ df_annual_forecast = df_annual_forecast[['scenario_id', 'run_id', 'forecast_year
 conn = output.create_connection('C:\\sqlite\\db\\pythonsqlite.db')
 
 #create tables - only needed on first run
-output.create_table(conn, output.model_results_ddl)
-output.create_table(conn, output.annual_forecast_ddl)
+# output.create_table(conn, output.model_results_ddl)
+# output.create_table(conn, output.annual_forecast_ddl)
 
 # get max values for run_id and scenario_id
 try:
