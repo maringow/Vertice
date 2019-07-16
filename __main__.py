@@ -164,27 +164,39 @@ window.mainloop()
 # ##----------------------------------------------------------------------
 # ## WRITE TO DB
 
+
+# create tables - only needed on first run
+# output.create_table(conn, output.model_results_ddl)
+# output.create_table(conn, output.annual_forecast_ddl)
+
+# create empty dataframes
+df_result = pd.DataFrame()
+df_annual_forecast = pd.DataFrame()
+
+# open connection to database
 conn = output.create_connection('C:\\sqlite\\db\\pythonsqlite.db')
 
-output.create_table(conn, output.model_results_ddl)
-output.create_table(conn, output.annual_forecast_ddl)
-
-run_id, result_id = output.select_max_ids(conn)[0]
+run_id, scenario_id = output.select_max_ids(conn)[0]
 run_id += 1
-result_id += 1
+scenario_id += 1
 
-### LOOP: RUN FINANCIAL FUNCTION, ADD RESULT_ID, APPEND TO OUTSIDE DFS, RESULT_ID+=1
+### LOOP:
+# PRODUCE ADJUSTED SCENARIO PARAMETERS (AFTER RUNNING BASE CASE)
+# RUN FINANCIAL FUNCTION AND GET BACK 1-ROW "RESULT" and 10-ROW "ANNUAL_FORECAST"
+# ADD SCENARIO_ID TO BOTH
+# APPEND TO OUTSIDE DFS DF_RESULT AND DF_ANNUAL FORECAST
+# RESULT_ID+=1
 
 # assign run_ids at the end
 df_result['run_id'] = run_id
 df_annual_forecast['run_id'] = run_id
 
 # insert data
-for index, row in result.iterrows():
+for index, row in df_result.iterrows():
     print(row)
     output.insert_result(conn, row)
 
-for index, row in result.iterrows():
+for index, row in df_result.iterrows():
     print(row)
     output.insert_result(conn, row)
 

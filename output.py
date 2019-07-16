@@ -20,25 +20,6 @@ def create_table(conn, create_table_sql):
         print(e)
 
 
-def insert_result(conn, results):
-    sql = """INSERT INTO model_results(run_id, brand_name, molecule, volume_growth_rate, npv)
-            VALUES(?,?,?,?,?)"""
-    cur = conn.cursor()
-    cur.execute(sql, results)
-    conn.commit()
-    return cur.lastrowid
-
-
-def insert_forecast(conn, annual_forecast):
-    sql = """INSERT INTO annual_forecast(result_id, run_id, forecast_year, number_gx_competitors, profit_share,
-            net_sales, cogs)
-            VALUES(?,?,?,?,?,?,?)"""
-    cur = conn.cursor()
-    cur.execute(sql, annual_forecast)
-    conn.commit()
-    return cur.lastrowid
-
-
 def select_all_results(conn):
     cur = conn.cursor()
     cur.execute("SELECT * FROM model_results")
@@ -65,9 +46,23 @@ def select_max_ids(conn):
     return row
 
 
+def insert_result(conn, results):
+    sql = """INSERT INTO model_results(scenario_id, run_id, brand_name, molecule, channel, indication,
+    presentation, comments, vertice_filing_month, vertice_filing_year, vertice_launch_month, vertice_launch_year, 
+    pos, base_year_volume, base_year_sales, volume_growth_rate, wac_price_growth_rate, per_unit_cogs, npv, irr, payback)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
+    cur = conn.cursor()
+    cur.execute(sql, results)
+    conn.commit()
+    return cur.lastrowid
+
+
+
+
+
 model_results_ddl = """CREATE TABLE IF NOT EXISTS model_results (
                         id integer PRIMARY KEY,
-                        result_id integer NOT NULL,
+                        scenario_id integer NOT NULL,
                         run_id integer NOT NULL,
                         brand_name text,
                         molecule text NOT NULL,
@@ -77,8 +72,8 @@ model_results_ddl = """CREATE TABLE IF NOT EXISTS model_results (
                         comments text,
                         vertice_filing_month integer,
                         vertice_filing_year integer,
-                        vertice_launch_year integer,
                         vertice_launch_month integer,
+                        vertice_launch_year integer,
                         pos real,
                         base_year_volume,
                         base_year_sales,
@@ -90,10 +85,18 @@ model_results_ddl = """CREATE TABLE IF NOT EXISTS model_results (
                         payback real
                         ); """
 
+def insert_forecast(conn, annual_forecast):
+    sql = """INSERT INTO annual_forecast(scenario_id, run_id, forecast_year, number_gx_competitors, profit_share,
+            milestone_payments, research_development_cost, net_sales, cogs, ebit, fcf, exit_value, moic)
+            VALUES(?,?,?,?,?,?,?)"""
+    cur = conn.cursor()
+    cur.execute(sql, annual_forecast)
+    conn.commit()
+    return cur.lastrowid
 
 annual_forecast_ddl = """CREATE TABLE IF NOT EXISTS annual_forecast (
                             id integer PRIMARY KEY,
-                            result_id integer,
+                            scenario_id integer,
                             run_id integer,
                             forecast_year integer,
                             number_gx_competitors integer,
