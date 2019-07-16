@@ -169,10 +169,6 @@ window.mainloop()
 # ## WRITE TO DB
 
 
-# create tables - only needed on first run
-# output.create_table(conn, output.model_results_ddl)
-# output.create_table(conn, output.annual_forecast_ddl)
-
 # create empty dataframes
 df_result = pd.DataFrame()
 df_annual_forecast = pd.DataFrame()
@@ -180,9 +176,18 @@ df_annual_forecast = pd.DataFrame()
 # open connection to database
 conn = output.create_connection('C:\\sqlite\\db\\pythonsqlite.db')
 
-run_id, scenario_id = output.select_max_ids(conn)[0]
-run_id += 1
-scenario_id += 1
+# create tables - only needed on first run
+output.create_table(conn, output.model_results_ddl)
+output.create_table(conn, output.annual_forecast_ddl)
+
+print(output.select_max_ids(conn))
+try:
+    scenario_id, run_id = output.select_max_ids(conn)[0]
+    run_id += 1
+    scenario_id += 1
+except:
+    run_id = 1
+    scenario_id = 1
 
 ### LOOP:
 # PRODUCE ADJUSTED SCENARIO PARAMETERS (AFTER RUNNING BASE CASE)
@@ -192,23 +197,6 @@ scenario_id += 1
 # RESULT_ID+=1
 
 # mocked up data for testing
-annual_forecast_ddl = """CREATE TABLE IF NOT EXISTS annual_forecast (
-                            id integer PRIMARY KEY,
-                            scenario_id integer,
-                            run_id integer,
-                            forecast_year integer,
-                            number_gx_competitors integer,
-                            profit_share real,
-                            milestone_payments real,
-                            research_development_cost real,
-                            net_sales real,
-                            cogs real,
-                            ebit real,
-                            fcf real,
-                            exit_value real,
-                            moic real
-                            ); """
-
 df_annual_forecast.append([101, 202, 2019, 2, .25, 500, 300, 12, 5, 7, 7, -35, -10])
 
 # assign run_ids at the end
@@ -225,4 +213,3 @@ for index, row in df_result.iterrows():
     output.insert_result(conn, row)
 
 conn.close()
-

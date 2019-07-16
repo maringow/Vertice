@@ -39,9 +39,8 @@ def select_all_forecasts(conn):
 
 
 def select_max_ids(conn):
-
-    cur=conn.cursor()
-    cur.execute("SELECT MAX(scenario_id, run_id) FROM model_results")
+    cur = conn.cursor()
+    cur.execute("SELECT MAX(scenario_id), MAX(run_id) FROM annual_forecast")
     row = cur.fetchall()
 
     return row
