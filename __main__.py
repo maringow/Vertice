@@ -156,60 +156,88 @@ parameters['payback'] = round(results[15], 2)
 parameters['exit_value'] = round(yearly_data.loc[2021]['Exit Values'], 2)
 parameters['moic'] = round(yearly_data.loc[2021]['MOIC'], 2)
 
-# ##----------------------------------------------------------------------
-# ## PRINT RESULTS TO WINDOW
+##----------------------------------------------------------------------
+## PRINT RESULTS TO WINDOW
 #
 # open window
 window = Tk()
 window6 = gui.ShowResults(window, parameters)
 window.mainloop()
 
-
-# ##----------------------------------------------------------------------
-# ## WRITE TO DB
-
+##----------------------------------------------------------------------
+## WRITE TO DB
 
 # create empty dataframes
-df_result = pd.DataFrame()
-df_annual_forecast = pd.DataFrame()
+df_result = pd.DataFrame(columns=['scenario_id', 'run_id', 'brand_name', 'molecule', 'channel', 'indication',
+                                  'presentation', 'comments', 'vertice_filing_month', 'vertice_filing_year',
+                                  'vertice_launch_month', 'vertice_launch_year', 'pos', 'base_year_volume',
+                                  'base_year_sales', 'volume_growth_rate', 'wac_price_growth_rate', 'per_unit_cogs',
+                                  'npv', 'irr', 'payback'])
+
+df_annual_forecast = pd.DataFrame(columns=['scenario_id', 'run_id', 'forecast_year', 'number_gx_competitors',
+                                           'profit_share', 'milestone_payments', 'research_development_cost',
+                                           'net_sales', 'cogs', 'ebit', 'fcf', 'exit_value', 'moic'])
 
 # open connection to database
 conn = output.create_connection('C:\\sqlite\\db\\pythonsqlite.db')
 
 # create tables - only needed on first run
-output.create_table(conn, output.model_results_ddl)
-output.create_table(conn, output.annual_forecast_ddl)
+# output.create_table(conn, output.model_results_ddl)
+# output.create_table(conn, output.annual_forecast_ddl)
 
-print(output.select_max_ids(conn))
+# get max values for run_id and scenario_id
 try:
     scenario_id, run_id = output.select_max_ids(conn)[0]
+    print('run_id {}'.format(run_id))
     run_id += 1
     scenario_id += 1
+    print('run id: {}'.format(run_id))
 except:
+    print('Exception occurred when reading max IDs')
     run_id = 1
     scenario_id = 1
 
-### LOOP:
+
+### BEGIN LOOP
 # PRODUCE ADJUSTED SCENARIO PARAMETERS (AFTER RUNNING BASE CASE)
 # RUN FINANCIAL FUNCTION AND GET BACK 1-ROW "RESULT" and 10-ROW "ANNUAL_FORECAST"
 # ADD SCENARIO_ID TO BOTH
 # APPEND TO OUTSIDE DFS DF_RESULT AND DF_ANNUAL FORECAST
-# RESULT_ID+=1
 
-# mocked up data for testing
-df_annual_forecast.append([101, 202, 2019, 2, .25, 500, 300, 12, 5, 7, 7, -35, -10])
+# add scenario_id and append the result row here
+# result['scenario_id'] = scenario_id
+df_result = df_result.append({'scenario_id': 123, 'brand_name': 'abc', 'molecule': 'xyz', 'channel': 'Retail',
+                              'indication': 'sdfsdfa', 'presentation': 'bbb', 'comments': 'ewhgoia ewiveowia ceowav',
+                              'vertice_filing_month': 4, 'vertice_filing_year': 2020,
+                              'vertice_launch_month': 8, 'vertice_launch_year': 2020, 'pos': .8,
+                              'base_year_volume': 324342, 'base_year_sales': 34837347, 'volume_growth_rate': .04,
+                              'wac_price_growth_rate': .02, 'per_unit_cogs': 8.10, 'npv': 5.26, 'irr': 120,
+                              'payback': 1.2}, ignore_index=True)
 
-# assign run_ids at the end
+# add append the annual forecast row here
+# annual_forecast['scenario_id'] = scenario_id
+df_annual_forecast = df_annual_forecast.append({'scenario_id': 101, 'forecast_year': 2019, 'number_gx_competitors': 2,
+                           'profit_share': .25, 'milestone_payments': 500, 'research_development_cost': 300,
+                           'net_sales': 12, 'cogs': 5, 'ebit': 7, 'fcf': 7, 'exit_value': -35, 'moic': -10},
+                          ignore_index=True)
+
+### END OF LOOP
+
+# assign run_ids once loop is over
 df_result['run_id'] = run_id
 df_annual_forecast['run_id'] = run_id
+
 
 # insert data
 for index, row in df_result.iterrows():
     print(row)
     output.insert_result(conn, row)
 
-for index, row in df_result.iterrows():
+for index, row in df_annual_forecast.iterrows():
     print(row)
-    output.insert_result(conn, row)
+    output.insert_forecast(conn, row)
+
+output.select_all_forecasts(conn)
+output.select_all_results(conn)
 
 conn.close()
