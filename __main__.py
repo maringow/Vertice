@@ -187,6 +187,26 @@ scenario_id += 1
 # APPEND TO OUTSIDE DFS DF_RESULT AND DF_ANNUAL FORECAST
 # RESULT_ID+=1
 
+# mocked up data for testing
+annual_forecast_ddl = """CREATE TABLE IF NOT EXISTS annual_forecast (
+                            id integer PRIMARY KEY,
+                            scenario_id integer,
+                            run_id integer,
+                            forecast_year integer,
+                            number_gx_competitors integer,
+                            profit_share real,
+                            milestone_payments real,
+                            research_development_cost real,
+                            net_sales real,
+                            cogs real,
+                            ebit real,
+                            fcf real,
+                            exit_value real,
+                            moic real
+                            ); """
+
+df_annual_forecast.append([101, 202, 2019, 2, .25, 500, 300, 12, 5, 7, 7, -35, -10])
+
 # assign run_ids at the end
 df_result['run_id'] = run_id
 df_annual_forecast['run_id'] = run_id

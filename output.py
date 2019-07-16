@@ -39,8 +39,9 @@ def select_all_forecasts(conn):
 
 
 def select_max_ids(conn):
+
     cur=conn.cursor()
-    cur.execute("SELECT MAX(run_id) FROM model_results")
+    cur.execute("SELECT MAX(scenario_id, run_id) FROM model_results")
     row = cur.fetchall()
 
     return row
@@ -57,7 +58,14 @@ def insert_result(conn, results):
     return cur.lastrowid
 
 
-
+def insert_forecast(conn, annual_forecast):
+    sql = """INSERT INTO annual_forecast(scenario_id, run_id, forecast_year, number_gx_competitors, profit_share,
+            milestone_payments, research_development_cost, net_sales, cogs, ebit, fcf, exit_value, moic)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)"""
+    cur = conn.cursor()
+    cur.execute(sql, annual_forecast)
+    conn.commit()
+    return cur.lastrowid
 
 
 model_results_ddl = """CREATE TABLE IF NOT EXISTS model_results (
@@ -85,14 +93,6 @@ model_results_ddl = """CREATE TABLE IF NOT EXISTS model_results (
                         payback real
                         ); """
 
-def insert_forecast(conn, annual_forecast):
-    sql = """INSERT INTO annual_forecast(scenario_id, run_id, forecast_year, number_gx_competitors, profit_share,
-            milestone_payments, research_development_cost, net_sales, cogs, ebit, fcf, exit_value, moic)
-            VALUES(?,?,?,?,?,?,?)"""
-    cur = conn.cursor()
-    cur.execute(sql, annual_forecast)
-    conn.commit()
-    return cur.lastrowid
 
 annual_forecast_ddl = """CREATE TABLE IF NOT EXISTS annual_forecast (
                             id integer PRIMARY KEY,
@@ -112,6 +112,3 @@ annual_forecast_ddl = """CREATE TABLE IF NOT EXISTS annual_forecast (
                             ); """
 
 
-conn = create_connection('C:\\sqlite\\db\\pythonsqlite.db')
-select_all_results(conn)
-conn.close()
