@@ -21,8 +21,8 @@ def create_table(conn, create_table_sql):
 
 
 def insert_result(conn, results):
-    sql = """INSERT INTO model_results(brand_name, molecule, volume_growth_rate, npv)
-            VALUES(?,?,?,?)"""
+    sql = """INSERT INTO model_results(run_id, brand_name, molecule, volume_growth_rate, npv)
+            VALUES(?,?,?,?,?)"""
     cur = conn.cursor()
     cur.execute(sql, results)
     conn.commit()
@@ -38,6 +38,7 @@ def insert_forecast(conn, annual_forecast):
     conn.commit()
     return cur.lastrowid
 
+
 def select_all_results(conn):
     cur = conn.cursor()
     cur.execute("SELECT * FROM model_results")
@@ -45,6 +46,7 @@ def select_all_results(conn):
 
     for row in rows:
         print(row)
+
 
 def select_all_forecasts(conn):
     cur = conn.cursor()
@@ -55,8 +57,17 @@ def select_all_forecasts(conn):
         print(row)
 
 
+def select_max_ids(conn):
+    cur=conn.cursor()
+    cur.execute("SELECT MAX(run_id) FROM model_results")
+    row = cur.fetchall()
+
+    return row
+
+
 model_results_ddl = """CREATE TABLE IF NOT EXISTS model_results (
                         id integer PRIMARY KEY,
+                        result_id integer NOT NULL,
                         run_id integer NOT NULL,
                         brand_name text,
                         molecule text NOT NULL,

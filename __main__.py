@@ -163,31 +163,24 @@ conn = output.create_connection('C:\\sqlite\\db\\pythonsqlite.db')
 # output.create_table(conn, output.model_results_ddl)
 # output.create_table(conn, output.annual_forecast_ddl)
 
-result = pd.DataFrame(columns=['brand_name', 'molecule_name', 'volume_growth_rate', 'npv'])
-annual_forecast = pd.DataFrame(columns=['forecast_year', 'number_gx_competitors', 'profit_share', 'net_sales', 'cogs'])
+run_id, result_id = output.select_max_ids(conn)[0]
+run_id += 1
+result_id += 1
 
-result.append({'brand_name': 'aaa', 'molecule': 'xxx', 'volume_growth_rate': .05, 'npv': 5.26})
-result.append({'brand_name': 'bbb', 'molecule': 'yyy', 'volume_growth_rate': -.03, 'npv': -1.2})
+### LOOP: RUN FINANCIAL FUNCTION, ADD RESULT_ID, APPEND TO OUTSIDE DFS, RESULT_ID+=1
 
-for row in result:
+# assign run_ids at the end
+df_result['run_id'] = run_id
+df_annual_forecast['run_id'] = run_id
+
+# insert data
+for index, row in result.iterrows():
+    print(row)
     output.insert_result(conn, row)
 
-for row in annual_forecast:
-    output.insert_forecast(conn, row)
+for index, row in result.iterrows():
+    print(row)
+    output.insert_result(conn, row)
 
 conn.close()
-
-# result1 = (101, 'WATER', 'H20', 45.6)
-# result2 = (102, 'GLEEVEC', 'IMATINIB', 127.3)
-# insert_result(conn, result1)
-# insert_result(conn, result2)
-#
-# annual1 = (101, 1000, 2019, 2, .25, 190000, 45000)
-# annual2 = (101, 1000, 2020, 3, .25, 250000, 65000)
-# insert_forecast(conn, annual1)
-# insert_forecast(conn, annual2)
-#
-# select_all_results(conn)
-# select_all_forecasts(conn)
-
 
