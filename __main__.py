@@ -145,7 +145,7 @@ parameters['cogs_variation'] = 0
 
 df_gfm, df_detail = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
 
-results, yearly_data = fincalcs.valuation_calculations(parameters, df_gfm)
+results, annual_forecast = fincalcs.valuation_calculations(parameters, df_gfm)
 
 ##----------------------------------------------------------------------
 ##SHOW RESULTS
@@ -153,8 +153,8 @@ results, yearly_data = fincalcs.valuation_calculations(parameters, df_gfm)
 parameters['npv'] = round(results[13], 2)
 parameters['irr'] = round(results[14]*100, 2)
 parameters['payback'] = round(results[15], 2)
-parameters['exit_value'] = round(yearly_data.loc[2021]['Exit Values'], 2)
-parameters['moic'] = round(yearly_data.loc[2021]['MOIC'], 2)
+parameters['exit_value'] = round(annual_forecast.loc[2021]['Exit Values'], 2)
+parameters['moic'] = round(annual_forecast.loc[2021]['MOIC'], 2)
 
 ##----------------------------------------------------------------------
 ## PRINT RESULTS TO WINDOW
@@ -168,22 +168,22 @@ window.mainloop()
 ## WRITE TO DB
 
 # create empty dataframes
-df_result = pd.DataFrame(columns=['scenario_id', 'run_id', 'brand_name', 'molecule', 'channel', 'indication',
-                                  'presentation', 'comments', 'vertice_filing_month', 'vertice_filing_year',
-                                  'vertice_launch_month', 'vertice_launch_year', 'pos', 'base_year_volume',
-                                  'base_year_sales', 'volume_growth_rate', 'wac_price_growth_rate', 'per_unit_cogs',
-                                  'npv', 'irr', 'payback'])
-
-df_annual_forecast = pd.DataFrame(columns=['scenario_id', 'run_id', 'forecast_year', 'number_gx_competitors',
-                                           'profit_share', 'milestone_payments', 'research_development_cost',
-                                           'net_sales', 'cogs', 'ebit', 'fcf', 'exit_value', 'moic'])
+# df_result = pd.DataFrame(columns=['scenario_id', 'run_id', 'brand_name', 'molecule', 'channel', 'indication',
+#                                   'presentation', 'comments', 'vertice_filing_month', 'vertice_filing_year',
+#                                   'vertice_launch_month', 'vertice_launch_year', 'pos', 'base_year_volume',
+#                                   'base_year_sales', 'volume_growth_rate', 'wac_price_growth_rate', 'per_unit_cogs',
+#                                   'npv', 'irr', 'payback'])
+#
+# df_annual_forecast = pd.DataFrame(columns=['scenario_id', 'run_id', 'forecast_year', 'number_gx_competitors',
+#                                            'profit_share', 'milestone_payments', 'research_development_cost',
+#                                            'net_sales', 'cogs', 'ebit', 'fcf', 'exit_value', 'moic'])
 
 # open connection to database
 conn = output.create_connection('C:\\sqlite\\db\\pythonsqlite.db')
 
-# create tables - only needed on first run
-# output.create_table(conn, output.model_results_ddl)
-# output.create_table(conn, output.annual_forecast_ddl)
+#create tables - only needed on first run
+output.create_table(conn, output.model_results_ddl)
+output.create_table(conn, output.annual_forecast_ddl)
 
 # get max values for run_id and scenario_id
 try:
@@ -203,7 +203,7 @@ except:
 
 #creating the df that will be inserted to the SQL db
 scenario_id = 1
-df_results = pd.DataFrame()
+df_result = pd.DataFrame()
 df_annual_forecast = pd.DataFrame(columns = ['scenario_id','Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D', 'Net Sales', 'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC'])
 
 #add scenario number
@@ -211,7 +211,7 @@ results.append(scenario_id)
 annual_forecast['scenario_id'] = scenario_id
 
 #adding the results to df that will go to SQL
-df_results = df_results.append([results])
+df_result = df_result.append([results])
 df_annual_forecast = df_annual_forecast.append(annual_forecast)
 
 # a few parameters to scan through, smaller range to save time
@@ -232,7 +232,7 @@ for i in years_to_discount:
                 for m in wac_price_increase:
                     for n in volume_growth:
                         for o in number_of_gx_players:
-                            global scenario_id, df_results, df_annual_forecast, parameters, df_gfm, df_detail, df_analog
+                           # global scenario_id, df_results, df_annual_forecast, parameters, df_gfm, df_detail, df_analog
                             scenario_id = scenario_id + 1
 
                             parameters['years_discounted'] = i
@@ -243,22 +243,22 @@ for i in years_to_discount:
                             parameters['volume_growth_rate'] = n
                             df_gfm['Number of Gx Players'] = o
 
-                            x, y = financial_calculations(parameters, df_gfm, df_detail, df_analog)
+                            x, y = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
 
-                            v, w = valuation_calculations(parameters, x)
+                            v, w = fincalcs.valuation_calculations(parameters, x)
 
                             # add scenario number to these results
                             v.append(scenario_id)
                             w['scenario_id'] = scenario_id
 
                             # adding results to df that will go to SQL
-                            df_results = df_results.append([v])
+                            df_result = df_result.append([v])
                             df_annual_forecast = df_annual_forecast.append(w)
 
                             print(scenario_id)
 
 #making scenario_id be the first column
-df_results = df_results[[19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]]
+df_result = df_result[[19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]]
 #creating a forecast year column
 df_annual_forecast['forecast_year'] = df_annual_forecast.index.values
 #ordering the columns to match below
