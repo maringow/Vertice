@@ -54,6 +54,7 @@ try:
         parameters['combined_molecules'] = [parameters['molecule_name']]
         parameters['dosage_forms'] = IMS.loc[IMS['Combined Molecule'] ==
                                              parameters['molecule_name']]['Prod Form2'].unique()
+        parameters['brand_name'] = ''
 except KeyError:
     print('Please select a brand or molecule to run the model.')
 
@@ -256,13 +257,18 @@ run_id = 0
 df_result['run_id'] = run_id
 df_annual_forecast['run_id'] = run_id
 #adding column names to df
-df_result.columns = ['scenario_id', 'run_id', 'brand_name', 'molecule', 'channel', 'indication', 'presentation',
+df_result.columns = ['scenario_id', 'brand_name', 'molecule', 'channel', 'indication', 'presentation',
                     'comments', 'vertice_filing_month', 'vertice_filing_year','vertice_launch_month',
                     'vertice_launch_year', 'pos', 'base_year_volume','base_year_sales', 'volume_growth_rate',
-                    'wac_price_growth_rate', 'per_unit_cogs','npv', 'irr', 'payback']
+                    'wac_price_growth_rate', 'per_unit_cogs','npv', 'irr', 'payback', 'run_id']
 #creating a forecast year column
 df_annual_forecast['forecast_year'] = df_annual_forecast.index.values
+
 #ordering the columns
+df_result = df_result[['scenario_id', 'run_id', 'brand_name', 'molecule', 'channel', 'indication', 'presentation',
+                      'comments', 'vertice_filing_month', 'vertice_filing_year','vertice_launch_month',
+                      'vertice_launch_year', 'pos', 'base_year_volume','base_year_sales', 'volume_growth_rate',
+                      'wac_price_growth_rate', 'per_unit_cogs','npv', 'irr', 'payback']]
 df_annual_forecast = df_annual_forecast[['scenario_id', 'run_id', 'forecast_year', 'Number of Gx Players', 'Profit Share',
                                          'Milestone Payments','R&D','Net Sales','COGS','EBIT','FCF', 'Exit Values', 'MOIC']]
 
@@ -287,6 +293,8 @@ except:
     scenario_id = 1
 
 #adding the max run_id and scenario_id to the 0-base numbers
+print(df_result['run_id'])
+
 df_result['run_id'] = df_result['run_id'] + run_id
 df_annual_forecast['run_id'] = df_annual_forecast['run_id'] + run_id
 df_result['scenario_id'] = df_result['scenario_id'] + scenario_id
