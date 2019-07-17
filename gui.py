@@ -135,10 +135,11 @@ class ConfirmBrand:
         self.growth_label.pack()
 
         # print df_merged_data
-        self.volumes_label = Label(master, text='2016 volume: {}; 2017 volume: {}; 2018 volume: {}'.format(
+        self.volumes_label = Label(master, text='2016 volume: {}; 2017 volume: {}; 2018 volume: {}; 2019 volume: {}'.format(
                                 (df_detail['Units'].sum(level='year_index').loc[2016]),
                                 (df_detail['Units'].sum(level='year_index').loc[2017]),
-                                (df_detail['Units'].sum(level='year_index').loc[2018])))
+                                (df_detail['Units'].sum(level='year_index').loc[2018]),
+                                (df_detail['Units'].sum(level='year_index').loc[2019])))
         self.volumes_label.pack()
 
         # add Continue button

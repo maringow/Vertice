@@ -115,13 +115,13 @@ def valuation_calculations(parameters, df_gfm):
     # Discounted Payback Period
     df_gfm['FCF PV'] = 0
     df_gfm['FCF PV'].loc[parameters['present_year']:parameters['present_year'] + parameters['years_discounted'] + 1] = pv
-    df_gfm['Cummulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[parameters['present_year']:parameters['present_year'] + parameters['years_discounted'] + 1])
-    df_gfm['Cummulative Discounted FCF'] = df_gfm['Cummulative Discounted FCF'].fillna(0)
-    idx = df_gfm[df_gfm['Cummulative Discounted FCF'] <= 0].index.max()  # last full year for payback calc
+    df_gfm['Cumulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[parameters['present_year']:parameters['present_year'] + parameters['years_discounted'] + 1])
+    df_gfm['Cumulative Discounted FCF'] = df_gfm['Cumulative Discounted FCF'].fillna(0)
+    idx = df_gfm[df_gfm['Cumulative Discounted FCF'] <= 0].index.max()  # last full year for payback calc
     if idx == parameters['last_forecasted_year']:
         discounted_payback_period = np.nan
     else:
-        discounted_payback_period = idx - parameters['present_year'] + 1 - df_gfm['Cummulative Discounted FCF'].loc[
+        discounted_payback_period = idx - parameters['present_year'] + 1 - df_gfm['Cumulative Discounted FCF'].loc[
             idx] / df_gfm['FCF PV'].loc[idx + 1]
 
     # Exit values
@@ -137,30 +137,50 @@ def valuation_calculations(parameters, df_gfm):
         else:
             MOIC.append(-df_gfm['Exit Values'].iloc[i] / cum_amt_invested.iloc[i])
     df_gfm["MOIC"] = MOIC
+    result = {'brand_name': parameters['brand_name'],
+              'combined_molecules': parameters['combined_molecules'],
+              'channel': parameters['channel'],
+              'indication': parameters['indication'],
+              'presentation': parameters['presentation'],
+              'comments': parameters['comments'],
+              'vertice_filing_month': parameters['vertice_filing_month'],
+              'vertice_filing_year': parameters['vertice_filing_year'],
+              'vertice_launch_month': parameters['vertice_launch_month'],
+              'vertice_launch_year': parameters['vertice_launch_year'],
+              'pos': parameters['pos'],
+              'base_year_volume': df_gfm['Market Volume'].loc[parameters['present_year'] - 1],
+              'base_year_market_size': df_gfm['Market Size'].loc[parameters['present_year'] - 1],
+              'volume_growth_rate': parameters['volume_growth_rate'],
+              'wac_increase': parameters['wac_increase'],
+              'api_cost_per_unit': parameters['api_cost_per_unit'],
+              'years_discounted': parameters['years_discounted'],
+              'cogs_variation': parameters['cogs_variation'],
+              'gx_players_adj': parameters['gx_players_adj'],
+              'npv': npv,
+              'irr': irr,
+              'discounted_payback_period': discounted_payback_period}
 
-    return ([parameters['brand_name'],
-             parameters['combined_molecules'],
-             parameters['channel'],
-             parameters['indication'],
-             parameters['presentation'],
-             parameters['comments'],
-             parameters['vertice_filling_month'],
-             parameters['vertice_filling_year'],
-             parameters['vertice_launch_month'],
-             parameters['vertice_launch_year'],
-             parameters['pos'],
-             df_gfm['Market Volume'].loc[parameters['present_year'] - 1],
-             df_gfm['Market Size'].loc[parameters['present_year'] - 1],
-             parameters['volume_growth_rate'],
-             parameters['wac_increase'],
-             parameters['api_cost_per_unit'],
-             parameters['years_discounted'],
-             parameters['cogs_variation'],
-             npv,
-             irr,
-             discounted_payback_period],
-            # yearly data:
-            df_gfm[['Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D', 'Net Sales', 'COGS', 'EBIT',
-                    'FCF', 'Exit Values', 'MOIC']])
-
-
+    # return ([parameters['brand_name'],
+    #          parameters['combined_molecules'],
+    #          parameters['channel'],
+    #          parameters['indication'],
+    #          parameters['presentation'],
+    #          parameters['comments'],
+    #          parameters['vertice_filing_month'],
+    #          parameters['vertice_filing_year'],
+    #          parameters['vertice_launch_month'],
+    #          parameters['vertice_launch_year'],
+    #          parameters['pos'],
+    #          df_gfm['Market Volume'].loc[parameters['present_year'] - 1],
+    #          df_gfm['Market Size'].loc[parameters['present_year'] - 1],
+    #          parameters['volume_growth_rate'],
+    #          parameters['wac_increase'],
+    #          parameters['api_cost_per_unit'],
+    #          parameters['years_discounted'],
+    #          parameters['cogs_variation'],
+    #          parameters['gx_players_adj'],
+    #          npv,
+    #          irr,
+    #          discounted_payback_period],
+    return result, df_gfm[['Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D', 'Net Sales', 'COGS', 'EBIT',
+                    'FCF', 'Exit Values', 'MOIC']] #yearly data
