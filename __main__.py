@@ -182,20 +182,17 @@ df_annual_forecast = df_annual_forecast.append(annual_forecast)
 # overall_cogs_increase = [-.1,0,.1]
 # wac_price_increase = [-.1,-.05,0]
 # volume_growth = [-.05,0,.05]
-#
-# number_of_gx_players = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-#                         [2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3]]
+
+number_of_gx_players = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                        [2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3]]
 
 # to run faster
 years_to_discount = [10]
-probability_of_success = [1]
 launch_delay_months = [0]
 overall_cogs_increase = [0,.1]
 wac_price_increase = [-.05,0]
 volume_growth = [.05]
 
-number_of_gx_players = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                        [2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3]]
 
 for i in years_to_discount:
     for j in probability_of_success:
