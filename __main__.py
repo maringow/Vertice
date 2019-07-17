@@ -158,7 +158,7 @@ window.mainloop()
 # PRODUCE ADJUSTED SCENARIO PARAMETERS (AFTER RUNNING BASE CASE)
 
 #creating the df that will be inserted to the SQL db
-scenario_id = 0
+scenario_id = 1
 df_result = pd.DataFrame()
 df_annual_forecast = pd.DataFrame(columns = ['scenario_id','Number of Gx Players', 'Profit Share', 'Milestone Payments',
                                              'R&D', 'Net Sales', 'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC'])
@@ -280,7 +280,7 @@ for index, row in df_annual_forecast.iterrows():
     print(row)
     output.insert_forecast(conn, row)
 
-output.select_all_forecasts(conn)
-output.select_all_results(conn)
+#output.select_all_forecasts(conn)
+#output.select_all_results(conn)
 
 conn.close()
