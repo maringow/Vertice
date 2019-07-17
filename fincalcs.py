@@ -160,6 +160,8 @@ def valuation_calculations(parameters, df_gfm):
               'irr': irr,
               'discounted_payback_period': discounted_payback_period}
 
+    print('loop: printing combined molecules: {}'.format(result['combined_molecules']))
+
     # return ([parameters['brand_name'],
     #          parameters['combined_molecules'],
     #          parameters['channel'],
