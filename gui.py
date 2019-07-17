@@ -95,7 +95,7 @@ class DosageForms:
 
 class ConfirmBrand:
 
-    def __init__(self, master, parameters):
+    def __init__(self, master, parameters, df_detail):
         self.master = master
         master.title("Generics Forecasting Model")
         master.geometry("600x400")
@@ -133,6 +133,13 @@ class ConfirmBrand:
         self.growth_label = Label(master, text='Two-year volume growth rate (CAGR): {}'
                                   .format(parameters['historical_growth_rate']))
         self.growth_label.pack()
+
+        # print df_merged_data
+        self.volumes_label = Label(master, text='2016 volume: {}; 2017 volume: {}; 2018 volume: {}'.format(
+                                (df_detail['Units'].sum(level='year_index').loc[2016]),
+                                (df_detail['Units'].sum(level='year_index').loc[2017]),
+                                (df_detail['Units'].sum(level='year_index').loc[2018])))
+        self.volumes_label.pack()
 
         # add Continue button
         self.continue_button = Button(master, text='Continue', command=master.destroy)

@@ -81,11 +81,16 @@ df_merged_data, df_detail = mergedatasets.merge_ims_prospecto(df_equivalents, pr
 parameters['count_competitors'] = len(df_equivalents.loc[pd.isnull(df_equivalents['2018_Units']) == False]
                                       ['Manufacturer'].unique())
 parameters['historical_growth_rate'] = fincalcs.get_growth_rate(df_detail)
-print(parameters['historical_growth_rate'])
+
+print('df_detail \n {}'.format(df_detail))
+
+print('Volume: {}'.format(df_detail['Units'].sum(level='year_index').loc[2016]))
+
+
 
 # open window
 window = Tk()
-window3 = gui.ConfirmBrand(window, parameters)
+window3 = gui.ConfirmBrand(window, parameters, df_detail)
 window.mainloop()
 
 
