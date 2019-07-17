@@ -71,6 +71,8 @@ parameters['count_eqs'] = len(df_equivalents)
 
 df_merged_data, df_detail = mergedatasets.merge_ims_prospecto(df_equivalents, prospectoRx)
 
+df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC']], on='NDC', how='left').set_index(['year_index', 'ndc_index'])
+
 ##----------------------------------------------------------------------
 ## WINDOW2: OPEN ConfirmBrand WINDOW AND SAVE
 
@@ -138,7 +140,7 @@ parameters['years_discounted'] = 10
 parameters['launch_delay'] = 0
 parameters['cogs_variation'] = 0
 
-df_gfm, df_detail = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
+df_gfm, df_detail, df_vertice_ndc_volumes = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
 
 results, annual_forecast = fincalcs.valuation_calculations(parameters, df_gfm)
 
@@ -177,11 +179,11 @@ df_annual_forecast = df_annual_forecast.append(annual_forecast)
 
 # a few parameters to scan through, smaller range to save time
 # years_to_discount = [5,10]
-# probability_of_success = [.5,1]
+probability_of_success = [.5,1]
 # launch_delay_months = [0,6,12]
 # overall_cogs_increase = [-.1,0,.1]
 # wac_price_increase = [-.1,-.05,0]
-# volume_growth = [-.05,0,.05]
+volume_growth = [-.05,0,.05]
 
 number_of_gx_players = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                         [2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3]]
@@ -191,7 +193,6 @@ years_to_discount = [10]
 launch_delay_months = [0]
 overall_cogs_increase = [0,.1]
 wac_price_increase = [-.05,0]
-volume_growth = [.05]
 
 
 for i in years_to_discount:
@@ -212,7 +213,7 @@ for i in years_to_discount:
                             parameters['volume_growth_rate'] = n
                             df_gfm['Number of Gx Players'] = o
 
-                            x, y = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
+                            x, y = fincalcs.forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog, df_vertice_ndc_volumes)
 
                             v, w = fincalcs.valuation_calculations(parameters, x)
 
@@ -289,11 +290,11 @@ df_annual_forecast['scenario_id'] = df_annual_forecast['scenario_id'] + scenario
 
 # insert data
 for index, row in df_result.iterrows():
-    print(row)
+    # print(row)
     output.insert_result(conn, row)
 
 for index, row in df_annual_forecast.iterrows():
-    print(row)
+    # print(row)
     output.insert_forecast(conn, row)
 
 #output.select_all_forecasts(conn)
