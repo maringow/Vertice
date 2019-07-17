@@ -165,19 +165,30 @@ df_annual_forecast = pd.DataFrame(columns = ['scenario_id','Number of Gx Players
 
 #add scenario number
 results.append(scenario_id)
-annual_forecast['scenario_id'] = 0
+annual_forecast['scenario_id'] = scenario_id
 
 #adding the results to df that will go to SQL
 df_result = df_result.append([results])
 df_annual_forecast = df_annual_forecast.append(annual_forecast)
 
 # a few parameters to scan through, smaller range to save time
+# years_to_discount = [5,10]
+# probability_of_success = [.5,1]
+# launch_delay_months = [0,6,12]
+# overall_cogs_increase = [-.1,0,.1]
+# wac_price_increase = [-.1,-.05,0]
+# volume_growth = [-.05,0,.05]
+#
+# number_of_gx_players = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+#                         [2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3]]
+
+# to run faster
 years_to_discount = [10]
-probability_of_success = [.5,1]
-launch_delay_months = [0,12]
-overall_cogs_increase = [-.1,.1]
-wac_price_increase = [0]
-volume_growth = [0,.05]
+probability_of_success = [1]
+launch_delay_months = [0]
+overall_cogs_increase = [0,.1]
+wac_price_increase = [-.05,0]
+volume_growth = [.05]
 
 number_of_gx_players = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                         [2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3]]
@@ -214,9 +225,6 @@ for i in years_to_discount:
 
                             print(scenario_id)
 
-#making scenario_id be the first column
-df_result = df_result[[19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]]
-
 
 # RUN FINANCIAL FUNCTION AND GET BACK 1-ROW "RESULT" and 10-ROW "ANNUAL_FORECAST"
 # ADD SCENARIO_ID TO BOTH
@@ -229,18 +237,19 @@ run_id = 0
 df_result['run_id'] = run_id
 df_annual_forecast['run_id'] = run_id
 #adding column names to df
-df_result.columns = ['scenario_id', 'brand_name', 'molecule', 'channel', 'indication', 'presentation',
+df_result.columns = ['brand_name', 'molecule', 'channel', 'indication', 'presentation',
                     'comments', 'vertice_filing_month', 'vertice_filing_year','vertice_launch_month',
                     'vertice_launch_year', 'pos', 'base_year_volume','base_year_sales', 'volume_growth_rate',
-                    'wac_price_growth_rate', 'per_unit_cogs','npv', 'irr', 'payback', 'run_id']
-
+                    'wac_price_growth_rate', 'per_unit_cogs', 'years_to_discount', 'cogs_increase', 'npv',
+                     'irr', 'payback', 'scenario_id', 'run_id']
 #creating a forecast year column
 df_annual_forecast['forecast_year'] = df_annual_forecast.index.values
 #ordering the columns
 df_result = df_result[['scenario_id', 'run_id', 'brand_name', 'molecule', 'channel', 'indication', 'presentation',
                       'comments', 'vertice_filing_month', 'vertice_filing_year','vertice_launch_month',
                       'vertice_launch_year', 'pos', 'base_year_volume','base_year_sales', 'volume_growth_rate',
-                      'wac_price_growth_rate', 'per_unit_cogs','npv', 'irr', 'payback']]
+                      'wac_price_growth_rate', 'per_unit_cogs','years_to_discount', 'cogs_increase',
+                       'npv', 'irr', 'payback']]
 df_annual_forecast = df_annual_forecast[['scenario_id', 'run_id', 'forecast_year', 'Number of Gx Players', 'Profit Share',
                                          'Milestone Payments','R&D','Net Sales','COGS','EBIT','FCF', 'Exit Values', 'MOIC']]
 
@@ -249,8 +258,8 @@ df_annual_forecast = df_annual_forecast[['scenario_id', 'run_id', 'forecast_year
 conn = output.create_connection('C:\\sqlite\\db\\pythonsqlite.db')
 
 #create tables - only needed on first run
-# output.create_table(conn, output.model_results_ddl)
-# output.create_table(conn, output.annual_forecast_ddl)
+output.create_table(conn, output.model_results_ddl)
+output.create_table(conn, output.annual_forecast_ddl)
 
 # get max values for run_id and scenario_id
 try:

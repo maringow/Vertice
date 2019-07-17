@@ -154,6 +154,8 @@ def valuation_calculations(parameters, df_gfm):
              parameters['volume_growth_rate'],
              parameters['wac_increase'],
              parameters['api_cost_per_unit'],
+             parameters['years_discounted'],
+             parameters['cogs_variation'],
              npv,
              irr,
              discounted_payback_period],
