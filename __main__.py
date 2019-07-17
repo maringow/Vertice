@@ -140,9 +140,9 @@ results, annual_forecast = fincalcs.valuation_calculations(parameters, df_gfm)
 ##----------------------------------------------------------------------
 ##SHOW RESULTS
 
-parameters['npv'] = round(results[13], 2)
-parameters['irr'] = round(results[14]*100, 2)
-parameters['payback'] = round(results[15], 2)
+parameters['npv'] = round(results[18], 2)
+parameters['irr'] = round(results[19]*100, 2)
+parameters['payback'] = round(results[20], 2)
 parameters['exit_value'] = round(annual_forecast.loc[2021]['Exit Values'], 2)
 parameters['moic'] = round(annual_forecast.loc[2021]['MOIC'], 2)
 
