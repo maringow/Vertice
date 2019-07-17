@@ -237,3 +237,15 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog, df_
                         'Total Capitalized'] - df_gfm['Write-off of Residual Tax Value']
 
     return(df_gfm, df_detail)
+
+#Function to get 2yr volume CAGR
+def get_growth_rate_2016_to_2018(df):
+    units_by_year = df['Units'].sum(level='year_index')
+    growth_rate = ((units_by_year.loc[2018] / units_by_year.loc[2016]) ** (1/2) - 1)
+    return growth_rate
+
+#Function to get 1yr volume CAGR
+def get_growth_rate_2017_to_2018(df):
+    units_by_year = df['Units'].sum(level='year_index')
+    growth_rate = ((units_by_year.loc[2018] / units_by_year.loc[2017]) - 1)
+    return growth_rate

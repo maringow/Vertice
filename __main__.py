@@ -177,12 +177,19 @@ annual_forecast['scenario_id'] = scenario_id
 df_result = df_result.append([results])
 df_annual_forecast = df_annual_forecast.append(annual_forecast)
 
-# a few parameters to scan through, smaller range to save time
+# Parameters to scan
 # years_to_discount = [5,10]
 probability_of_success = [.5,1]
 # launch_delay_months = [0,6,12]
 # overall_cogs_increase = [-.1,0,.1]
 # wac_price_increase = [-.1,-.05,0]
+#to handle Inf values for historical growth rates
+if  abs(fincalcs.get_growth_rate_2016_to_2018(df_detail)) != np.inf:
+    parameters['historical_growth_rate'] = fincalcs.get_growth_rate_2016_to_2018(df_detail)
+elif abs(fincalcs.get_growth_rate_2017_to_2018(df_detail)) != np.inf:
+    parameters['historical_growth_rate'] = fincalcs.get_growth_rate_2017_to_2018(df_detail)
+else:
+    parameters['historical_growth_rate'] = 0
 volume_growth = [parameters['historical_growth_rate']-.05,parameters['historical_growth_rate'],parameters['historical_growth_rate']+.05]
 
 number_of_gx_players = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
