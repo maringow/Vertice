@@ -183,7 +183,7 @@ probability_of_success = [.5,1]
 # launch_delay_months = [0,6,12]
 # overall_cogs_increase = [-.1,0,.1]
 # wac_price_increase = [-.1,-.05,0]
-volume_growth = [-.05,0,.05]
+volume_growth = [parameters['historical_growth_rate']-.05,parameters['historical_growth_rate'],parameters['historical_growth_rate']+.05]
 
 number_of_gx_players = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                         [2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3]]
@@ -272,7 +272,7 @@ output.create_table(conn, output.annual_forecast_ddl)
 # get max values for run_id and scenario_id
 try:
     scenario_id, run_id = output.select_max_ids(conn)[0]
-    print('run_id {}'.format(run_id))
+   # print('run_id {}'.format(run_id))
     run_id += 1
     scenario_id += 1
     print('run id: {}'.format(run_id))
@@ -281,7 +281,6 @@ except:
     run_id = 1
     scenario_id = 1
 
-print(df_result['run_id'][0])
 #adding the max run_id and scenario_id to the 0-base numbers
 df_result['run_id'] = df_result['run_id'] + run_id
 df_annual_forecast['run_id'] = df_annual_forecast['run_id'] + run_id
