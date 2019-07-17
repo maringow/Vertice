@@ -158,10 +158,9 @@ window.mainloop()
 # PRODUCE ADJUSTED SCENARIO PARAMETERS (AFTER RUNNING BASE CASE)
 
 #creating the df that will be inserted to the SQL db
-scenario_id = 1
+scenario_id = 0
 df_result = pd.DataFrame()
-df_annual_forecast = pd.DataFrame(columns = ['scenario_id','Number of Gx Players', 'Profit Share', 'Milestone Payments',
-                                             'R&D', 'Net Sales', 'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC'])
+df_annual_forecast = pd.DataFrame()
 
 #add scenario number
 results.append(scenario_id)
@@ -236,14 +235,20 @@ for i in years_to_discount:
 run_id = 0
 df_result['run_id'] = run_id
 df_annual_forecast['run_id'] = run_id
+
 #adding column names to df
 df_result.columns = ['brand_name', 'molecule', 'channel', 'indication', 'presentation',
                     'comments', 'vertice_filing_month', 'vertice_filing_year','vertice_launch_month',
                     'vertice_launch_year', 'pos', 'base_year_volume','base_year_sales', 'volume_growth_rate',
                     'wac_price_growth_rate', 'per_unit_cogs', 'years_to_discount', 'cogs_increase', 'npv',
                      'irr', 'payback', 'scenario_id', 'run_id']
+
+df_annual_forecast.columns = ['Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D', 'Net Sales',
+                              'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC', 'scenario_id', 'run_id']
+
 #creating a forecast year column
 df_annual_forecast['forecast_year'] = df_annual_forecast.index.values
+
 #ordering the columns
 df_result = df_result[['scenario_id', 'run_id', 'brand_name', 'molecule', 'channel', 'indication', 'presentation',
                       'comments', 'vertice_filing_month', 'vertice_filing_year','vertice_launch_month',
