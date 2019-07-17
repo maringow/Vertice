@@ -114,8 +114,8 @@ def valuation_calculations(parameters, df_gfm):
 
     # Discounted Payback Period
     df_gfm['FCF PV'] = 0
-    df_gfm['FCF PV'].loc[parameters['present_year']:] = pv
-    df_gfm['Cummulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[parameters['present_year']:])
+    df_gfm['FCF PV'].loc[parameters['present_year']:parameters['present_year'] + parameters['years_discounted'] + 1] = pv
+    df_gfm['Cummulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[parameters['present_year']:parameters['present_year'] + parameters['years_discounted'] + 1])
     df_gfm['Cummulative Discounted FCF'] = df_gfm['Cummulative Discounted FCF'].fillna(0)
     idx = df_gfm[df_gfm['Cummulative Discounted FCF'] <= 0].index.max()  # last full year for payback calc
     if idx == parameters['last_forecasted_year']:
