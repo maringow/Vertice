@@ -132,7 +132,7 @@ class ConfirmBrand:
 
         # create label for 2-year growth rate
         self.growth_label = Label(master, text='Two-year volume growth rate (CAGR): {}'
-                                  .format(parameters['historical_growth_rate']))
+                                  .format(round(parameters['historical_growth_rate'],2)))
         self.growth_label.pack()
 
         # print df_merged_data
