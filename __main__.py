@@ -71,6 +71,8 @@ parameters['count_eqs'] = len(df_equivalents)
 
 df_merged_data, df_detail = mergedatasets.merge_ims_prospecto(df_equivalents, prospectoRx)
 
+df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC']], on='NDC', how='left').set_index(['year_index', 'ndc_index'])
+
 ##----------------------------------------------------------------------
 ## WINDOW2: OPEN ConfirmBrand WINDOW AND SAVE
 
@@ -145,7 +147,7 @@ parameters['launch_delay'] = 0
 parameters['cogs_variation'] = 0
 parameters['gx_players_adj'] = 0
 
-df_gfm, df_detail = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
+df_gfm, df_detail, df_vertice_ndc_volumes = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
 
 results, annual_forecast = fincalcs.valuation_calculations(parameters, df_gfm)
 
@@ -193,8 +195,8 @@ df_annual_forecast = df_annual_forecast.append(annual_forecast)
 # launch_delay_months = [0,6,12]
 # overall_cogs_increase = [-.1,0,.1]
 # wac_price_increase = [-.1,-.05,0]
-# volume_growth = [-.05,0,.05]
-#
+volume_growth = [parameters['historical_growth_rate']-.05,parameters['historical_growth_rate'],parameters['historical_growth_rate']+.05]
+
 # number_of_gx_players = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 #                         [2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3]]
 
@@ -228,7 +230,7 @@ for i in years_to_discount:
 
                             df_gfm['Number of Gx Players'] = base_gx_players + o
 
-                            x, y = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
+                            x, y = fincalcs.forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog, df_vertice_ndc_volumes)
 
                             v, w = fincalcs.valuation_calculations(parameters, x)
 
@@ -289,6 +291,7 @@ output.create_table(conn, output.annual_forecast_ddl)
 # get max values for run_id and scenario_id
 try:
     scenario_id, run_id = output.select_max_ids(conn)[0]
+   # print('run_id {}'.format(run_id))
     run_id += 1
     scenario_id += 1
 except:
@@ -296,7 +299,6 @@ except:
     run_id = 1
     scenario_id = 1
 
-print(df_result['run_id'][0])
 #adding the max run_id and scenario_id to the 0-base numbers
 df_result['run_id'] = df_result['run_id'] + run_id
 df_annual_forecast['run_id'] = df_annual_forecast['run_id'] + run_id
