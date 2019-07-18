@@ -12,7 +12,7 @@ def get_dosage_forms(parameters, IMS):
             parameters['combined_molecules'] = [parameters['molecule_name']]
             parameters['dosage_forms'] = IMS.loc[IMS['Combined Molecule'] ==
                                                  parameters['molecule_name']]['Prod Form2'].unique()
-            parameters['brand_name'] = ''
+            parameters['brand_name'] = 'Not specified'
     except KeyError:
         print('Please select a brand or molecule to run the model.')
 

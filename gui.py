@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+import tkinter.tix as tix
 
 ##----------------------------------------------------------------------
 ## WINDOW: SELECT BRAND NAME
@@ -135,15 +136,49 @@ class ConfirmBrand:
         self.growth_label.pack()
 
         # print df_merged_data
-        self.volumes_label = Label(master, text='2016 volume: {}; 2017 volume: {}; 2018 volume: {}'.format(
+        self.volumes_label = Label(master, text='2016 volume: {}; 2017 volume: {}; 2018 volume: {}; 2019 volume: {}'.format(
                                 (df_detail['Units'].sum(level='year_index').loc[2016]),
                                 (df_detail['Units'].sum(level='year_index').loc[2017]),
-                                (df_detail['Units'].sum(level='year_index').loc[2018])))
+                                (df_detail['Units'].sum(level='year_index').loc[2018]),
+                                (df_detail['Units'].sum(level='year_index').loc[2019])))
         self.volumes_label.pack()
 
         # add Continue button
         self.continue_button = Button(master, text='Continue', command=master.destroy)
         self.continue_button.pack(pady=10)
+
+
+##----------------------------------------------------------------------
+## WINDOW: SELECT NDCS
+
+class SelectNDCs:
+
+    def __init__(self, master, df_merged_data):
+        self.master = master
+        master. title("Generics Forecasting Model")
+
+        # create window header
+        self.title = Label(master, text='Generics Forecasting Model: Set Excel Filepath', font='Helvetica 9 bold')
+        self.title.grid(row=0, columnspan=2, pady=20, padx=20)
+
+        self.ndcs = df_merged_data['NDC'].unique()
+        self.selected_ndcs = []
+        self.var = []
+
+        # add dosage form checkboxes
+        for n in range(len(self.ndcs)):
+            v=IntVar()
+            box = Checkbutton(self.master, text=self.ndcs[n], variable=v)
+            box.grid(row=n+1, column=0)
+            self.var.append(v)
+            manufacturer = df_merged_data['Manufacturer'].loc[df_merged_data['NDC'] == self.ndcs[n]]
+            self.manufacturer_label = Label(master, text=manufacturer)
+            self.manufacturer_label.grid(row=n+1, column=1)
+
+
+        # add Continue button
+        self.continue_button = Button(master, text='Continue', command=master.destroy)
+        self.continue_button.grid(row=100, column=1, pady=20, padx=20, sticky='e')
 
 
 ##----------------------------------------------------------------------

@@ -96,6 +96,12 @@ window3 = gui.ConfirmBrand(window, parameters, df_detail)
 window.mainloop()
 
 
+# open window
+window=Tk()
+window10 = gui.SelectNDCs(window, df_merged_data)
+window.mainloop()
+
+
 ##----------------------------------------------------------------------
 ## WINDOW4: OPEN EnterFilepath WINDOW AND SAVE VALUES
 window = Tk()
@@ -139,6 +145,7 @@ print(df_detail['Units'])
 parameters['years_discounted'] = 10
 parameters['launch_delay'] = 0
 parameters['cogs_variation'] = 0
+parameters['gx_players_adj'] = 0
 
 df_gfm, df_detail, df_vertice_ndc_volumes = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
 
@@ -147,9 +154,9 @@ results, annual_forecast = fincalcs.valuation_calculations(parameters, df_gfm)
 ##----------------------------------------------------------------------
 ##SHOW RESULTS
 
-parameters['npv'] = round(results[18], 2)
-parameters['irr'] = round(results[19]*100, 2)
-parameters['payback'] = round(results[20], 2)
+parameters['npv'] = round(results['npv'], 2)
+parameters['irr'] = round(results['irr']*100, 2)
+parameters['payback'] = round(results['discounted_payback_period'], 2)
 parameters['exit_value'] = round(annual_forecast.loc[2021]['Exit Values'], 2)
 parameters['moic'] = round(annual_forecast.loc[2021]['MOIC'], 2)
 
@@ -164,22 +171,27 @@ window.mainloop()
 ### BEGIN LOOP --------------------------------------------------
 # PRODUCE ADJUSTED SCENARIO PARAMETERS (AFTER RUNNING BASE CASE)
 
-#creating the df that will be inserted to the SQL db
-scenario_id = 0
-df_result = pd.DataFrame()
-df_annual_forecast = pd.DataFrame()
-
 #add scenario number
-results.append(scenario_id)
+scenario_id = 0
+results['scenario_id'] = scenario_id
 annual_forecast['scenario_id'] = scenario_id
 
+#creating the df that will be inserted to the SQL db
+
+df_result = pd.DataFrame.from_dict(data=results, orient='columns')
+df_annual_forecast = pd.DataFrame()
+
+print('results: {}'.format(results))
+
 #adding the results to df that will go to SQL
-df_result = df_result.append([results])
+#df_result = df_result.append([results])
+print('df_result columns after building from results')
+print(df_result.columns)
 df_annual_forecast = df_annual_forecast.append(annual_forecast)
 
 # Parameters to scan
 # years_to_discount = [5,10]
-probability_of_success = [.5,1]
+# probability_of_success = [.5,1]
 # launch_delay_months = [0,6,12]
 # overall_cogs_increase = [-.1,0,.1]
 # wac_price_increase = [-.1,-.05,0]
@@ -192,15 +204,18 @@ else:
     parameters['historical_growth_rate'] = 0
 volume_growth = [parameters['historical_growth_rate']-.05,parameters['historical_growth_rate'],parameters['historical_growth_rate']+.05]
 
-number_of_gx_players = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-                        [2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3]]
+# number_of_gx_players = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+#                         [2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3]]
 
 # to run faster
 years_to_discount = [10]
+probability_of_success = [1]
 launch_delay_months = [0]
 overall_cogs_increase = [0,.1]
 wac_price_increase = [-.05,0]
-
+volume_growth = [.05]
+gx_players_adj = [-2, -1, 0, 1, 2]
+base_gx_players = df_gfm['Number of Gx Players']
 
 for i in years_to_discount:
     for j in probability_of_success:
@@ -208,7 +223,7 @@ for i in years_to_discount:
             for l in overall_cogs_increase:
                 for m in wac_price_increase:
                     for n in volume_growth:
-                        for o in number_of_gx_players:
+                        for o in gx_players_adj:
                            # global scenario_id, df_results, df_annual_forecast, parameters, df_gfm, df_detail, df_analog
                             scenario_id = scenario_id + 1
 
@@ -218,18 +233,22 @@ for i in years_to_discount:
                             parameters['cogs_variation'] = l
                             parameters['wac_increase'] = m
                             parameters['volume_growth_rate'] = n
-                            df_gfm['Number of Gx Players'] = o
+                            parameters['gx_players_adj'] = o
+
+                            df_gfm['Number of Gx Players'] = base_gx_players + o
 
                             x, y = fincalcs.forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog, df_vertice_ndc_volumes)
 
                             v, w = fincalcs.valuation_calculations(parameters, x)
 
                             # add scenario number to these results
-                            v.append(scenario_id)
+                            v['scenario_id'] = scenario_id
                             w['scenario_id'] = scenario_id
 
                             # adding results to df that will go to SQL
-                            df_result = df_result.append([v])
+                            df_result = df_result.append(pd.Series(v, index=df_result.columns), ignore_index=True)
+                            print('printing df_result during loop')
+                            print(df_result)
                             df_annual_forecast = df_annual_forecast.append(w)
 
                             print(scenario_id)
@@ -246,12 +265,12 @@ run_id = 0
 df_result['run_id'] = run_id
 df_annual_forecast['run_id'] = run_id
 
-#adding column names to df
-df_result.columns = ['brand_name', 'molecule', 'channel', 'indication', 'presentation',
-                    'comments', 'vertice_filing_month', 'vertice_filing_year','vertice_launch_month',
-                    'vertice_launch_year', 'pos', 'base_year_volume','base_year_sales', 'volume_growth_rate',
-                    'wac_price_growth_rate', 'per_unit_cogs', 'years_to_discount', 'cogs_increase', 'npv',
-                     'irr', 'payback', 'scenario_id', 'run_id']
+#adding column names to df - should be no longer needed, names created from dict
+# df_result.columns = ['brand_name', 'molecule', 'channel', 'indication', 'presentation',
+#                     'comments', 'vertice_filing_month', 'vertice_filing_year','vertice_launch_month',
+#                     'vertice_launch_year', 'pos', 'base_year_volume','base_year_sales', 'volume_growth_rate',
+#                     'wac_price_growth_rate', 'per_unit_cogs', 'years_to_discount', 'cogs_increase', 'gx_players_adj',
+#                     'npv', 'irr', 'payback', 'scenario_id', 'run_id']
 
 df_annual_forecast.columns = ['Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D', 'Net Sales',
                               'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC', 'scenario_id', 'run_id']
@@ -260,11 +279,11 @@ df_annual_forecast.columns = ['Number of Gx Players', 'Profit Share', 'Milestone
 df_annual_forecast['forecast_year'] = df_annual_forecast.index.values
 
 #ordering the columns
-df_result = df_result[['scenario_id', 'run_id', 'brand_name', 'molecule', 'channel', 'indication', 'presentation',
+df_result = df_result[['scenario_id', 'run_id', 'brand_name', 'combined_molecules', 'channel', 'indication', 'presentation',
                       'comments', 'vertice_filing_month', 'vertice_filing_year','vertice_launch_month',
-                      'vertice_launch_year', 'pos', 'base_year_volume','base_year_sales', 'volume_growth_rate',
-                      'wac_price_growth_rate', 'per_unit_cogs','years_to_discount', 'cogs_increase',
-                       'npv', 'irr', 'payback']]
+                      'vertice_launch_year', 'pos', 'base_year_volume','base_year_market_size', 'volume_growth_rate',
+                      'wac_increase', 'api_cost_per_unit','years_discounted', 'cogs_variation',
+                      'gx_players_adj', 'npv', 'irr', 'discounted_payback_period']]
 df_annual_forecast = df_annual_forecast[['scenario_id', 'run_id', 'forecast_year', 'Number of Gx Players', 'Profit Share',
                                          'Milestone Payments','R&D','Net Sales','COGS','EBIT','FCF', 'Exit Values', 'MOIC']]
 
@@ -282,7 +301,6 @@ try:
    # print('run_id {}'.format(run_id))
     run_id += 1
     scenario_id += 1
-    print('run id: {}'.format(run_id))
 except:
     print('Exception occurred when reading max IDs')
     run_id = 1
@@ -296,11 +314,11 @@ df_annual_forecast['scenario_id'] = df_annual_forecast['scenario_id'] + scenario
 
 # insert data
 for index, row in df_result.iterrows():
-    # print(row)
+    print(row)
     output.insert_result(conn, row)
 
 for index, row in df_annual_forecast.iterrows():
-    # print(row)
+    print(row)
     output.insert_forecast(conn, row)
 
 #output.select_all_forecasts(conn)
