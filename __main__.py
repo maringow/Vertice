@@ -73,6 +73,10 @@ df_merged_data, df_detail = mergedatasets.merge_ims_prospecto(df_equivalents, pr
 
 #df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC']], on='NDC', how='left').set_index(['year_index', 'ndc_index'])
 
+# turn arrays into strings now that we are done using them (SQLite does not support arrays)
+parameters['combined_molecules'] = '; '.join(parameters['combined_molecules'])
+parameters['dosage_forms'] = '; '.join(parameters['dosage_forms'])
+
 ##----------------------------------------------------------------------
 ## WINDOW2: OPEN ConfirmBrand WINDOW AND SAVE
 
@@ -109,7 +113,6 @@ window5 = gui.EnterFilepath(window)
 window.mainloop()
 
 parameters.update(window5.parameters)
-print('CHECKPOINT: {}'.format(parameters))
 
 ##----------------------------------------------------------------------
 ## WINDOW3: OPEN EnterCOGS WINDOW AND SAVE VALUES
@@ -180,7 +183,8 @@ annual_forecast['scenario_id'] = scenario_id
 
 #creating the df that will be inserted to the SQL db
 
-df_result = pd.DataFrame.from_dict(data=results, orient='columns')
+df_result = pd.DataFrame.from_dict(data=results, orient='index')
+df_result = df_result.transpose()
 df_annual_forecast = pd.DataFrame()
 
 print('results: {}'.format(results))
@@ -242,7 +246,6 @@ for i in years_to_discount:
 
                             # adding results to df that will go to SQL
                             df_result = df_result.append(pd.Series(v, index=df_result.columns), ignore_index=True)
-                            print('printing df_result during loop')
                             print(df_result)
                             df_annual_forecast = df_annual_forecast.append(w)
 
@@ -263,10 +266,10 @@ df_annual_forecast['run_id'] = run_id
 df_annual_forecast.columns = ['Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D', 'Net Sales',
                               'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC', 'scenario_id', 'run_id']
 
-#creating a forecast year column
+# creating a forecast year column
 df_annual_forecast['forecast_year'] = df_annual_forecast.index.values
 
-#ordering the columns
+# ordering the columns
 df_result = df_result[['scenario_id', 'run_id', 'run_name', 'brand_name', 'combined_molecules', 'dosage_forms', 'channel', 'indication', 'presentation',
                       'comments', 'vertice_filing_month', 'vertice_filing_year','vertice_launch_month',
                       'vertice_launch_year', 'pos', 'base_year_volume','base_year_market_size', 'volume_growth_rate',
@@ -308,6 +311,8 @@ for index, row in df_result.iterrows():
 for index, row in df_annual_forecast.iterrows():
     print(row)
     output.insert_forecast(conn, row)
+
+conn.commit()
 
 #output.select_all_forecasts(conn)
 #output.select_all_results(conn)

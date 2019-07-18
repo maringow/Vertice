@@ -9,7 +9,7 @@ def get_dosage_forms(parameters, IMS):
                 'Combined Molecule'].unique()
             parameters['dosage_forms'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']]['Prod Form2'].unique()
         elif parameters['search_type'] == 'molecule':
-            parameters['combined_molecules'] = IMS.loc[IMS['Combined Molecule'] == parameters['molecule_name']]['Combined Molecule'].unique()
+            parameters['combined_molecules'] = [parameters['molecule_name']]
             parameters['dosage_forms'] = IMS.loc[IMS['Combined Molecule'] ==
                                                  parameters['molecule_name']]['Prod Form2'].unique()
             parameters['brand_name'] = 'Not specified'

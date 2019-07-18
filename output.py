@@ -54,7 +54,6 @@ def insert_result(conn, results):
             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
     cur = conn.cursor()
     cur.execute(sql, results)
-    conn.commit()
     return cur.lastrowid
 
 
@@ -64,7 +63,6 @@ def insert_forecast(conn, annual_forecast):
             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)"""
     cur = conn.cursor()
     cur.execute(sql, annual_forecast)
-    conn.commit()
     return cur.lastrowid
 
 

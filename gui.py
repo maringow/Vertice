@@ -117,11 +117,11 @@ class ConfirmBrand:
             self.selection_label.pack(pady=20)
 
         # create labels for molecule and dosage form used
-        self.combined_molecules = '; '.join(parameters['combined_molecules'])
+        self.combined_molecules = parameters['combined_molecules']
         self.molecules_label = Label(master, text='Molecules searched: {}'.format(self.combined_molecules))
         self.molecules_label.pack()
 
-        self.dosage_forms = '; '.join(parameters['dosage_forms'])
+        self.dosage_forms = parameters['dosage_forms']
         self.dosage_forms_label = Label(master, text='Dosage forms searched: {}'.format(self.dosage_forms))
         self.dosage_forms_label.pack()
 
@@ -205,7 +205,7 @@ class EnterFilepath:
         self.filepath_entry.pack()
 
         # add entry for run name
-        self.run_name_label = Label(master, text='Enter run name (optional):')
+        self.run_name_label = Label(master, text='Enter a run tag (optional):')
         self.run_name_label.pack(pady=10)
         self.run_name_entry = Entry(master)
         self.run_name_entry.pack()

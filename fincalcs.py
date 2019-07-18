@@ -145,6 +145,8 @@ def valuation_calculations(parameters, df_gfm):
         else:
             MOIC.append(-df_gfm['Exit Values'].iloc[i] / cum_amt_invested.iloc[i])
     df_gfm["MOIC"] = MOIC
+
+    # save results
     result = {'brand_name': parameters['brand_name'],
               'combined_molecules': parameters['combined_molecules'],
               'dosage_forms': parameters['dosage_forms'],
@@ -170,8 +172,6 @@ def valuation_calculations(parameters, df_gfm):
               'discounted_payback_period': discounted_payback_period,
               'run_name': parameters['run_name']}
 
-    print('loop: printing combined molecules: {}'.format(result['combined_molecules']))
-
     # return ([parameters['brand_name'],
     #          parameters['combined_molecules'],
     #          parameters['channel'],
@@ -196,6 +196,8 @@ def valuation_calculations(parameters, df_gfm):
     #          discounted_payback_period],
     return result, df_gfm[['Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D', 'Net Sales', 'COGS', 'EBIT',
                     'FCF', 'Exit Values', 'MOIC']] #yearly data
+
+
 #Financial calculations affected only by the parameter scan
 def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog, df_vertice_ndc_volumes):
     import pandas as pd
