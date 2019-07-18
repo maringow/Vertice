@@ -1,7 +1,15 @@
 #Function to get 2yr volume CAGR
 def get_growth_rate(df):
+    import numpy as np
     units_by_year = df['Units'].sum(level='year_index')
-    growth_rate = round(((units_by_year.loc[2018] / units_by_year.loc[2016]) ** (1/2) - 1), 2)
+    growth_rate1 = ((units_by_year.loc[2018] / units_by_year.loc[2016]) ** (1/2) - 1)
+    growth_rate2 = ((units_by_year.loc[2018] / units_by_year.loc[2017]) - 1)
+    if abs(growth_rate1) != np.inf:
+        growth_rate = growth_rate1
+    elif abs(growth_rate2) != np.inf:
+        growth_rate = growth_rate2
+    else:
+        growth_rate= 0
     return growth_rate
 
 
@@ -260,14 +268,3 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog, df_
 
     return(df_gfm, df_detail)
 
-#Function to get 2yr volume CAGR
-def get_growth_rate_2016_to_2018(df):
-    units_by_year = df['Units'].sum(level='year_index')
-    growth_rate = ((units_by_year.loc[2018] / units_by_year.loc[2016]) ** (1/2) - 1)
-    return growth_rate
-
-#Function to get 1yr volume CAGR
-def get_growth_rate_2017_to_2018(df):
-    units_by_year = df['Units'].sum(level='year_index')
-    growth_rate = ((units_by_year.loc[2018] / units_by_year.loc[2017]) - 1)
-    return growth_rate
