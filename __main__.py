@@ -94,6 +94,12 @@ window3 = gui.ConfirmBrand(window, parameters, df_detail)
 window.mainloop()
 
 
+# open window
+window=Tk()
+window10 = gui.SelectNDCs(window, df_merged_data)
+window.mainloop()
+
+
 ##----------------------------------------------------------------------
 ## WINDOW4: OPEN EnterFilepath WINDOW AND SAVE VALUES
 window = Tk()
@@ -283,10 +289,8 @@ output.create_table(conn, output.annual_forecast_ddl)
 # get max values for run_id and scenario_id
 try:
     scenario_id, run_id = output.select_max_ids(conn)[0]
-    print('run_id {}'.format(run_id))
     run_id += 1
     scenario_id += 1
-    print('run id: {}'.format(run_id))
 except:
     print('Exception occurred when reading max IDs')
     run_id = 1
