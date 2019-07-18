@@ -47,11 +47,11 @@ def select_max_ids(conn):
 
 
 def insert_result(conn, results):
-    sql = """INSERT INTO model_results(scenario_id, run_id, brand_name, molecule, channel, indication,
+    sql = """INSERT INTO model_results(scenario_id, run_id, run_name, brand_name, molecule, dosage_form, channel, indication,
     presentation, comments, vertice_filing_month, vertice_filing_year, vertice_launch_month, vertice_launch_year, 
     pos, base_year_volume, base_year_sales, volume_growth_rate, wac_price_growth_rate, per_unit_cogs, years_to_discount, 
     cogs_increase, gx_players_adj, npv, irr, payback)
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
     cur = conn.cursor()
     cur.execute(sql, results)
     conn.commit()
@@ -72,8 +72,10 @@ model_results_ddl = """CREATE TABLE IF NOT EXISTS model_results (
                         id integer PRIMARY KEY,
                         scenario_id integer NOT NULL,
                         run_id integer NOT NULL,
+                        run_name text,
                         brand_name text,
                         molecule text NOT NULL,
+                        dosage_form text,
                         channel text,
                         indication text,
                         presentation text,

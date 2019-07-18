@@ -109,7 +109,7 @@ window5 = gui.EnterFilepath(window)
 window.mainloop()
 
 parameters.update(window5.parameters)
-
+print('CHECKPOINT: {}'.format(parameters))
 
 ##----------------------------------------------------------------------
 ## WINDOW3: OPEN EnterCOGS WINDOW AND SAVE VALUES
@@ -130,6 +130,8 @@ df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC', 'API_cost']
 #df_detail['COGS'] = df_detail['Units'] * df_detail['API_cost']
 #df_detail.drop(columns=['API_cost'])
 print(df_detail)
+
+
 
 ##----------------------------------------------------------------------
 ## READ EXCEL
@@ -258,13 +260,6 @@ run_id = 0
 df_result['run_id'] = run_id
 df_annual_forecast['run_id'] = run_id
 
-#adding column names to df - should be no longer needed, names created from dict
-# df_result.columns = ['brand_name', 'molecule', 'channel', 'indication', 'presentation',
-#                     'comments', 'vertice_filing_month', 'vertice_filing_year','vertice_launch_month',
-#                     'vertice_launch_year', 'pos', 'base_year_volume','base_year_sales', 'volume_growth_rate',
-#                     'wac_price_growth_rate', 'per_unit_cogs', 'years_to_discount', 'cogs_increase', 'gx_players_adj',
-#                     'npv', 'irr', 'payback', 'scenario_id', 'run_id']
-
 df_annual_forecast.columns = ['Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D', 'Net Sales',
                               'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC', 'scenario_id', 'run_id']
 
@@ -272,7 +267,7 @@ df_annual_forecast.columns = ['Number of Gx Players', 'Profit Share', 'Milestone
 df_annual_forecast['forecast_year'] = df_annual_forecast.index.values
 
 #ordering the columns
-df_result = df_result[['scenario_id', 'run_id', 'brand_name', 'combined_molecules', 'channel', 'indication', 'presentation',
+df_result = df_result[['scenario_id', 'run_id', 'run_name', 'brand_name', 'combined_molecules', 'dosage_forms', 'channel', 'indication', 'presentation',
                       'comments', 'vertice_filing_month', 'vertice_filing_year','vertice_launch_month',
                       'vertice_launch_year', 'pos', 'base_year_volume','base_year_market_size', 'volume_growth_rate',
                       'wac_increase', 'api_cost_per_unit','years_discounted', 'cogs_variation',

@@ -194,15 +194,21 @@ class EnterFilepath:
         master.geometry("600x400")
 
         # create window header
-        self.title = Label(master, text='Generics Forecasting Model: Set Excel Filepath', font='Helvetica 9 bold')
+        self.title = Label(master, text='Generics Forecasting Model: Set Filepath and Run Name', font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
-        # add entries for variables
-        self.filepath_label = Label(master, text='Enter filepath for Excel parameters: ')
+        # add entry for filepath and populate
+        self.filepath_label = Label(master, text='Enter filepath for Excel parameters:')
         self.filepath_label.pack(pady=10)
         self.filepath_entry = Entry(master)
         self.filepath_entry.insert(END, 'Model Inputs Demo.xlsx')
         self.filepath_entry.pack()
+
+        # add entry for run name
+        self.run_name_label = Label(master, text='Enter run name (optional):')
+        self.run_name_label.pack(pady=10)
+        self.run_name_entry = Entry(master)
+        self.run_name_entry.pack()
 
         # add Save and Continue button
         self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
@@ -210,6 +216,8 @@ class EnterFilepath:
 
     def save_and_continue(self):
         self.parameters['excel_filepath'] = self.filepath_entry.get()
+        self.parameters['run_name'] = self.run_name_entry.get()
+
         self.master.destroy()
 
 

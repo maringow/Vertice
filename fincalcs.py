@@ -147,6 +147,7 @@ def valuation_calculations(parameters, df_gfm):
     df_gfm["MOIC"] = MOIC
     result = {'brand_name': parameters['brand_name'],
               'combined_molecules': parameters['combined_molecules'],
+              'dosage_forms': parameters['dosage_forms'],
               'channel': parameters['channel'],
               'indication': parameters['indication'],
               'presentation': parameters['presentation'],
@@ -166,7 +167,8 @@ def valuation_calculations(parameters, df_gfm):
               'gx_players_adj': parameters['gx_players_adj'],
               'npv': npv,
               'irr': irr,
-              'discounted_payback_period': discounted_payback_period}
+              'discounted_payback_period': discounted_payback_period,
+              'run_name': parameters['run_name']}
 
     print('loop: printing combined molecules: {}'.format(result['combined_molecules']))
 
