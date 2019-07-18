@@ -71,7 +71,7 @@ parameters['count_eqs'] = len(df_equivalents)
 
 df_merged_data, df_detail = mergedatasets.merge_ims_prospecto(df_equivalents, prospectoRx)
 
-df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC']], on='NDC', how='left').set_index(['year_index', 'ndc_index'])
+#df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC']], on='NDC', how='left').set_index(['year_index', 'ndc_index'])
 
 ##----------------------------------------------------------------------
 ## WINDOW2: OPEN ConfirmBrand WINDOW AND SAVE
@@ -97,9 +97,9 @@ window.mainloop()
 
 
 # open window
-window=Tk()
-window10 = gui.SelectNDCs(window, df_merged_data)
-window.mainloop()
+# window=Tk()
+# window10 = gui.SelectNDCs(window, df_merged_data)
+# window.mainloop()
 
 
 ##----------------------------------------------------------------------
