@@ -23,7 +23,7 @@ def create_table(conn, create_table_sql):
 def add_column(conn, table_name, column_name, datatype):  # datatype options are text, integer, real
     try:
         cur = conn.cursor()
-        cur.execute("ALTER TABLE model_results ADD COLUMN xyz text")
+        cur.execute("ALTER TABLE {tn} ADD COLUMN {cn} {dt}".format(tn=table_name, cn=column_name, dt=datatype))
     except Error as e:
         print(e)
 
