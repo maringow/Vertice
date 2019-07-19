@@ -20,6 +20,13 @@ def create_table(conn, create_table_sql):
         print(e)
 
 
+def add_column(conn, table_name, column_name, datatype):  # datatype options are text, integer, real
+    try:
+        cur = conn.cursor()
+        cur.execute("ALTER TABLE model_results ADD COLUMN xyz text")
+    except Error as e:
+        print(e)
+
 def select_all_results(conn):
     cur = conn.cursor()
     cur.execute("SELECT * FROM model_results")

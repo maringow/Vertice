@@ -194,7 +194,7 @@ class EnterFilepath:
         master.geometry("600x400")
 
         # create window header
-        self.title = Label(master, text='Generics Forecasting Model: Set Filepath and Run Name', font='Helvetica 9 bold')
+        self.title = Label(master, text='Generics Forecasting Model: Set Filepath and Run Tag', font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
         # add entry for filepath and populate
