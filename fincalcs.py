@@ -36,10 +36,6 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
         df_detail.loc[i]['Units'] = df_detail.loc[i - 1]['Units'] * (1 + parameters['volume_growth_rate'])
 
     # Adjust volumes for launch year and if there is a partial year
-    parameters['vertice_launch_month'] = parameters['launch_delay'] + parameters['vertice_launch_month']
-    if parameters['vertice_launch_month'] > 12:
-        parameters['vertice_launch_month'] = parameters['vertice_launch_month'] - 12
-        parameters['vertice_launch_year'] = parameters['vertice_launch_year'] + 1
     vol_adj = []
     for i in range(2016, parameters['last_forecasted_year'] + 1):
         if i < parameters['vertice_launch_year']:
@@ -216,10 +212,8 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog, df_
         df_detail.loc[i]['Units'] = df_detail.loc[i - 1]['Units'] * (1 + parameters['volume_growth_rate'])
 
     # Adjust volumes for launch year and if there is a partial year
-    parameters['vertice_launch_month'] = parameters['launch_delay'] + parameters['vertice_launch_month']
-    if parameters['vertice_launch_month'] > 12:
-        parameters['vertice_launch_month'] = parameters['vertice_launch_month'] - 12
-        parameters['vertice_launch_year'] = parameters['vertice_launch_year'] + 1
+    parameters['vertice_launch_year'] = parameters['launch_delay'] + parameters['vertice_launch_year']
+
     vol_adj = []
     for i in range(2016, parameters['last_forecasted_year'] + 1):
         if i < parameters['vertice_launch_year']:
@@ -232,8 +226,8 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog, df_
     df_vertice_ndc_volumes = df_vertice_ndc_volumes * parameters['pos']
 
     # Calculating price (WAC) in future
-    for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
-        df_detail.loc[i]['Price'] = df_detail.loc[i - 1]['Price'] * (1 + parameters['wac_increase'])
+    # for i in range(parameters['present_year'], parameters['last_forecasted_year_year'] + 1):
+    #     df_detail.loc[i]['Price'] = df_detail.loc[i - 1]['Price'] * (1 + parameters['wac_increase'])
 
     df_vertice_ndc_prices = df_detail['Price'].mul(df_gfm['Vertice Price as % of WAC'], level=0, fill_value=0)
     df_gfm['Net Sales'] = (df_vertice_ndc_prices * df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
