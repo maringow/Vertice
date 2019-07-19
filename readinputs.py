@@ -88,11 +88,13 @@ def read_model_inputs(parameters):
 
     df_analog = pd.DataFrame(index=range(0, 10))
     df_analog['Retail Net Price Pct BWAC'] = pull_analog_data(2)
-    #df_analog['Retail Market Share'] = pull_analog_data(3)
     df_analog['Clinic Net Price Pct BWAC'] = pull_analog_data(4)
-    #df_analog['Clinic Market Share'] = pull_analog_data(5)
     df_analog['Hospital Net Price Pct BWAC'] = pull_analog_data(6)
-    #df_analog['Hospital Market Share'] = pull_analog_data(7)
+
+    df_analog['Clinic Market Share'] = pull_analog_data(5)
+    df_analog['Retail Market Share'] = pull_analog_data(3)
+    df_analog['Hospital Market Share'] = pull_analog_data(7)
+
     df_analog.index.name = "Number of Gx Players"
     df_analog = df_analog.fillna(0)
 

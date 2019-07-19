@@ -45,9 +45,18 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
         else:
             vol_adj.append(1)
 
-    df_vertice_ndc_volumes_100 = df_detail['Units'].mul(vol_adj * df_gfm['Gx Penetration'], level=0, fill_value=0).mul(
+     # Assign Vertice GX Market Share
+    #NVM let them keep the override
+    # if parameters['channel'] == 'Retail':
+    #     df_gfm['Vertice Gx Market Share'] = df_analog['Retail Market Share']
+    # elif parameters['channel'] == 'Hospital':
+    #     df_gfm['Vertice Gx Market Share'] = df_analog['Hospital Market Share']
+    # else parameters['channel'] == 'Clinic':
+    #     df_gfm['Vertice Gx Market Share'] =  df_analog['Clinic Market Share']
+
+    df_vertice_ndc_volumes = df_detail['Units'].mul(vol_adj * df_gfm['Gx Penetration'], level=0, fill_value=0).mul(
         df_gfm['Vertice Gx Market Share'], level=0, fill_value=0)
-    df_vertice_ndc_volumes = df_vertice_ndc_volumes_100 * parameters['pos']
+    df_vertice_ndc_volumes = df_vertice_ndc_volumes * parameters['pos']
 
     # Calculating price (WAC) in future
     for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
@@ -98,7 +107,7 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
         'Additional Non-cash Effects'] - df_gfm['Change in Net Current Assets'] + df_gfm['Capital Avoidance'] + df_gfm[
                         'Total Capitalized'] - df_gfm['Write-off of Residual Tax Value']
 
-    return(df_gfm, df_detail, df_vertice_ndc_volumes_100)
+    return(df_gfm, df_detail)
 
 
 def valuation_calculations(parameters, df_gfm):
@@ -194,8 +203,7 @@ def valuation_calculations(parameters, df_gfm):
                     'FCF', 'Exit Values', 'MOIC']] #yearly data
 
 
-#Financial calculations affected only by the parameter scan
-def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog, df_vertice_ndc_volumes):
+def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
     import pandas as pd
     import numpy as np
 
@@ -213,7 +221,6 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog, df_
 
     # Adjust volumes for launch year and if there is a partial year
     parameters['vertice_launch_year'] = parameters['launch_delay'] + parameters['vertice_launch_year']
-
     vol_adj = []
     for i in range(2016, parameters['last_forecasted_year'] + 1):
         if i < parameters['vertice_launch_year']:
@@ -223,11 +230,13 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog, df_
         else:
             vol_adj.append(1)
 
-    df_vertice_ndc_volumes = df_vertice_ndc_volumes * parameters['pos']
+    # Assign Vertice GX Market Share based on analog
+    df_gfm['Vertice Gx Market Share'] = df_analog.loc[df_gfm['Number of Gx Players'],[parameters['channel'] + ' Market Share']].values
+    #TODO do exception if Auto?
 
-    # Calculating price (WAC) in future
-    # for i in range(parameters['present_year'], parameters['last_forecasted_year_year'] + 1):
-    #     df_detail.loc[i]['Price'] = df_detail.loc[i - 1]['Price'] * (1 + parameters['wac_increase'])
+    df_vertice_ndc_volumes = df_detail['Units'].mul(vol_adj * df_gfm['Gx Penetration'], level=0, fill_value=0).mul(
+    df_gfm['Vertice Gx Market Share'], level=0, fill_value=0)
+    df_vertice_ndc_volumes = df_vertice_ndc_volumes * parameters['pos']
 
     df_vertice_ndc_prices = df_detail['Price'].mul(df_gfm['Vertice Price as % of WAC'], level=0, fill_value=0)
     df_gfm['Net Sales'] = (df_vertice_ndc_prices * df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
@@ -264,5 +273,4 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog, df_
         'Additional Non-cash Effects'] - df_gfm['Change in Net Current Assets'] + df_gfm['Capital Avoidance'] + df_gfm[
                         'Total Capitalized'] - df_gfm['Write-off of Residual Tax Value']
 
-    return(df_gfm, df_detail)
-
+    return(df_gfm, df_detail) #TODO don't return every column? If it saves time?

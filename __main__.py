@@ -152,7 +152,7 @@ parameters['launch_delay'] = 0
 parameters['cogs_variation'] = 0
 parameters['gx_players_adj'] = 0
 
-df_gfm, df_detail, df_vertice_ndc_volumes = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
+df_gfm, df_detail = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
 
 results, annual_forecast = fincalcs.valuation_calculations(parameters, df_gfm)
 
@@ -211,7 +211,7 @@ years_to_discount = [10]
 launch_delay_years = [0]
 #overall_cogs_increase = [0,.1]
 # volume_growth = [.05]
-gx_players_adj = [-2, -1, 0, 1, 2]
+gx_players_adj = [-2, -1, 0, 1, 2] #TODO make sure there is no negative numbers
 base_gx_players = df_gfm['Number of Gx Players']
 
 for i in years_to_discount:
@@ -232,7 +232,7 @@ for i in years_to_discount:
 
                         df_gfm['Number of Gx Players'] = base_gx_players + n
 
-                        x, y = fincalcs.forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog, df_vertice_ndc_volumes)
+                        x, y = fincalcs.forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog)
 
                         v, w = fincalcs.valuation_calculations(parameters, x)
 
@@ -246,11 +246,6 @@ for i in years_to_discount:
                         df_annual_forecast = df_annual_forecast.append(w)
 
                         print(scenario_id)
-
-
-# RUN FINANCIAL FUNCTION AND GET BACK 1-ROW "RESULT" and 10-ROW "ANNUAL_FORECAST"
-# ADD SCENARIO_ID TO BOTH
-# APPEND TO OUTSIDE DFS DF_RESULT AND DF_ANNUAL FORECAST
 
 ### FORMATTING THE RESULTS TO PUT INTO DB ----------------------------
 
