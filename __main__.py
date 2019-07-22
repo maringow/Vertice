@@ -95,11 +95,9 @@ window.mainloop()
 
 
 # open window
-window=Tk()
-window10 = gui.SelectNDCs(window, df_merged_data, df_detail)
-window.mainloop()
-
-print(window10.selected_ndcs)
+# window=Tk()
+# window10 = gui.SelectNDCs(window, df_merged_data)
+# window.mainloop()
 
 
 ##----------------------------------------------------------------------
@@ -116,15 +114,19 @@ window = Tk()
 window4 = gui.EnterCOGS(window, df_equivalents)
 window.mainloop()
 
-
+parameters['std_cogs_margin_override'] = window4.COGS['gm_override']
 parameters['api_units'] = window4.COGS['units']
 parameters['api_cost_per_unit'] = pd.to_numeric(window4.COGS['cost_per_unit'])
+parameters['standard_cogs_entry'] = window4.COGS['standard_cogs_entry']
 df_merged_data['API_units'] = 0
 
 # map COGS into df_merged_data and df_detail
-for key, value in window4.COGS['units_per_pack'].items():
-    df_merged_data['API_units'].loc[df_merged_data['Pack'] == key] = pd.to_numeric(value)
-df_merged_data['API_cost'] = df_merged_data['API_units'] * parameters['api_cost_per_unit']
+if parameters['standard_cogs_entry'] != '':
+    df_merged_data['API_cost'] = pd.to_numeric(parameters['standard_cogs_entry'])
+else:
+    for key, value in window4.COGS['units_per_pack'].items():
+        df_merged_data['API_units'].loc[df_merged_data['Pack'] == key] = pd.to_numeric(value)
+    df_merged_data['API_cost'] = df_merged_data['API_units'] * parameters['api_cost_per_unit']
 df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC', 'API_cost']], on='NDC', how='left').set_index(['year_index', 'ndc_index'])
 #df_detail['COGS'] = df_detail['Units'] * df_detail['API_cost']
 #df_detail.drop(columns=['API_cost'])
@@ -139,7 +141,7 @@ print(df_detail)
 parameters, df_gfm, df_analog = readinputs.read_model_inputs(parameters)
 
 print(parameters['volume_growth_rate'])
-print('UNITS: \n{}'.format(df_detail['Units']))
+print(df_detail['Units'])
 
 
 #Financial Calcs
@@ -148,8 +150,9 @@ parameters['launch_delay'] = 0
 parameters['cogs_variation'] = 0
 parameters['gx_players_adj'] = 0
 
+df_gfm, df_detail = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
 
-df_gfm, df_detail, df_vertice_ndc_volumes = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
+print(df_gfm[['Net Sales','Standard COGS','FCF']])
 
 results, annual_forecast = fincalcs.valuation_calculations(parameters, df_gfm)
 
@@ -208,9 +211,8 @@ years_to_discount = [10]
 launch_delay_years = [0]
 #overall_cogs_increase = [0,.1]
 # volume_growth = [.05]
-gx_players_adj = [-2, -1, 0, 1, 2]
+gx_players_adj = [-2, -1, 0, 1, 2] #TODO make sure there is no negative numbers
 base_gx_players = df_gfm['Number of Gx Players']
-
 
 for i in years_to_discount:
     for j in probability_of_success:
@@ -230,7 +232,7 @@ for i in years_to_discount:
 
                         df_gfm['Number of Gx Players'] = base_gx_players + n
 
-                        x, y = fincalcs.forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog, df_vertice_ndc_volumes)
+                        x, y = fincalcs.forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog)
 
                         v, w = fincalcs.valuation_calculations(parameters, x)
 
@@ -244,11 +246,6 @@ for i in years_to_discount:
                         df_annual_forecast = df_annual_forecast.append(w)
 
                         print(scenario_id)
-
-
-# RUN FINANCIAL FUNCTION AND GET BACK 1-ROW "RESULT" and 10-ROW "ANNUAL_FORECAST"
-# ADD SCENARIO_ID TO BOTH
-# APPEND TO OUTSIDE DFS DF_RESULT AND DF_ANNUAL FORECAST
 
 ### FORMATTING THE RESULTS TO PUT INTO DB ----------------------------
 

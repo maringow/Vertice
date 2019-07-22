@@ -131,16 +131,16 @@ class ConfirmBrand:
         self.competitors_label.pack()
 
         # create label for 2-year growth rate
-        self.growth_label = Label(master, text='Two-year volume growth rate (CAGR): {}'
+        self.growth_label = Label(master, text='Two-year market volume growth rate (CAGR) for molecule: {}'
                                   .format(round(parameters['historical_growth_rate'],2)))
         self.growth_label.pack()
 
         # print df_merged_data
-        self.volumes_label = Label(master, text='2016 volume: {}; 2017 volume: {}; 2018 volume: {}; 2019 volume: {}'.format(
-                                (df_detail['Units'].sum(level='year_index').loc[2016]),
-                                (df_detail['Units'].sum(level='year_index').loc[2017]),
-                                (df_detail['Units'].sum(level='year_index').loc[2018]),
-                                (df_detail['Units'].sum(level='year_index').loc[2019])))
+        self.volumes_label = Label(master, text='2016 volume: {:,}; 2017 volume: {:,}; 2018 volume: {:,}; 2019 volume: {:,}'.format(
+                                int(df_detail['Units'].sum(level='year_index').loc[2016]),
+                                int(df_detail['Units'].sum(level='year_index').loc[2017]),
+                                int(df_detail['Units'].sum(level='year_index').loc[2018]),
+                                int(df_detail['Units'].sum(level='year_index').loc[2019])))
         self.volumes_label.pack()
 
         # add Continue button
@@ -272,34 +272,57 @@ class EnterCOGS:
         self.master = master
         master.title('Generics Forecasting Model')
 
-        self.title = Label(master, text='Generics Forecasting Model: Enter API COGS', font='Helvetica 9 bold')
+        self.title = Label(master, text='Enter Margin to Calculate Total Standard COGS', font='Helvetica 9 bold')
         self.title.grid(row=0, columnspan=2, pady=10)
 
+        #if user uses straight gross margin approach, instead of API approach
+        self.gross_margin = Label(master, text='As % of Net Sales (enter as decimal): ') #TODO can this be worded better
+        self.gross_margin.grid(row=1, column=0)
+        self.gross_margin = Entry(master)
+        self.gross_margin.grid(row=1, column=1)
+
+        self.sep1 = ttk.Separator(master, orient="horizontal")
+        self.sep1.grid(column=0, row=2, columnspan=2, sticky="ew")
+        self.sty = ttk.Style(master)
+        self.sty.configure("TSeparator", background="blue")
+
+        self.or_label = Label(master, text='OR', font='Helvetica 9 bold')
+        self.or_label.grid(row=2, columnspan=2, pady=10)
+        self.subtitle = Label(master, text="Enter API COGS (if cost is equal across all packs)", font='Helvetica 9 bold') #TODO word this better
+        self.subtitle.grid(row=3, columnspan=2, pady=10)
+
         # add entry boxes for desired units and API cost per unit
-        self.standard_cogs_label = Label(master, text='Enter standard COGS in $: ')
-        self.standard_cogs_label.grid(row=1, column=0)
+        self.standard_cogs_label = Label(master, text='API COGS per NDC ($): ')  #TODO or say per SKU?
+        self.standard_cogs_label.grid(row=4, column=0)
         self.standard_cogs_entry = Entry(master)
-        self.standard_cogs_entry.grid(row=1, column=1)
+        self.standard_cogs_entry.grid(row=4, column=1)
 
-        self.or_label = Label(master, text='OR enter API cost/unit:', font='Helvetica 9 bold')
-        self.or_label.grid(row=2, columnspan=2, pady=20)
+        self.sep2 = ttk.Separator(master, orient="horizontal")
+        self.sep2.grid(column=0, row=5, columnspan=2, sticky="ew")
+        # self.sty = ttk.Style(master)
+        # self.sty.configure("TSeparator", background="red")
 
-        self.unit_label = Label(master, text='Enter base unit: ')
-        self.unit_label.grid(row=3, column=0)
+        self.or_label = Label(master, text='OR', font='Helvetica 9 bold')
+        self.or_label.grid(row=5, columnspan=2, pady=20)
+        self.subtitle = Label(master, text='Enter API cost per unit', font='Helvetica 9 bold') #TODO word this better
+        self.subtitle.grid(row=6, columnspan=2, pady=10)
+
+        self.unit_label = Label(master, text='Base unit: ')
+        self.unit_label.grid(row=7, column=0)
         self.unit_entry = Entry(master)
-        self.unit_entry.grid(row=3, column=1)
+        self.unit_entry.grid(row=7, column=1)
 
-        self.cost_per_unit_label = Label(master, text='Enter API cost per unit ($): ')
-        self.cost_per_unit_label.grid(row=4, column=0)
+        self.cost_per_unit_label = Label(master, text='API cost per unit ($): ')
+        self.cost_per_unit_label.grid(row=8, column=0)
         self.cost_per_unit_entry = Entry(master)
-        self.cost_per_unit_entry.grid(row=4, column=1)
+        self.cost_per_unit_entry.grid(row=8, column=1)
 
         # add entry boxes for API units for each pack type found in therapeutic equivalents
         self.API_costs_label = Label(master, text='Enter number of units for each pack type found: ')
-        self.API_costs_label.grid(row=5, columnspan=2, pady=20)
+        self.API_costs_label.grid(row=9, columnspan=2, pady=20)
 
         self.entries = []  # save entries created in list so that they can be accessed to store values
-        i = 6  # start placing labels below the already assigned rows
+        i = 10  # start placing labels below the already assigned rows
 
         # add frame to allow scrolling
 
@@ -321,6 +344,8 @@ class EnterCOGS:
         run_model_button.grid(row=i+1, column=1, pady=10)
 
     def save_and_run(self):
+        self.COGS['gm_override'] = self.gross_margin.get()
+        self.COGS['standard_cogs_entry'] = self.standard_cogs_entry.get()
         self.COGS['units'] = self.unit_entry.get()
         self.COGS['cost_per_unit'] = self.cost_per_unit_entry.get()
         self.COGS['units_per_pack'] = {}
