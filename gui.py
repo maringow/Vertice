@@ -131,16 +131,16 @@ class ConfirmBrand:
         self.competitors_label.pack()
 
         # create label for 2-year growth rate
-        self.growth_label = Label(master, text='Two-year volume growth rate (CAGR): {}'
+        self.growth_label = Label(master, text='Two-year market volume growth rate (CAGR) for molecule: {}'
                                   .format(round(parameters['historical_growth_rate'],2)))
         self.growth_label.pack()
 
         # print df_merged_data
-        self.volumes_label = Label(master, text='2016 volume: {}; 2017 volume: {}; 2018 volume: {}; 2019 volume: {}'.format(
-                                (df_detail['Units'].sum(level='year_index').loc[2016]),
-                                (df_detail['Units'].sum(level='year_index').loc[2017]),
-                                (df_detail['Units'].sum(level='year_index').loc[2018]),
-                                (df_detail['Units'].sum(level='year_index').loc[2019])))
+        self.volumes_label = Label(master, text='2016 volume: {:,}; 2017 volume: {:,}; 2018 volume: {:,}; 2019 volume: {:,}'.format(
+                                int(df_detail['Units'].sum(level='year_index').loc[2016]),
+                                int(df_detail['Units'].sum(level='year_index').loc[2017]),
+                                int(df_detail['Units'].sum(level='year_index').loc[2018]),
+                                int(df_detail['Units'].sum(level='year_index').loc[2019])))
         self.volumes_label.pack()
 
         # add Continue button

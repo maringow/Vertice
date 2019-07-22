@@ -1,3 +1,6 @@
+import pandas as pd
+import numpy as np
+
 #Function to get 2yr volume CAGR
 def get_growth_rate(df):
     import numpy as np
@@ -15,8 +18,6 @@ def get_growth_rate(df):
 
 #Function to do financial calculations, these are all dependent on previous data
 def financial_calculations(parameters, df_gfm, df_detail, df_analog):
-    import pandas as pd
-    import numpy as np
 
     # Assign Vertice price as % of either BWAC or GWAC
     if parameters['brand_status'] == 'Brand':
@@ -111,8 +112,6 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
 
 
 def valuation_calculations(parameters, df_gfm):
-    import pandas as pd
-    import numpy as np
 
     # IRR
     irr = np.irr(df_gfm.FCF.loc[parameters['present_year']:parameters['present_year'] + parameters['years_discounted'] + 1])
@@ -196,7 +195,7 @@ def valuation_calculations(parameters, df_gfm):
     #          parameters['years_discounted'],
     #          parameters['cogs_variation'],
     #          parameters['gx_players_adj'],
-    #          npv,
+    #          npv,s
     #          irr,
     #          discounted_payback_period],
     return result, df_gfm[['Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D', 'Net Sales', 'COGS', 'EBIT',
@@ -204,8 +203,6 @@ def valuation_calculations(parameters, df_gfm):
 
 
 def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
-    import pandas as pd
-    import numpy as np
 
     # Assign Vertice price as % of either BWAC or GWAC
     if parameters['brand_status'] == 'Brand':
