@@ -23,7 +23,6 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
     import pandas as pd
     import numpy as np
 
-
     def strip_non_numeric(df_column):
         df_column = df_column.str.replace('[^0-9]', '')
         df_column = pd.to_numeric(df_column)

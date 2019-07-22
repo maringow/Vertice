@@ -182,7 +182,7 @@ class SelectNDCs():
         self.var = []
 
         m = 0
-        header = ['NDC', 'Manufacturer', 'Dosage Form', 'Current Year Volume']
+        header = ['NDC', 'Manufacturer', 'Dosage Form']
         for h in header:
             label = Label(self.frame,text=h, font='Helvetica 8 bold')
             label.grid(row=0, column=m, padx=4)
@@ -272,14 +272,14 @@ class EnterCOGS:
         self.master = master
         master.title('Generics Forecasting Model')
 
-        self.title = Label(master, text='Enter Margin to Calculate Total Standard COGS', font='Helvetica 9 bold')
+        self.title = Label(master, text='Enter Standard Margin', font='Helvetica 9 bold')
         self.title.grid(row=0, columnspan=2, pady=10)
 
         #if user uses straight gross margin approach, instead of API approach
-        self.gross_margin = Label(master, text='Enter gross margin assumption (enter as decimal): ')
-        self.gross_margin.grid(row=1, column=0)
+        self.gross_margin = Label(master, text='Enter gross margin assumption (as decimal):')
+        self.gross_margin.grid(row=1, column=0, padx=10)
         self.gross_margin = Entry(master)
-        self.gross_margin.grid(row=1, column=1)
+        self.gross_margin.grid(row=1, column=1, padx=10)
 
         self.sep1 = ttk.Separator(master, orient="horizontal")
         self.sep1.grid(column=0, row=2, columnspan=2, sticky="ew")
@@ -287,15 +287,15 @@ class EnterCOGS:
         self.sty.configure("TSeparator", background="blue")
 
         self.or_label = Label(master, text='OR', font='Helvetica 9 bold')
-        self.or_label.grid(row=2, columnspan=2, pady=10)
-        self.subtitle = Label(master, text="Enter standard COGS ($): ", font='Helvetica 9 bold') # TODO make sure this is COGS, not API COGS
-        self.subtitle.grid(row=3, columnspan=2, pady=10)
+        self.or_label.grid(row=2, columnspan=2, pady=10, padx=10)
+        self.subtitle = Label(master, text="Enter Standard COGS", font='Helvetica 9 bold') # TODO make sure this is COGS, not API COGS
+        self.subtitle.grid(row=3, columnspan=2, pady=10, padx=10)
 
         # add entry boxes for desired units and API cost per unit
-        self.standard_cogs_label = Label(master, text='API COGS by NDC ($): ')
-        self.standard_cogs_label.grid(row=4, column=0)
+        self.standard_cogs_label = Label(master, text='Standard COGS ($): ')
+        self.standard_cogs_label.grid(row=4, column=0, padx=10)
         self.standard_cogs_entry = Entry(master)
-        self.standard_cogs_entry.grid(row=4, column=1)
+        self.standard_cogs_entry.grid(row=4, column=1, padx=10)
 
         self.sep2 = ttk.Separator(master, orient="horizontal")
         self.sep2.grid(column=0, row=5, columnspan=2, sticky="ew")
@@ -303,9 +303,9 @@ class EnterCOGS:
         # self.sty.configure("TSeparator", background="red")
 
         self.or_label = Label(master, text='OR', font='Helvetica 9 bold')
-        self.or_label.grid(row=5, columnspan=2, pady=20)
-        self.subtitle = Label(master, text='Enter API cost per unit', font='Helvetica 9 bold') #TODO word this better
-        self.subtitle.grid(row=6, columnspan=2, pady=10)
+        self.or_label.grid(row=5, columnspan=2, pady=20, padx=10)
+        self.subtitle = Label(master, text='Enter API Cost Per Unit', font='Helvetica 9 bold') #TODO word this better
+        self.subtitle.grid(row=6, columnspan=2, pady=10, padx=10)
 
         self.unit_label = Label(master, text='Base unit: ')
         self.unit_label.grid(row=7, column=0)
@@ -322,9 +322,11 @@ class EnterCOGS:
         self.API_costs_label.grid(row=9, columnspan=2, pady=20)
 
         self.entries = []  # save entries created in list so that they can be accessed to store values
-        i = 10  # start placing labels below the already assigned rows
+        i = 0  # start placing labels below the already assigned rows
 
         # add frame to allow scrolling
+        self.frame = Frame(master)
+        self.frame.grid(row=10, columnspan=2)
 
         # add scrollbar
         #self.scroll = Scrollbar(master, orient='vertical')
@@ -332,16 +334,16 @@ class EnterCOGS:
 
         self.packs = df_equivalents['Pack'].unique()
         for p in self.packs:
-            pack_label = Label(master, text=p)
+            pack_label = Label(self.frame, text=p)
             pack_label.grid(row=i, column=0, padx=10)
-            pack_entry = Entry(master)
+            pack_entry = Entry(self.frame)
             pack_entry.grid(row=i, column=1, padx=10)
             self.entries.append(pack_entry)
             i += 1
 
         # add Run Model button
         run_model_button = Button(master, text='Run Model', command=self.save_and_run)
-        run_model_button.grid(row=i+1, column=1, pady=10)
+        run_model_button.grid(row=11, column=1, pady=10)
 
     def save_and_run(self):
         self.COGS['gm_override'] = self.gross_margin.get()
