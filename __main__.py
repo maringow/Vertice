@@ -288,8 +288,9 @@ try:
    # print('run_id {}'.format(run_id))
     run_id += 1
     scenario_id += 1
-except:
+except Error as e:
     print('Exception occurred when reading max IDs')
+    print('Error message: {}'.format(e))
     run_id = 1
     scenario_id = 1
 
