@@ -288,11 +288,11 @@ class EnterCOGS:
 
         self.or_label = Label(master, text='OR', font='Helvetica 9 bold')
         self.or_label.grid(row=2, columnspan=2, pady=10)
-        self.subtitle = Label(master, text="Enter API COGS (if cost is equal across all packs)", font='Helvetica 9 bold') #TODO word this better
+        self.subtitle = Label(master, text="Enter standard COGS ($): ", font='Helvetica 9 bold') # TODO make sure this is COGS, not API COGS
         self.subtitle.grid(row=3, columnspan=2, pady=10)
 
         # add entry boxes for desired units and API cost per unit
-        self.standard_cogs_label = Label(master, text='API COGS per NDC ($): ')  #TODO or say per SKU?
+        self.standard_cogs_label = Label(master, text='API COGS by NDC ($): ')
         self.standard_cogs_label.grid(row=4, column=0)
         self.standard_cogs_entry = Entry(master)
         self.standard_cogs_entry.grid(row=4, column=1)
