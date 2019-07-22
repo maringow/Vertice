@@ -120,15 +120,19 @@ window = Tk()
 window4 = gui.EnterCOGS(window, df_equivalents)
 window.mainloop()
 
-
+parameters['std_cogs_margin_override'] = window4.COGS['gm_override']
 parameters['api_units'] = window4.COGS['units']
 parameters['api_cost_per_unit'] = pd.to_numeric(window4.COGS['cost_per_unit'])
+parameters['standard_cogs_entry'] = window4.COGS['standard_cogs_entry']
 df_merged_data['API_units'] = 0
 
 # map COGS into df_merged_data and df_detail
-for key, value in window4.COGS['units_per_pack'].items():
-    df_merged_data['API_units'].loc[df_merged_data['Pack'] == key] = pd.to_numeric(value)
-df_merged_data['API_cost'] = df_merged_data['API_units'] * parameters['api_cost_per_unit']
+if parameters['standard_cogs_entry'] != '':
+    df_merged_data['API_cost'] = pd.to_numeric(parameters['standard_cogs_entry'])
+else:
+    for key, value in window4.COGS['units_per_pack'].items():
+        df_merged_data['API_units'].loc[df_merged_data['Pack'] == key] = pd.to_numeric(value)
+    df_merged_data['API_cost'] = df_merged_data['API_units'] * parameters['api_cost_per_unit']
 df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC', 'API_cost']], on='NDC', how='left').set_index(['year_index', 'ndc_index'])
 #df_detail['COGS'] = df_detail['Units'] * df_detail['API_cost']
 #df_detail.drop(columns=['API_cost'])
@@ -153,6 +157,8 @@ parameters['cogs_variation'] = 0
 parameters['gx_players_adj'] = 0
 
 df_gfm, df_detail = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
+
+print(df_gfm[['Net Sales','Standard COGS','FCF']])
 
 results, annual_forecast = fincalcs.valuation_calculations(parameters, df_gfm)
 

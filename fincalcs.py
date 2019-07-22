@@ -46,15 +46,6 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
         else:
             vol_adj.append(1)
 
-     # Assign Vertice GX Market Share
-    #NVM let them keep the override
-    # if parameters['channel'] == 'Retail':
-    #     df_gfm['Vertice Gx Market Share'] = df_analog['Retail Market Share']
-    # elif parameters['channel'] == 'Hospital':
-    #     df_gfm['Vertice Gx Market Share'] = df_analog['Hospital Market Share']
-    # else parameters['channel'] == 'Clinic':
-    #     df_gfm['Vertice Gx Market Share'] =  df_analog['Clinic Market Share']
-
     df_vertice_ndc_volumes = df_detail['Units'].mul(vol_adj * df_gfm['Gx Penetration'], level=0, fill_value=0).mul(
         df_gfm['Vertice Gx Market Share'], level=0, fill_value=0)
     df_vertice_ndc_volumes = df_vertice_ndc_volumes * parameters['pos']
@@ -66,26 +57,28 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
     df_vertice_ndc_prices = df_detail['Price'].mul(df_gfm['Vertice Price as % of WAC'], level=0, fill_value=0)
     df_gfm['Net Sales'] = (df_vertice_ndc_prices * df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
 
-    # Calculating API_cost in future
-    for i in range(parameters['present_year'] + 1, parameters['last_forecasted_year'] + 1):
-        df_detail.loc[i]['API_cost'] = df_detail.loc[i - 1]['API_cost'] * (1 + parameters['cogs']['cost_increase'])
-
-    df_gfm['Standard COGS'] = -(df_detail['API_cost'] * df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
-    df_gfm['Other Unit COGS'] = -((parameters['cogs']['excipients'] + parameters['cogs']['direct_labor'] +
-                                   parameters['cogs']['variable_overhead'] + parameters['cogs']['fixed_overhead'] +
-                                   parameters['cogs']['depreciation'] + parameters['cogs'][
-                                       'cmo_markup']) * df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
-
-    # Financial statement calculations
     df_gfm['Gross Sales'] = df_gfm['Net Sales'] / (1 - parameters['gtn_%'])
     df_gfm['Distribution'] = -df_gfm['Gross Sales'] * parameters['cogs']['distribution']
     df_gfm['Write-offs'] = -df_gfm['Gross Sales'] * parameters['cogs']['writeoffs']
-    df_gfm['Profit Share'] = -(
-                df_gfm['Net Sales'] + df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs']) * df_gfm[
-                                 'Profit Share %']
-    df_gfm['COGS'] = df_gfm['Standard COGS'] + df_gfm['Other Unit COGS'] + df_gfm['Distribution'] + df_gfm[
-        'Write-offs'] + df_gfm['Profit Share'] + df_gfm['Milestone Payments']
-    df_gfm['COGS'] = df_gfm['COGS'] * (1 + parameters['cogs_variation'])
+
+    #if stmt for margin approach or API approach
+    if parameters['std_cogs_margin_override'] != '':
+        df_gfm['Standard COGS'] = -df_gfm['Net Sales'] * pd.to_numeric(parameters['std_cogs_margin_override'])
+    else:
+        # Calculating std_cost_per_unit in future
+        df_detail['std_cost_per_unit'] = df_detail['API_cost'].add((parameters['cogs']['excipients'] +
+                                                                    parameters['cogs']['direct_labor'] +
+                                                                    parameters['cogs']['variable_overhead'] +
+                                                                    parameters['cogs']['fixed_overhead'] +
+                                                                    parameters['cogs']['depreciation'] +
+                                                                    parameters['cogs']['cmo_markup']), level=0, fill_value=0)
+        for i in range(parameters['present_year'] + 1, parameters['last_forecasted_year'] + 1):
+            df_detail.loc[i]['std_cost_per_unit'] = df_detail.loc[i - 1]['std_cost_per_unit'] * (1 + parameters['cogs']['cost_increase'])
+
+        df_gfm['Standard COGS'] = -(df_detail['std_cost_per_unit'] * df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
+
+    df_gfm['Profit Share'] = -(df_gfm['Net Sales'] + df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs']) * df_gfm['Profit Share %']
+    df_gfm['COGS'] = df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs'] + df_gfm['Profit Share'] + df_gfm['Milestone Payments']
     df_gfm['Gross Profit'] = df_gfm['Net Sales'] + df_gfm['COGS']
     df_gfm['Inventory'] = - parameters['DIO'] * df_gfm['Standard COGS'] / 360
     df_gfm['Accounts Receivable'] = parameters['DSO'] * df_gfm['Net Sales'] / 360
@@ -176,28 +169,6 @@ def valuation_calculations(parameters, df_gfm):
               'discounted_payback_period': discounted_payback_period,
               'run_name': parameters['run_name']}
 
-    # return ([parameters['brand_name'],
-    #          parameters['combined_molecules'],
-    #          parameters['channel'],
-    #          parameters['indication'],
-    #          parameters['presentation'],
-    #          parameters['comments'],
-    #          parameters['vertice_filing_month'],
-    #          parameters['vertice_filing_year'],
-    #          parameters['vertice_launch_month'],
-    #          parameters['vertice_launch_year'],
-    #          parameters['pos'],
-    #          df_gfm['Market Volume'].loc[parameters['present_year'] - 1],
-    #          df_gfm['Market Size'].loc[parameters['present_year'] - 1],
-    #          parameters['volume_growth_rate'],
-    #          parameters['wac_increase'],
-    #          parameters['api_cost_per_unit'],
-    #          parameters['years_discounted'],
-    #          parameters['cogs_variation'],
-    #          parameters['gx_players_adj'],
-    #          npv,s
-    #          irr,
-    #          discounted_payback_period],
     return result, df_gfm[['Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D', 'Net Sales', 'COGS', 'EBIT',
                     'FCF', 'Exit Values', 'MOIC']] #yearly data
 
@@ -242,11 +213,8 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
     df_gfm['Gross Sales'] = df_gfm['Net Sales'] / (1 - parameters['gtn_%'])
     df_gfm['Distribution'] = -df_gfm['Gross Sales'] * parameters['cogs']['distribution']
     df_gfm['Write-offs'] = -df_gfm['Gross Sales'] * parameters['cogs']['writeoffs']
-    df_gfm['Profit Share'] = -(
-                df_gfm['Net Sales'] + df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs']) * df_gfm[
-                                 'Profit Share %']
-    df_gfm['COGS'] = df_gfm['Standard COGS'] + df_gfm['Other Unit COGS'] + df_gfm['Distribution'] + df_gfm[
-        'Write-offs'] + df_gfm['Profit Share'] + df_gfm['Milestone Payments']
+    df_gfm['Profit Share'] = -(df_gfm['Net Sales'] + df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs']) * df_gfm['Profit Share %']
+    df_gfm['COGS'] = df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs'] + df_gfm['Profit Share'] + df_gfm['Milestone Payments']
     df_gfm['COGS'] = df_gfm['COGS'] * (1 + parameters['cogs_variation'])
     df_gfm['Gross Profit'] = df_gfm['Net Sales'] + df_gfm['COGS']
     df_gfm['Inventory'] = - parameters['DIO'] * df_gfm['Standard COGS'] / 360
