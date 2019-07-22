@@ -247,27 +247,27 @@ class EnterCOGS:
         self.master = master
         master.title('Generics Forecasting Model')
 
-        self.title = Label(master, text='Enter Margin to Calculate Standard COGS', font='Helvetica 9 bold')
+        self.title = Label(master, text='Enter Margin to Calculate Total Standard COGS', font='Helvetica 9 bold')
         self.title.grid(row=0, columnspan=2, pady=10)
 
         #if user uses straight gross margin approach, instead of API approach
-        self.gross_margin = Label(master, text='Standard COGS as % of Net Sales (enter as decimal): ') #TODO can this be worded better
+        self.gross_margin = Label(master, text='As % of Net Sales (enter as decimal): ') #TODO can this be worded better
         self.gross_margin.grid(row=1, column=0)
         self.gross_margin = Entry(master)
         self.gross_margin.grid(row=1, column=1)
 
-        self.sep = ttk.Separator(master, orient="horizontal")
-        self.sep.grid(column=0, row=2, columnspan=2, sticky="ew")
+        self.sep1 = ttk.Separator(master, orient="horizontal")
+        self.sep1.grid(column=0, row=2, columnspan=2, sticky="ew")
         self.sty = ttk.Style(master)
-        self.sty.configure("TSeparator", background="red")
+        self.sty.configure("TSeparator", background="blue")
 
-        self.subtitle = Label(master, text='OR Enter API COGS', font='Helvetica 9 bold')
-        self.subtitle.grid(row=2, columnspan=2, pady=10)
-        self.subsubtitle = Label(master, text="*if cost is equal across all packs") #TODO word this better
-        self.subsubtitle.grid(row=3, columnspan=2, pady=10)
+        self.or_label = Label(master, text='OR', font='Helvetica 9 bold')
+        self.or_label.grid(row=2, columnspan=2, pady=10)
+        self.subtitle = Label(master, text="Enter API COGS (if cost is equal across all packs)", font='Helvetica 9 bold') #TODO word this better
+        self.subtitle.grid(row=3, columnspan=2, pady=10)
 
         # add entry boxes for desired units and API cost per unit
-        self.standard_cogs_label = Label(master, text='Standard COGS in $: ')
+        self.standard_cogs_label = Label(master, text='API COGS per NDC ($): ')  #TODO or say per SKU?
         self.standard_cogs_label.grid(row=4, column=0)
         self.standard_cogs_entry = Entry(master)
         self.standard_cogs_entry.grid(row=4, column=1)
@@ -277,25 +277,27 @@ class EnterCOGS:
         # self.sty = ttk.Style(master)
         # self.sty.configure("TSeparator", background="red")
 
-        self.or_label = Label(master, text='OR Enter API cost/unit', font='Helvetica 9 bold')
+        self.or_label = Label(master, text='OR', font='Helvetica 9 bold')
         self.or_label.grid(row=5, columnspan=2, pady=20)
+        self.subtitle = Label(master, text='Enter API cost per unit', font='Helvetica 9 bold') #TODO word this better
+        self.subtitle.grid(row=6, columnspan=2, pady=10)
 
         self.unit_label = Label(master, text='Base unit: ')
-        self.unit_label.grid(row=6, column=0)
+        self.unit_label.grid(row=7, column=0)
         self.unit_entry = Entry(master)
-        self.unit_entry.grid(row=6, column=1)
+        self.unit_entry.grid(row=7, column=1)
 
         self.cost_per_unit_label = Label(master, text='API cost per unit ($): ')
-        self.cost_per_unit_label.grid(row=7, column=0)
+        self.cost_per_unit_label.grid(row=8, column=0)
         self.cost_per_unit_entry = Entry(master)
-        self.cost_per_unit_entry.grid(row=7, column=1)
+        self.cost_per_unit_entry.grid(row=8, column=1)
 
         # add entry boxes for API units for each pack type found in therapeutic equivalents
         self.API_costs_label = Label(master, text='Enter number of units for each pack type found: ')
-        self.API_costs_label.grid(row=8, columnspan=2, pady=20)
+        self.API_costs_label.grid(row=9, columnspan=2, pady=20)
 
         self.entries = []  # save entries created in list so that they can be accessed to store values
-        i = 9  # start placing labels below the already assigned rows
+        i = 10  # start placing labels below the already assigned rows
 
         # add frame to allow scrolling
 
