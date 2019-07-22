@@ -88,12 +88,6 @@ parameters['count_competitors'] = len(df_equivalents.loc[pd.isnull(df_equivalent
                                       ['Manufacturer'].unique())
 parameters['historical_growth_rate'] = fincalcs.get_growth_rate(df_detail)
 
-print('df_detail \n {}'.format(df_detail))
-
-print('Volume: {}'.format(df_detail['Units'].sum(level='year_index').loc[2016]))
-
-
-
 # open window
 window = Tk()
 window3 = gui.ConfirmBrand(window, parameters, df_detail)
@@ -101,9 +95,11 @@ window.mainloop()
 
 
 # open window
-# window=Tk()
-# window10 = gui.SelectNDCs(window, df_merged_data)
-# window.mainloop()
+window=Tk()
+window10 = gui.SelectNDCs(window, df_merged_data, df_detail)
+window.mainloop()
+
+print(window10.selected_ndcs)
 
 
 ##----------------------------------------------------------------------
@@ -143,7 +139,7 @@ print(df_detail)
 parameters, df_gfm, df_analog = readinputs.read_model_inputs(parameters)
 
 print(parameters['volume_growth_rate'])
-print(df_detail['Units'])
+print('UNITS: \n{}'.format(df_detail['Units']))
 
 
 #Financial Calcs
@@ -151,6 +147,7 @@ parameters['years_discounted'] = 10
 parameters['launch_delay'] = 0
 parameters['cogs_variation'] = 0
 parameters['gx_players_adj'] = 0
+
 
 df_gfm, df_detail, df_vertice_ndc_volumes = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
 
@@ -213,6 +210,7 @@ launch_delay_years = [0]
 # volume_growth = [.05]
 gx_players_adj = [-2, -1, 0, 1, 2]
 base_gx_players = df_gfm['Number of Gx Players']
+
 
 for i in years_to_discount:
     for j in probability_of_success:

@@ -153,47 +153,72 @@ class ConfirmBrand:
 
 class SelectNDCs():
 
-    def __init__(self, master, df_merged_data):
+    def __init__(self, master, df_merged_data, df_detail):
 
         self.master = master
         master.title("Generics Forecasting Model")
 
         # create window header
-        self.title = Label(master, text='Generics Forecasting Model: Set Excel Filepath', font='Helvetica 9 bold')
+        self.title = Label(master, text='Generics Forecasting Model: Select NDCs', font='Helvetica 9 bold')
         self.title.grid(row=0, columnspan=2, pady=20, padx=20)
 
         # create canvas and scrollbar
-        self.canvas = Canvas()
+        self.canvas = Canvas(master, borderwidth=2, scrollregion=(0,0,500,500))
         self.canvas.grid(row=1, columnspan=2)
-        self.scrollbar = Scrollbar(master, orient='vertical', command=self.canvas.yview)
+        self.scrollbar = Scrollbar(self.master, orient='vertical', command=self.canvas.yview)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.grid(row=0, rowspan=100, column=3)
+        #self.scrollbar.pack(side='right')
+
 
         # create frame to lay out objects within the canvas
         self.frame = Frame(self.canvas, borderwidth=2)
         self.frame.grid(row=0, columnspan=2)
 
         # set up variables to store user selections
+        self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])['NDC']
+        print(self.ndcs)
         self.selected_ndcs = []
         self.var = []
-        n=0
+
+        m = 0
+        header = ['NDC', 'Manufacturer', 'Dosage Form', 'Current Year Volume']
+        for h in header:
+            label = Label(self.frame,text=h, font='Helvetica 8 bold')
+            label.grid(row=0, column=m, padx=4)
+            m+=1
+
+        n = 1
 
         # # add dosage form checkboxes
-        for index, row in df_merged_data.sort_values(by='NDC').iterrows():
+        for index, row in df_merged_data.sort_values(by=['Manufacturer', 'NDC']).iterrows():
             v=IntVar()
+            v.set(1)
             box = Checkbutton(self.frame, text=row['NDC'], variable=v)
-            box.grid(row=n, column=0)
+            box.grid(row=n, column=0, sticky='w', padx=2)
             self.var.append(v)
-            manufacturer = row['Manufacturer']
-            self.manufacturer_label = Label(self.frame, text=manufacturer)
-            self.manufacturer_label.grid(row=n, column=1)
+            self.manufacturer_label = Label(self.frame, text=row['Manufacturer'])
+            self.manufacturer_label.grid(row=n, column=1, sticky='w', padx=2)
+            self.form_label = Label(self.frame, text=row['Prod Form3'])
+            self.form_label.grid(row=n, column=2, sticky='w', padx=2)
             n+=1
 
-
+        self.canvas.create_window((0,0), anchor='nw', window=self.frame, tags='self.frame')
+        self.frame.bind('<Configure>', self.onFrameConfigure)
 
         # add Continue button
-        self.continue_button = Button(master, text='Continue', command=master.destroy)
+        self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
         self.continue_button.grid(row=1000, column=1, pady=20, padx=20, sticky='e')
 
+    def onFrameConfigure(self, event):
+        '''Reset scroll region to encompass inner frame'''
+        self.canvas.configure(scrollregion=self.canvas.bbox('all'))
+
+    def save_and_continue(self):
+        print(self.ndcs)
+        self.selected_ndcs = [self.ndcs[i] for i in range(len(self.ndcs))
+                                      if self.var[i].get() == 1]
+        self.master.destroy()
 
 ##----------------------------------------------------------------------
 ## WINDOW: ENTER EXCEL FILEPATH
