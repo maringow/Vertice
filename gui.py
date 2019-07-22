@@ -190,7 +190,7 @@ class SelectNDCs():
 
         n = 1
 
-        # # add dosage form checkboxes
+        # add ndc checkboxes
         for index, row in df_merged_data.sort_values(by=['Manufacturer', 'NDC']).iterrows():
             v=IntVar()
             v.set(1)
@@ -276,7 +276,7 @@ class EnterCOGS:
         self.title.grid(row=0, columnspan=2, pady=10)
 
         #if user uses straight gross margin approach, instead of API approach
-        self.gross_margin = Label(master, text='As % of Net Sales (enter as decimal): ') #TODO can this be worded better
+        self.gross_margin = Label(master, text='Enter gross margin assumption (enter as decimal): ')
         self.gross_margin.grid(row=1, column=0)
         self.gross_margin = Entry(master)
         self.gross_margin.grid(row=1, column=1)

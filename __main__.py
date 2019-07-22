@@ -95,9 +95,9 @@ window.mainloop()
 
 
 # open window
-# window=Tk()
-# window10 = gui.SelectNDCs(window, df_merged_data)
-# window.mainloop()
+window=Tk()
+window10 = gui.SelectNDCs(window, df_merged_data, df_detail)
+window.mainloop()
 
 
 ##----------------------------------------------------------------------
