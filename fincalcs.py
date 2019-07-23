@@ -86,16 +86,13 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
                 df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs'] + df_gfm['Profit Share'] +
                 df_gfm['Milestone Payments'] + df_gfm['SG&A']) / 360
     df_gfm['Working Capital'] = df_gfm['Inventory'] + df_gfm['Accounts Receivable'] - df_gfm['Accounts Payable']
-    df_gfm['EBIT'] = df_gfm['Gross Profit'] + df_gfm['SG&A'] + df_gfm['R&D'] - df_gfm[
-        'Tax depreciation']  # essentially "adjusted EBIT" as it doesn't include other impacts, proceeds from disposals, write-offs of residual tax value, etc
+    df_gfm['EBIT'] = df_gfm['Gross Profit'] + df_gfm['SG&A'] + df_gfm['R&D'] - df_gfm['Tax depreciation']  # essentially "adjusted EBIT" as it doesn't include other impacts, proceeds from disposals, write-offs of residual tax value, etc
     df_gfm['Operating Income'] = df_gfm['EBIT'] + df_gfm['Net proceeds from Disposals'] + df_gfm[
         'Write-off of Residual Tax Value'] + df_gfm['Other Income, Expenses, Except Items'] + df_gfm[
                                      'Additional Impacts on P&L']
     df_gfm['Profit Tax'] = -df_gfm['Operating Income'] * parameters['tax_rate']
-    df_gfm['Total Net Current Assets'] = df_gfm['Working Capital'] + df_gfm[
-        'Other Net Current Assets']  # put in as positive numbers, different than excel
-    df_gfm['Change in Net Current Assets'] = df_gfm['Total Net Current Assets'] - df_gfm[
-        'Total Net Current Assets'].shift(1)
+    df_gfm['Total Net Current Assets'] = df_gfm['Working Capital'] + df_gfm['Other Net Current Assets']  # put in as positive numbers, different than excel
+    df_gfm['Change in Net Current Assets'] = df_gfm['Total Net Current Assets'] - df_gfm['Total Net Current Assets'].shift(1)
     df_gfm['Change in Net Current Assets'] = df_gfm['Change in Net Current Assets'].fillna(0)
     df_gfm['FCF'] = df_gfm['Operating Income'] + df_gfm['Profit Tax'] + df_gfm['Tax depreciation'] + df_gfm[
         'Additional Non-cash Effects'] - df_gfm['Change in Net Current Assets'] + df_gfm['Capital Avoidance'] + df_gfm[
@@ -180,8 +177,7 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
         col_name = [parameters['channel'] + ' Net Price Pct BWAC']
         df_gfm['Vertice Price as % of WAC'] = df_analog.loc[df_gfm['Number of Gx Players'], col_name].values
     else:
-        df_gfm['Vertice Price as % of WAC'] = (1 - parameters['gtn_%']) * (
-                    1 - df_gfm['Price Discount of Current Gx Net Price'])
+        df_gfm['Vertice Price as % of WAC'] = (1 - parameters['gtn_%']) * (1 - df_gfm['Price Discount of Current Gx Net Price'])
 
     # Calculating volume of market in future
     for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
@@ -223,16 +219,13 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
                 df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs'] + df_gfm['Profit Share'] +
                 df_gfm['Milestone Payments'] + df_gfm['SG&A']) / 360
     df_gfm['Working Capital'] = df_gfm['Inventory'] + df_gfm['Accounts Receivable'] - df_gfm['Accounts Payable']
-    df_gfm['EBIT'] = df_gfm['Gross Profit'] + df_gfm['SG&A'] + df_gfm['R&D'] - df_gfm[
-        'Tax depreciation']
+    df_gfm['EBIT'] = df_gfm['Gross Profit'] + df_gfm['SG&A'] + df_gfm['R&D'] - df_gfm['Tax depreciation']
     df_gfm['Operating Income'] = df_gfm['EBIT'] + df_gfm['Net proceeds from Disposals'] + df_gfm[
         'Write-off of Residual Tax Value'] + df_gfm['Other Income, Expenses, Except Items'] + df_gfm[
                                      'Additional Impacts on P&L']
     df_gfm['Profit Tax'] = -df_gfm['Operating Income'] * parameters['tax_rate']
-    df_gfm['Total Net Current Assets'] = df_gfm['Working Capital'] + df_gfm[
-        'Other Net Current Assets']
-    df_gfm['Change in Net Current Assets'] = df_gfm['Total Net Current Assets'] - df_gfm[
-        'Total Net Current Assets'].shift(1)
+    df_gfm['Total Net Current Assets'] = df_gfm['Working Capital'] + df_gfm['Other Net Current Assets']
+    df_gfm['Change in Net Current Assets'] = df_gfm['Total Net Current Assets'] - df_gfm['Total Net Current Assets'].shift(1)
     df_gfm['Change in Net Current Assets'] = df_gfm['Change in Net Current Assets'].fillna(0)
     df_gfm['FCF'] = df_gfm['Operating Income'] + df_gfm['Profit Tax'] + df_gfm['Tax depreciation'] + df_gfm[
         'Additional Non-cash Effects'] - df_gfm['Change in Net Current Assets'] + df_gfm['Capital Avoidance'] + df_gfm[
