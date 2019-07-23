@@ -37,11 +37,8 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
     # join price and therapeutic equivalents on NDC
     df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
 
-    # fill in blank prices with lowest price of same strength and pack quantity
+    # fill in blank prices with lowest WAC price
     df_merged_data['WACPrice'].fillna(min(df_merged_data['WACPrice']))
-
-    # TODO if no price match on NDC is found, use the lowest price for the same strength and package units
-    #     if no record with the same strength and package units, use the lowest overall price
 
     # build hierarchical index on Year and NDC
     year_range = [int(i) for i in np.array(range(2016, 2031))] #TODO - use data from excel to make dataframe?

@@ -126,22 +126,22 @@ class ConfirmBrand:
         self.dosage_forms_label.pack()
 
         # create label for number of competitors found
-        self.competitors_label = Label(master, text='Number of active competitors found (sales in 2018): {}'.
-                                       format(parameters['count_competitors']))
-        self.competitors_label.pack()
+        # self.competitors_label = Label(master, text='Number of active competitors found (sales in 2018): {}'.
+        #                                format(parameters['count_competitors']))
+        # self.competitors_label.pack()
 
         # create label for 2-year growth rate
-        self.growth_label = Label(master, text='Two-year market volume growth rate (CAGR) for molecule: {}'
-                                  .format(round(parameters['historical_growth_rate'],2)))
-        self.growth_label.pack()
+        # self.growth_label = Label(master, text='Two-year market volume growth rate (CAGR) for molecule: {}'
+        #                           .format(round(parameters['historical_growth_rate'],2)))
+        # self.growth_label.pack()
 
         # print df_merged_data
-        self.volumes_label = Label(master, text='2016 volume: {:,}; 2017 volume: {:,}; 2018 volume: {:,}; 2019 volume: {:,}'.format(
-                                int(df_detail['Units'].sum(level='year_index').loc[2016]),
-                                int(df_detail['Units'].sum(level='year_index').loc[2017]),
-                                int(df_detail['Units'].sum(level='year_index').loc[2018]),
-                                int(df_detail['Units'].sum(level='year_index').loc[2019])))
-        self.volumes_label.pack()
+        # self.volumes_label = Label(master, text='2016 volume: {:,}; 2017 volume: {:,}; 2018 volume: {:,}; 2019 volume: {:,}'.format(
+        #                         int(df_detail['Units'].sum(level='year_index').loc[2016]),
+        #                         int(df_detail['Units'].sum(level='year_index').loc[2017]),
+        #                         int(df_detail['Units'].sum(level='year_index').loc[2018]),
+        #                         int(df_detail['Units'].sum(level='year_index').loc[2019])))
+        # self.volumes_label.pack()
 
         # add Continue button
         self.continue_button = Button(master, text='Continue', command=master.destroy)
@@ -165,7 +165,7 @@ class SelectNDCs():
         # create canvas and scrollbar
         self.canvas = Canvas(master, borderwidth=2, scrollregion=(0,0,500,500))
         self.canvas.grid(row=1, columnspan=2)
-        self.scrollbar = Scrollbar(self.master, orient='vertical', command=self.canvas.yview)
+        self.scrollbar = Scrollbar(master, orient='vertical', command=self.canvas.yview)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
         self.scrollbar.grid(row=0, rowspan=100, column=3)
         #self.scrollbar.pack(side='right')
@@ -304,7 +304,7 @@ class EnterCOGS:
 
         self.or_label = Label(master, text='OR', font='Helvetica 9 bold')
         self.or_label.grid(row=5, columnspan=2, pady=20, padx=10)
-        self.subtitle = Label(master, text='Enter API Cost Per Unit', font='Helvetica 9 bold') #TODO word this better
+        self.subtitle = Label(master, text='Enter API Cost Per Unit', font='Helvetica 9 bold')
         self.subtitle.grid(row=6, columnspan=2, pady=10, padx=10)
 
         self.unit_label = Label(master, text='Base unit: ')
@@ -325,6 +325,8 @@ class EnterCOGS:
         i = 0  # start placing labels below the already assigned rows
 
         # add frame to allow scrolling
+        #self.canvas = Canvas()
+        # self.canvas.grid()
         self.frame = Frame(master)
         self.frame.grid(row=10, columnspan=2)
 

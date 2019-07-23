@@ -67,6 +67,7 @@ print(parameters['dosage_forms'])
 
 # find all IMS records that match the Combined Molecule and Prod Form2
 df_equivalents = mergedatasets.get_equiv(IMS, parameters)
+# df_equivalents =
 parameters['count_eqs'] = len(df_equivalents)
 
 df_merged_data, df_detail = mergedatasets.merge_ims_prospecto(df_equivalents, prospectoRx)
@@ -81,7 +82,6 @@ parameters['dosage_forms'] = '; '.join(parameters['dosage_forms'])
 ## WINDOW2: OPEN ConfirmBrand WINDOW AND SAVE
 
 # TODO maybe add volume and price numbers to this - could help user forecast growth and confirm code is working
-# TODO make count_competitors work past 2019
 
 # set parameters to display in confirmation window
 parameters['count_competitors'] = len(df_equivalents.loc[pd.isnull(df_equivalents['2018_Units']) == False]
