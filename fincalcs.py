@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-#Function to get 2yr volume CAGR
+#Function to get 2yr volume CAGR #TODO - years - will need to update when we have new annual data
 def get_growth_rate(df):
     import numpy as np
     units_by_year = df['Units'].sum(level='year_index')
@@ -62,8 +62,8 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
     df_gfm['Write-offs'] = -df_gfm['Gross Sales'] * parameters['cogs']['writeoffs']
 
     #if stmt for margin approach or API approach
-    if parameters['std_cogs_margin_override'] != '':
-        df_gfm['Standard COGS'] = -df_gfm['Net Sales'] * pd.to_numeric(parameters['std_cogs_margin_override'])
+    if parameters['profit_margin_override'] != '':
+        df_gfm['Standard COGS'] = -df_gfm['Net Sales'] * (1 - pd.to_numeric(parameters['profit_margin_override']))
     else:
         # Calculating std_cost_per_unit in future
         df_detail['std_cost_per_unit'] = df_detail['API_cost'].add((parameters['cogs']['excipients'] +
@@ -164,7 +164,7 @@ def valuation_calculations(parameters, df_gfm):
               'wac_increase': parameters['wac_increase'],
               'api_cost_per_unit': parameters['api_cost_per_unit'],
               'api_cost_unit': parameters['api_units'],
-              'std_cogs_margin': parameters['std_cogs_margin_override'],
+              'profit_margin_override': parameters['profit_margin_override'],
               'standard_cogs_entry': parameters['standard_cogs_entry'],
               'years_discounted': parameters['years_discounted'],
               'cogs_variation': parameters['cogs_variation'],

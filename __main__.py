@@ -84,7 +84,7 @@ parameters['dosage_forms'] = '; '.join(parameters['dosage_forms'])
 
 # set parameters to display in confirmation window
 parameters['count_competitors'] = len(df_equivalents.loc[pd.isnull(df_equivalents['2018_Units']) == False]
-                                      ['Manufacturer'].unique())
+                                      ['Manufacturer'].unique())  #TODO - years - will need to update when we have new annual data
 parameters['historical_growth_rate'] = fincalcs.get_growth_rate(df_detail)
 
 # open window
@@ -112,7 +112,7 @@ window = Tk()
 window4 = gui.EnterCOGS(window, df_equivalents)
 window.mainloop()
 
-parameters['std_cogs_margin_override'] = window4.COGS['gm_override']
+parameters['profit_margin_override'] = window4.COGS['gm_override']
 parameters['api_units'] = window4.COGS['units']
 parameters['api_cost_per_unit'] = pd.to_numeric(window4.COGS['cost_per_unit'])
 parameters['standard_cogs_entry'] = window4.COGS['standard_cogs_entry']
@@ -146,6 +146,8 @@ parameters['gx_players_adj'] = 0
 df_gfm, df_detail = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
 
 results, annual_forecast = fincalcs.valuation_calculations(parameters, df_gfm)
+
+print(annual_forecast[['Net Sales','COGS','EBIT','FCF']])
 
 ##----------------------------------------------------------------------
 ##SHOW RESULTS
@@ -182,8 +184,8 @@ print('results: {}'.format(results))
 
 #adding the results to df that will go to SQL
 #df_result = df_result.append([results])
-print('df_result columns after building from results')
-print(df_result.columns)
+# print('df_result columns after building from results')
+# print(df_result.columns)
 df_annual_forecast = df_annual_forecast.append(annual_forecast)
 #
 # t0 = time.time()
@@ -193,7 +195,7 @@ df_annual_forecast = df_annual_forecast.append(annual_forecast)
 # launch_delay_years = [0,1]
 # overall_cogs_increase = [-.3,0,.3]
 # volume_growth = [parameters['historical_growth_rate']-.05,parameters['historical_growth_rate'],parameters['historical_growth_rate']+.05]
-# gx_players_adj = [-2, -1, 0, 1, 2] #TODO make sure there is no negative numbers
+# gx_players_adj = [-2, -1, 0, 1, 2] #TODO make sure there is no negative numbers?
 # base_gx_players = df_gfm['Number of Gx Players']
 #
 # for i in years_to_discount:
@@ -274,7 +276,7 @@ for i in x[1]:
 
 t1 = time.time()
 total = t1-t0
-print(total)
+print('Time taken to run parameter scan: {} seconds'.format(round(total,1)))
 
 ### FORMATTING THE RESULTS TO PUT INTO DB ----------------------------
 
@@ -294,7 +296,7 @@ df_result = df_result[['scenario_id', 'run_id', 'run_name', 'brand_name', 'combi
                        'channel', 'indication', 'presentation', 'internal_external', 'brand_status','comments',
                        'vertice_filing_month', 'vertice_filing_year','vertice_launch_month', 'vertice_launch_year',
                        'pos', 'exit_multiple', 'discount_rate', 'tax_rate', 'base_year_volume','base_year_market_size',
-                       'volume_growth_rate', 'wac_increase', 'api_cost_per_unit', 'api_cost_unit', 'std_cogs_margin',
+                       'volume_growth_rate', 'wac_increase', 'api_cost_per_unit', 'api_cost_unit', 'profit_margin_override',
                        'standard_cogs_entry', 'years_discounted', 'cogs_variation', 'gx_players_adj', 'npv', 'irr',
                        'discounted_payback_period']]
 df_annual_forecast = df_annual_forecast[['scenario_id', 'run_id', 'forecast_year', 'Number of Gx Players', 'Profit Share',
