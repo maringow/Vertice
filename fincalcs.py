@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-#Function to get 2yr volume CAGR
+#Function to get 2yr volume CAGR #TODO - years - will need to update when we have new annual data
 def get_growth_rate(df):
     import numpy as np
     units_by_year = df['Units'].sum(level='year_index')
@@ -62,8 +62,8 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
     df_gfm['Write-offs'] = -df_gfm['Gross Sales'] * parameters['cogs']['writeoffs']
 
     #if stmt for margin approach or API approach
-    if parameters['std_cogs_margin_override'] != '':
-        df_gfm['Standard COGS'] = -df_gfm['Net Sales'] * pd.to_numeric(parameters['std_cogs_margin_override'])
+    if parameters['profit_margin_override'] != '':
+        df_gfm['Standard COGS'] = -df_gfm['Net Sales'] * (1 - pd.to_numeric(parameters['profit_margin_override']))
     else:
         # Calculating std_cost_per_unit in future
         df_detail['std_cost_per_unit'] = df_detail['API_cost'].add((parameters['cogs']['excipients'] +
@@ -147,17 +147,25 @@ def valuation_calculations(parameters, df_gfm):
               'channel': parameters['channel'],
               'indication': parameters['indication'],
               'presentation': parameters['presentation'],
+              'internal_external': parameters['internal_external'],
+              'brand_status': parameters['brand_status'],
               'comments': parameters['comments'],
               'vertice_filing_month': parameters['vertice_filing_month'],
               'vertice_filing_year': parameters['vertice_filing_year'],
               'vertice_launch_month': parameters['vertice_launch_month'],
               'vertice_launch_year': parameters['vertice_launch_year'],
               'pos': parameters['pos'],
+              'exit_multiple': parameters['exit_multiple'],
+              'discount_rate': parameters['discount_rate'],
+              'tax_rate': parameters['tax_rate'],
               'base_year_volume': df_gfm['Market Volume'].loc[parameters['present_year'] - 1],
               'base_year_market_size': df_gfm['Market Size'].loc[parameters['present_year'] - 1],
               'volume_growth_rate': parameters['volume_growth_rate'],
               'wac_increase': parameters['wac_increase'],
               'api_cost_per_unit': parameters['api_cost_per_unit'],
+              'api_cost_unit': parameters['api_units'],
+              'profit_margin_override': parameters['profit_margin_override'],
+              'standard_cogs_entry': parameters['standard_cogs_entry'],
               'years_discounted': parameters['years_discounted'],
               'cogs_variation': parameters['cogs_variation'],
               'gx_players_adj': parameters['gx_players_adj'],
@@ -166,8 +174,9 @@ def valuation_calculations(parameters, df_gfm):
               'discounted_payback_period': discounted_payback_period,
               'run_name': parameters['run_name']}
 
-    return result, df_gfm[['Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D', 'Net Sales', 'COGS', 'EBIT',
-                    'FCF', 'Exit Values', 'MOIC']] #yearly data
+    return result, df_gfm[['Number of Gx Players', 'Profit Share %', 'Milestone Payments', 'R&D',
+                           'Vertice Price as % of WAC','Net Sales', 'COGS', 'EBIT',
+                            'FCF', 'Exit Values', 'MOIC']] #yearly data
 
 
 def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
@@ -196,7 +205,6 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
 
     # Assign Vertice GX Market Share based on analog
     df_gfm['Vertice Gx Market Share'] = df_analog.loc[df_gfm['Number of Gx Players'],[parameters['channel'] + ' Market Share']].values
-    #TODO do exception if Auto?
 
     df_vertice_ndc_volumes = df_detail['Units'].mul(vol_adj * df_gfm['Gx Penetration'], level=0, fill_value=0).mul(
     df_gfm['Vertice Gx Market Share'], level=0, fill_value=0)

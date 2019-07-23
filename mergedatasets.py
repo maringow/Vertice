@@ -41,7 +41,7 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
     df_merged_data['WACPrice'].fillna(min(df_merged_data['WACPrice']))
 
     # build hierarchical index on Year and NDC
-    year_range = [int(i) for i in np.array(range(2016, 2031))] #TODO - use data from excel to make dataframe?
+    year_range = [int(i) for i in np.array(range(2016, 2035))]
     NDCs = [int(i) for i in df_equivalents['NDC'].unique()]
     index_arrays = [year_range, NDCs]
     multiIndex = pd.MultiIndex.from_product(index_arrays, names=['year_index', 'ndc_index'])

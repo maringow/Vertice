@@ -339,7 +339,7 @@ class EnterFilepath:
         self.filepath_label = Label(master, text='Enter filepath for Excel parameters:')
         self.filepath_label.pack(pady=10)
         self.filepath_entry = Entry(master)
-        self.filepath_entry.insert(END, 'Model Inputs Demo.xlsx')
+        self.filepath_entry.insert(END, 'Model Inputs.xlsx')
         self.filepath_entry.pack()
 
         # add entry for run name
@@ -371,11 +371,11 @@ class EnterCOGS:
         self.master = master
         master.title('Generics Forecasting Model')
 
-        self.title = Label(master, text='Enter Standard Margin', font='Helvetica 9 bold')
+        self.title = Label(master, text='Enter Gross Margin', font='Helvetica 9 bold') #margin before Distribution, Write-offs, Profit Share, and Milestone Payments
         self.title.grid(row=0, columnspan=2, pady=10)
 
         #if user uses straight gross margin approach, instead of API approach
-        self.gross_margin = Label(master, text='Enter gross margin assumption (as decimal):')
+        self.gross_margin = Label(master, text='Gross margin assumption (as decimal):')
         self.gross_margin.grid(row=1, column=0, padx=10)
         self.gross_margin = Entry(master)
         self.gross_margin.grid(row=1, column=1, padx=10)
@@ -387,7 +387,7 @@ class EnterCOGS:
 
         self.or_label = Label(master, text='OR', font='Helvetica 9 bold')
         self.or_label.grid(row=2, columnspan=2, pady=10, padx=10)
-        self.subtitle = Label(master, text="Enter Standard COGS", font='Helvetica 9 bold') # TODO make sure this is COGS, not API COGS
+        self.subtitle = Label(master, text="Enter Standard COGS", font='Helvetica 9 bold')
         self.subtitle.grid(row=3, columnspan=2, pady=10, padx=10)
 
         # add entry boxes for desired units and API cost per unit
@@ -481,9 +481,9 @@ class ShowResults:
         self.unit_label.pack()
         self.unit_label = Label(master, text='Payback: {} years'.format(parameters['payback']))
         self.unit_label.pack()
-        self.unit_label = Label(master, text='Exit value: ${} million'.format(parameters['exit_value']))
+        self.unit_label = Label(master, text='Exit value in 2021: ${} million'.format(parameters['exit_value']))
         self.unit_label.pack()
-        self.unit_label = Label(master, text='MOIC: {}x'.format(parameters['moic']))
+        self.unit_label = Label(master, text='MOIC in 2021: {}x'.format(parameters['moic']))
         self.unit_label.pack()
 
         # add Finish button

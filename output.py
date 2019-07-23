@@ -55,11 +55,13 @@ def select_max_ids(conn):
 
 
 def insert_result(conn, results):
-    sql = """INSERT INTO model_results(scenario_id, run_id, run_name, brand_name, molecule, dosage_form, channel, indication,
-    presentation, comments, vertice_filing_month, vertice_filing_year, vertice_launch_month, vertice_launch_year, 
-    pos, base_year_volume, base_year_sales, volume_growth_rate, wac_price_growth_rate, per_unit_cogs, years_to_discount, 
-    cogs_increase, gx_players_adj, npv, irr, payback)
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
+    sql = """INSERT INTO model_results(scenario_id, run_id, run_name, brand_name, molecule, dosage_form, 
+    channel, indication, presentation, internal_external, brand_status, comments, vertice_filing_month, 
+    vertice_filing_year, vertice_launch_month, vertice_launch_year, pos, exit_multiple, discount_rate,  
+    tax_rate, base_year_volume, base_year_sales, volume_growth_rate, wac_price_growth_rate, api_per_unit,  
+    api_cost_unit, profit_margin_override, standard_cogs_entry, years_to_discount, cogs_increase, 
+    gx_players_adj, npv, irr, payback)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
     cur = conn.cursor()
     cur.execute(sql, results)
     return cur.lastrowid
@@ -67,8 +69,8 @@ def insert_result(conn, results):
 
 def insert_forecast(conn, annual_forecast):
     sql = """INSERT INTO annual_forecast(scenario_id, run_id, forecast_year, number_gx_competitors, profit_share,
-            milestone_payments, research_development_cost, net_sales, cogs, ebit, fcf, exit_value, moic)
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)"""
+            milestone_payments, research_development_cost, price_pct_of_mkt, net_sales, cogs, ebit, fcf, exit_value, moic)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
     cur = conn.cursor()
     cur.execute(sql, annual_forecast)
     return cur.lastrowid
@@ -85,20 +87,28 @@ model_results_ddl = """CREATE TABLE IF NOT EXISTS model_results (
                         channel text,
                         indication text,
                         presentation text,
+                        internal_external text,
+                        brand_status text,
                         comments text,
                         vertice_filing_month integer,
                         vertice_filing_year integer,
                         vertice_launch_month integer,
                         vertice_launch_year integer,
                         pos real,
-                        base_year_volume,
-                        base_year_sales,
+                        exit_multiple real,
+                        discount_rate real,
+                        tax_rate real,
+                        base_year_volume integer,
+                        base_year_sales real,
                         volume_growth_rate real,
                         wac_price_growth_rate real,
-                        per_unit_cogs real,
-                        years_to_discount real,
+                        api_per_unit real,
+                        api_cost_unit real,
+                        profit_margin_override real,
+                        standard_cogs_entry real,
+                        years_to_discount integer,
                         cogs_increase real,
-                        gx_players_adj,
+                        gx_players_adj integer,
                         npv real,
                         irr real,
                         payback real
@@ -114,6 +124,7 @@ annual_forecast_ddl = """CREATE TABLE IF NOT EXISTS annual_forecast (
                             profit_share real,
                             milestone_payments real,
                             research_development_cost real,
+                            price_pct_of_mkt real,
                             net_sales real,
                             cogs real,
                             ebit real,
