@@ -31,6 +31,7 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
     # parse NDC columns from IMS and ProspectoRx
     df_equivalents['NDC'] = strip_non_numeric(df_equivalents['NDC'].str.split('\s', expand=True)[0])
     df_equivalents['NDC'].fillna(999, inplace=True)  ## if NDC is "NDC NOT AVAILABLE" or other invalid value, fill with 999
+    df_equivalents['NDC'] = df_equivalents['NDC'].astype(np.int64)
     prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
     prospectoRx['NDC'] = strip_non_numeric(prospectoRx['NDC'])
 

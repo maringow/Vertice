@@ -169,20 +169,20 @@ class SelectNDCs():
         self.title = Label(master, text='Generics Forecasting Model: Select NDCs', font='Helvetica 9 bold')
         self.title.grid(row=0, columnspan=2, pady=20, padx=20)
 
-        self.outer_frame = Frame(master, bg="#EBEBEB")
+        self.outer_frame = Frame(master)
         self.outer_frame.grid(row=1, column=0, columnspan=2)
         self.outer_frame.rowconfigure(0, weight=1)
         self.outer_frame.columnconfigure(0, weight=1)
 
-        self.canvas = Canvas(self.outer_frame, bg="#EBEBEB")
+        self.canvas = Canvas(self.outer_frame)
         self.canvas.grid(sticky="nsew", padx=40)
 
-        self.inner_frame = Frame(self.canvas, bg="#EBEBEB")
+        self.inner_frame = Frame(self.canvas)
         self.canvas.create_window(0, 0, window=self.inner_frame, anchor='nw')
 
         # set up variables to store user selections
-        self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])[['NDC', 'Manufacturer', 'Prod Form3']].reset_index(drop=True)
-        self.ndcs = self.ndcs.drop_duplicates()
+        self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])[['NDC', 'Manufacturer', 'Prod Form3']]
+        self.ndcs = self.ndcs.drop_duplicates().reset_index()
         print('df_merged_data', df_merged_data)
         print('self.ndcs', self.ndcs)
         self.selected_ndcs = pd.DataFrame()
@@ -217,7 +217,6 @@ class SelectNDCs():
         self.scroll.grid(row=0, sticky="nse")
 
         self.inner_frame.bind("<Configure>", self.update_scrollregion)
-        # self.canvas.bind('<Configure>', self.update_canvas_width)
 
         # add Continue button
         self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
@@ -233,91 +232,6 @@ class SelectNDCs():
     def update_scrollregion(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-    # def update_canvas_width(self, event):
-    #     canvas_width = event.width
-    #     self.canvas.itemconfig(self.inner_frame, width=canvas_width)
-
-
-
-
-
-
-##----------------------------------------------------------------------
-## WINDOW: SELECT NDCS
-
-# class SelectNDCs():
-#
-#     def __init__(self, master, df_merged_data):
-#
-#         self.master = master
-#         master.title("Generics Forecasting Model")
-#         #master.geometry("600x400")
-#
-#         # create window header
-#         self.title = Label(master, text='Generics Forecasting Model: Select NDCs', font='Helvetica 9 bold')
-#         self.title.grid(row=0, columnspan=3, pady=20, padx=20)
-#
-#         # create canvas and scrollbar
-#         self.canvas = Canvas(master, borderwidth=2, scrollregion=(0,0,500,500), height=250, width=570)
-#         self.canvas.grid(row=1, columnspan=3, sticky='nsew')
-#         self.scrollbar = Scrollbar(master, orient='vertical', command=self.canvas.yview)
-#         self.canvas.configure(yscrollcommand=self.scrollbar.set)
-#         self.scrollbar.grid(row=0, rowspan=100, column=5)
-#
-#
-#         # create frame to lay out objects within the canvas
-#         # self.frame = Frame(self.canvas, borderwidth=2)
-#         self.frame = Frame(self.canvas, borderwidth=2)
-#         self.frame.grid(row=0, columnspan=3)
-#
-#
-#         # set up variables to store user selections
-#         self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])[['NDC', 'Manufacturer', 'Prod Form3']].reset_index(drop=True)
-#         self.ndcs = self.ndcs.drop_duplicates()
-#         print('df_merged_data', df_merged_data)
-#         print('self.ndcs', self.ndcs)
-#         self.selected_ndcs = pd.DataFrame()
-#         self.var = []
-#
-#         m = 0
-#         header = ['NDC', 'Manufacturer', 'Dosage Form']
-#         for h in header:
-#             label = Label(self.frame,text=h, font='Helvetica 8 bold')
-#             label.grid(row=0, column=m, padx=8)
-#             m+=1
-#
-#         n = 1
-#
-#         # add ndc checkboxes
-#         for index, row in self.ndcs.iterrows():
-#             v=IntVar()
-#             v.set(1)
-#             box = Checkbutton(self.frame, text=row['NDC'], variable=v)
-#             box.grid(row=n, column=0, sticky='w', padx=2)
-#             self.var.append(v)
-#             self.manufacturer_label = Label(self.frame, text=row['Manufacturer'])
-#             self.manufacturer_label.grid(row=n, column=1, sticky='w', padx=8)
-#             self.form_label = Label(self.frame, text=row['Prod Form3'])
-#             self.form_label.grid(row=n, column=2, sticky='w', padx=8)
-#             n+=1
-#
-#         self.canvas.create_window((0,0), anchor='nw', window=self.frame, tags='self.frame')
-#         self.frame.bind('<Configure>', self.onFrameConfigure)
-#
-#         # add Continue button
-#         self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
-#         self.continue_button.grid(row=1000, column=2, pady=20, padx=20, sticky='e')
-#
-#     def onFrameConfigure(self, event):
-#         '''Reset scroll region to encompass inner frame'''
-#         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
-#
-#     def save_and_continue(self):
-#         print(self.var)
-#         print(self.ndcs['NDC'])
-#         self.selected_ndcs = [self.ndcs['NDC'][i] for i in range(len(self.ndcs))
-#                                       if self.var[i].get() == 1]
-#         self.master.destroy()
 
 ##----------------------------------------------------------------------
 ## WINDOW: ENTER EXCEL FILEPATH
@@ -375,10 +289,10 @@ class EnterCOGS:
         self.title.grid(row=0, columnspan=2, pady=10)
 
         #if user uses straight gross margin approach, instead of API approach
-        self.gross_margin = Label(master, text='Gross margin assumption (as decimal):')
-        self.gross_margin.grid(row=1, column=0, padx=10)
-        self.gross_margin = Entry(master)
-        self.gross_margin.grid(row=1, column=1, padx=10)
+        self.gross_margin_label = Label(master, text='Gross margin assumption (as decimal): ')
+        self.gross_margin_label.grid(row=1, column=0, sticky='e')
+        self.gross_margin_entry = Entry(master)
+        self.gross_margin_entry.grid(row=1, column=1, sticky='w')
 
         self.sep1 = ttk.Separator(master, orient="horizontal")
         self.sep1.grid(column=0, row=2, columnspan=2, sticky="ew")
@@ -392,9 +306,9 @@ class EnterCOGS:
 
         # add entry boxes for desired units and API cost per unit
         self.standard_cogs_label = Label(master, text='Standard COGS ($): ')
-        self.standard_cogs_label.grid(row=4, column=0, padx=10)
+        self.standard_cogs_label.grid(row=4, column=0, sticky='e')
         self.standard_cogs_entry = Entry(master)
-        self.standard_cogs_entry.grid(row=4, column=1, padx=10)
+        self.standard_cogs_entry.grid(row=4, column=1, sticky='w')
 
         self.sep2 = ttk.Separator(master, orient="horizontal")
         self.sep2.grid(column=0, row=5, columnspan=2, sticky="ew")
@@ -402,52 +316,62 @@ class EnterCOGS:
         # self.sty.configure("TSeparator", background="red")
 
         self.or_label = Label(master, text='OR', font='Helvetica 9 bold')
-        self.or_label.grid(row=5, columnspan=2, pady=20, padx=10)
+        self.or_label.grid(row=5, columnspan=2, pady=10, padx=10)
         self.subtitle = Label(master, text='Enter API Cost Per Unit', font='Helvetica 9 bold')
         self.subtitle.grid(row=6, columnspan=2, pady=10, padx=10)
 
         self.unit_label = Label(master, text='Base unit: ')
-        self.unit_label.grid(row=7, column=0)
+        self.unit_label.grid(row=7, column=0, sticky='e')
         self.unit_entry = Entry(master)
-        self.unit_entry.grid(row=7, column=1)
+        self.unit_entry.grid(row=7, column=1, sticky='w')
 
         self.cost_per_unit_label = Label(master, text='API cost per unit ($): ')
-        self.cost_per_unit_label.grid(row=8, column=0)
+        self.cost_per_unit_label.grid(row=8, column=0, sticky='e')
         self.cost_per_unit_entry = Entry(master)
-        self.cost_per_unit_entry.grid(row=8, column=1)
+        self.cost_per_unit_entry.grid(row=8, column=1, sticky='w')
 
         # add entry boxes for API units for each pack type found in therapeutic equivalents
         self.API_costs_label = Label(master, text='Enter number of units for each pack type found: ')
-        self.API_costs_label.grid(row=9, columnspan=2, pady=20)
+        self.API_costs_label.grid(row=9, columnspan=2, pady=10)
 
         self.entries = []  # save entries created in list so that they can be accessed to store values
         i = 0  # start placing labels below the already assigned rows
 
-        # add frame to allow scrolling
-        #self.canvas = Canvas()
-        # self.canvas.grid()
-        self.frame = Frame(master)
-        self.frame.grid(row=10, columnspan=2)
 
-        # add scrollbar
-        #self.scroll = Scrollbar(master, orient='vertical')
-        #self.scroll.grid(column=3, sticky='ns')
+        self.outer_frame = Frame(master)
+        self.outer_frame.grid(row=10, column=0, columnspan=2)
+        self.outer_frame.rowconfigure(0, weight=1)
+        self.outer_frame.columnconfigure(0, weight=1)
+
+        self.canvas = Canvas(self.outer_frame)
+        self.canvas.grid(sticky="nsew")
+
+        self.inner_frame = Frame(self.canvas)
+        self.canvas.create_window(0, 0, window=self.inner_frame, anchor='nw')
+
 
         self.packs = df_equivalents['Pack'].unique()
         for p in self.packs:
-            pack_label = Label(self.frame, text=p)
-            pack_label.grid(row=i, column=0, padx=10)
-            pack_entry = Entry(self.frame)
-            pack_entry.grid(row=i, column=1, padx=10)
+            pack_label = Label(self.inner_frame, text=p)
+            pack_label.grid(row=i, column=0, padx=5, sticky='e')
+            pack_entry = Entry(self.inner_frame)
+            pack_entry.grid(row=i, column=1, padx=5, sticky='w')
             self.entries.append(pack_entry)
             i += 1
+
+        self.scroll = Scrollbar(self.outer_frame, orient=VERTICAL)
+        self.scroll.config(command=self.canvas.yview)
+        self.canvas.config(yscrollcommand=self.scroll.set)
+        self.scroll.grid(row=0, sticky="nse")
+
+        self.inner_frame.bind("<Configure>", self.update_scrollregion)
 
         # add Run Model button
         run_model_button = Button(master, text='Run Model', command=self.save_and_run)
         run_model_button.grid(row=11, column=1, pady=10)
 
     def save_and_run(self):
-        self.COGS['gm_override'] = self.gross_margin.get()
+        self.COGS['gm_override'] = self.gross_margin_entry.get()
         self.COGS['standard_cogs_entry'] = self.standard_cogs_entry.get()
         self.COGS['units'] = self.unit_entry.get()
         self.COGS['cost_per_unit'] = self.cost_per_unit_entry.get()
@@ -457,6 +381,9 @@ class EnterCOGS:
             self.COGS['units_per_pack'][self.packs[j]] = e.get()
             j += 1
         self.master.destroy()
+
+    def update_scrollregion(self, event):
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
 
 
