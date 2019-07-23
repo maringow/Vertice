@@ -290,11 +290,13 @@ df_annual_forecast.columns = ['Number of Gx Players', 'Profit Share', 'Milestone
 df_annual_forecast['forecast_year'] = df_annual_forecast.index.values
 
 # ordering the columns
-df_result = df_result[['scenario_id', 'run_id', 'run_name', 'brand_name', 'combined_molecules', 'dosage_forms', 'channel', 'indication', 'presentation',
-                      'comments', 'vertice_filing_month', 'vertice_filing_year','vertice_launch_month',
-                      'vertice_launch_year', 'pos', 'base_year_volume','base_year_market_size', 'volume_growth_rate',
-                      'wac_increase', 'api_cost_per_unit','years_discounted', 'cogs_variation',
-                      'gx_players_adj', 'npv', 'irr', 'discounted_payback_period']]
+df_result = df_result[['scenario_id', 'run_id', 'run_name', 'brand_name', 'combined_molecules', 'dosage_forms',
+                       'channel', 'indication', 'presentation', 'internal_external', 'brand_status','comments',
+                       'vertice_filing_month', 'vertice_filing_year','vertice_launch_month', 'vertice_launch_year',
+                       'pos', 'exit_multiple', 'discount_rate', 'tax_rate', 'base_year_volume','base_year_market_size',
+                       'volume_growth_rate', 'wac_increase', 'api_cost_per_unit', 'api_cost_unit', 'std_cogs_margin',
+                       'standard_cogs_entry', 'years_discounted', 'cogs_variation', 'gx_players_adj', 'npv', 'irr',
+                       'discounted_payback_period']]
 df_annual_forecast = df_annual_forecast[['scenario_id', 'run_id', 'forecast_year', 'Number of Gx Players', 'Profit Share',
                                          'Milestone Payments','R&D','Vertice Price as % of WAC', 'Net Sales','COGS',
                                          'EBIT','FCF', 'Exit Values', 'MOIC']]
