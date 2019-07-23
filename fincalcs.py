@@ -166,7 +166,7 @@ def valuation_calculations(parameters, df_gfm):
               'discounted_payback_period': discounted_payback_period,
               'run_name': parameters['run_name']}
 
-    return result, df_gfm[['Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D', 'Net Sales', 'COGS', 'EBIT',
+    return result, df_gfm[['Number of Gx Players', 'Profit Share %', 'Milestone Payments', 'R&D', 'Net Sales', 'COGS', 'EBIT',
                     'FCF', 'Exit Values', 'MOIC']] #yearly data
 
 
@@ -196,7 +196,6 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
 
     # Assign Vertice GX Market Share based on analog
     df_gfm['Vertice Gx Market Share'] = df_analog.loc[df_gfm['Number of Gx Players'],[parameters['channel'] + ' Market Share']].values
-    #TODO do exception if Auto?
 
     df_vertice_ndc_volumes = df_detail['Units'].mul(vol_adj * df_gfm['Gx Penetration'], level=0, fill_value=0).mul(
     df_gfm['Vertice Gx Market Share'], level=0, fill_value=0)
