@@ -104,6 +104,9 @@ window.mainloop()
 
 selected_NDCs = window8.selected_ndcs
 print(selected_NDCs)
+print('Before drop: {}'.format(df_detail))
+df_detail = df_detail[df_detail['NDC'].isin(selected_NDCs)]
+print('After drop: {}'.format(df_detail))
 
 
 ##----------------------------------------------------------------------

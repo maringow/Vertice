@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 import tkinter.tix as tix
+import pandas as pd
 
 ##----------------------------------------------------------------------
 ## WINDOW: SELECT BRAND NAME
@@ -157,31 +158,31 @@ class SelectNDCs():
 
         self.master = master
         master.title("Generics Forecasting Model")
-        master.geometry("600x400")
+        #master.geometry("600x400")
 
         # create window header
         self.title = Label(master, text='Generics Forecasting Model: Select NDCs', font='Helvetica 9 bold')
-        self.title.grid(row=0, columnspan=4, pady=20, padx=20)
+        self.title.grid(row=0, columnspan=3, pady=20, padx=20)
 
         # create canvas and scrollbar
         self.canvas = Canvas(master, borderwidth=2, scrollregion=(0,0,500,500), height=250, width=570)
-        self.canvas.grid(row=1, columnspan=4)
+        self.canvas.grid(row=1, columnspan=3)
         self.scrollbar = Scrollbar(master, orient='vertical', command=self.canvas.yview)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
         self.scrollbar.grid(row=0, rowspan=100, column=5)
 
         # create frame to lay out objects within the canvas
         self.frame = Frame(self.canvas, borderwidth=2)
-        self.frame.grid(row=0, columnspan=4)
+        self.frame.grid(row=0, columnspan=3)
 
         # set up variables to store user selections
-        self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])['NDC'].reset_index(drop=True)
-        print(self.ndcs)
-        self.selected_ndcs = []
+        self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])[['NDC', 'Manufacturer', 'Prod Form3']].reset_index(drop=True)
+        self.ndcs = self.ndcs.drop_duplicates()
+        self.selected_ndcs = pd.DataFrame()
         self.var = []
 
         m = 0
-        header = ['NDC', 'Manufacturer', 'Dosage Form', 'Pack']
+        header = ['NDC', 'Manufacturer', 'Dosage Form']
         for h in header:
             label = Label(self.frame,text=h, font='Helvetica 8 bold')
             label.grid(row=0, column=m, padx=8)
@@ -190,7 +191,7 @@ class SelectNDCs():
         n = 1
 
         # add ndc checkboxes
-        for index, row in df_merged_data.sort_values(by=['Manufacturer', 'NDC']).iterrows():
+        for index, row in self.ndcs.iterrows():
             v=IntVar()
             v.set(1)
             box = Checkbutton(self.frame, text=row['NDC'], variable=v)
@@ -200,8 +201,6 @@ class SelectNDCs():
             self.manufacturer_label.grid(row=n, column=1, sticky='w', padx=8)
             self.form_label = Label(self.frame, text=row['Prod Form3'])
             self.form_label.grid(row=n, column=2, sticky='w', padx=8)
-            self.pack_label = Label(self.frame, text=row['Pack'])
-            self.pack_label.grid(row=n, column=3, sticky='w', padx=8)
             n+=1
 
         self.canvas.create_window((0,0), anchor='nw', window=self.frame, tags='self.frame')
@@ -209,19 +208,17 @@ class SelectNDCs():
 
         # add Continue button
         self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
-        self.continue_button.grid(row=1000, column=1, pady=20, padx=20, sticky='e')
+        self.continue_button.grid(row=1000, column=2, pady=20, padx=20, sticky='e')
 
     def onFrameConfigure(self, event):
         '''Reset scroll region to encompass inner frame'''
         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
 
     def save_and_continue(self):
-        print(self.ndcs)
-        self.selected_ndcs = [self.ndcs[i] for i in range(len(self.ndcs))
+        print(self.var)
+        print(self.ndcs['NDC'])
+        self.selected_ndcs = [self.ndcs['NDC'][i] for i in range(len(self.ndcs))
                                       if self.var[i].get() == 1]
-        print(self.selected_ndcs)
-        for i in range(len(self.var)):
-            print(i, self.var[i].get())
         self.master.destroy()
 
 ##----------------------------------------------------------------------
