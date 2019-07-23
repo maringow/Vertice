@@ -149,8 +149,13 @@ class ConfirmBrand:
         self.continue_button.pack(pady=10)
 
 
+
+
+
+
+
 ##----------------------------------------------------------------------
-## WINDOW: SELECT NDCS
+## WINDOW: SELECT NDCS V2
 
 class SelectNDCs():
 
@@ -158,33 +163,36 @@ class SelectNDCs():
 
         self.master = master
         master.title("Generics Forecasting Model")
-        #master.geometry("600x400")
+        # master.geometry("600x400")
 
         # create window header
         self.title = Label(master, text='Generics Forecasting Model: Select NDCs', font='Helvetica 9 bold')
-        self.title.grid(row=0, columnspan=3, pady=20, padx=20)
+        self.title.grid(row=0, columnspan=2, pady=20, padx=20)
 
-        # create canvas and scrollbar
-        self.canvas = Canvas(master, borderwidth=2, scrollregion=(0,0,500,500), height=250, width=570)
-        self.canvas.grid(row=1, columnspan=3)
-        self.scrollbar = Scrollbar(master, orient='vertical', command=self.canvas.yview)
-        self.canvas.configure(yscrollcommand=self.scrollbar.set)
-        self.scrollbar.grid(row=0, rowspan=100, column=5)
+        self.outer_frame = Frame(master, bg="#EBEBEB")
+        self.outer_frame.grid(row=1, column=0, columnspan=2)
+        self.outer_frame.rowconfigure(0, weight=1)
+        self.outer_frame.columnconfigure(0, weight=1)
 
-        # create frame to lay out objects within the canvas
-        self.frame = Frame(self.canvas, borderwidth=2)
-        self.frame.grid(row=0, columnspan=3)
+        self.canvas = Canvas(self.outer_frame, bg="#EBEBEB")
+        self.canvas.grid(sticky="nsew", padx=40)
+
+        self.inner_frame = Frame(self.canvas, bg="#EBEBEB")
+        self.canvas.create_window(0, 0, window=self.inner_frame, anchor='nw')
 
         # set up variables to store user selections
         self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])[['NDC', 'Manufacturer', 'Prod Form3']].reset_index(drop=True)
         self.ndcs = self.ndcs.drop_duplicates()
+        print('df_merged_data', df_merged_data)
+        print('self.ndcs', self.ndcs)
         self.selected_ndcs = pd.DataFrame()
         self.var = []
 
         m = 0
+
         header = ['NDC', 'Manufacturer', 'Dosage Form']
         for h in header:
-            label = Label(self.frame,text=h, font='Helvetica 8 bold')
+            label = Label(self.inner_frame,text=h, font='Helvetica 8 bold')
             label.grid(row=0, column=m, padx=8)
             m+=1
 
@@ -194,25 +202,26 @@ class SelectNDCs():
         for index, row in self.ndcs.iterrows():
             v=IntVar()
             v.set(1)
-            box = Checkbutton(self.frame, text=row['NDC'], variable=v)
+            box = Checkbutton(self.inner_frame, text=row['NDC'], variable=v)
             box.grid(row=n, column=0, sticky='w', padx=2)
             self.var.append(v)
-            self.manufacturer_label = Label(self.frame, text=row['Manufacturer'])
+            self.manufacturer_label = Label(self.inner_frame, text=row['Manufacturer'])
             self.manufacturer_label.grid(row=n, column=1, sticky='w', padx=8)
-            self.form_label = Label(self.frame, text=row['Prod Form3'])
+            self.form_label = Label(self.inner_frame, text=row['Prod Form3'])
             self.form_label.grid(row=n, column=2, sticky='w', padx=8)
             n+=1
 
-        self.canvas.create_window((0,0), anchor='nw', window=self.frame, tags='self.frame')
-        self.frame.bind('<Configure>', self.onFrameConfigure)
+        self.scroll = Scrollbar(self.outer_frame, orient=VERTICAL)
+        self.scroll.config(command=self.canvas.yview)
+        self.canvas.config(yscrollcommand=self.scroll.set)
+        self.scroll.grid(row=0, sticky="nse")
+
+        self.inner_frame.bind("<Configure>", self.update_scrollregion)
+        # self.canvas.bind('<Configure>', self.update_canvas_width)
 
         # add Continue button
         self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
-        self.continue_button.grid(row=1000, column=2, pady=20, padx=20, sticky='e')
-
-    def onFrameConfigure(self, event):
-        '''Reset scroll region to encompass inner frame'''
-        self.canvas.configure(scrollregion=self.canvas.bbox('all'))
+        self.continue_button.grid(row=1000, column=1, pady=20, padx=20, sticky='e')
 
     def save_and_continue(self):
         print(self.var)
@@ -220,6 +229,95 @@ class SelectNDCs():
         self.selected_ndcs = [self.ndcs['NDC'][i] for i in range(len(self.ndcs))
                                       if self.var[i].get() == 1]
         self.master.destroy()
+
+    def update_scrollregion(self, event):
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    # def update_canvas_width(self, event):
+    #     canvas_width = event.width
+    #     self.canvas.itemconfig(self.inner_frame, width=canvas_width)
+
+
+
+
+
+
+##----------------------------------------------------------------------
+## WINDOW: SELECT NDCS
+
+# class SelectNDCs():
+#
+#     def __init__(self, master, df_merged_data):
+#
+#         self.master = master
+#         master.title("Generics Forecasting Model")
+#         #master.geometry("600x400")
+#
+#         # create window header
+#         self.title = Label(master, text='Generics Forecasting Model: Select NDCs', font='Helvetica 9 bold')
+#         self.title.grid(row=0, columnspan=3, pady=20, padx=20)
+#
+#         # create canvas and scrollbar
+#         self.canvas = Canvas(master, borderwidth=2, scrollregion=(0,0,500,500), height=250, width=570)
+#         self.canvas.grid(row=1, columnspan=3, sticky='nsew')
+#         self.scrollbar = Scrollbar(master, orient='vertical', command=self.canvas.yview)
+#         self.canvas.configure(yscrollcommand=self.scrollbar.set)
+#         self.scrollbar.grid(row=0, rowspan=100, column=5)
+#
+#
+#         # create frame to lay out objects within the canvas
+#         # self.frame = Frame(self.canvas, borderwidth=2)
+#         self.frame = Frame(self.canvas, borderwidth=2)
+#         self.frame.grid(row=0, columnspan=3)
+#
+#
+#         # set up variables to store user selections
+#         self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])[['NDC', 'Manufacturer', 'Prod Form3']].reset_index(drop=True)
+#         self.ndcs = self.ndcs.drop_duplicates()
+#         print('df_merged_data', df_merged_data)
+#         print('self.ndcs', self.ndcs)
+#         self.selected_ndcs = pd.DataFrame()
+#         self.var = []
+#
+#         m = 0
+#         header = ['NDC', 'Manufacturer', 'Dosage Form']
+#         for h in header:
+#             label = Label(self.frame,text=h, font='Helvetica 8 bold')
+#             label.grid(row=0, column=m, padx=8)
+#             m+=1
+#
+#         n = 1
+#
+#         # add ndc checkboxes
+#         for index, row in self.ndcs.iterrows():
+#             v=IntVar()
+#             v.set(1)
+#             box = Checkbutton(self.frame, text=row['NDC'], variable=v)
+#             box.grid(row=n, column=0, sticky='w', padx=2)
+#             self.var.append(v)
+#             self.manufacturer_label = Label(self.frame, text=row['Manufacturer'])
+#             self.manufacturer_label.grid(row=n, column=1, sticky='w', padx=8)
+#             self.form_label = Label(self.frame, text=row['Prod Form3'])
+#             self.form_label.grid(row=n, column=2, sticky='w', padx=8)
+#             n+=1
+#
+#         self.canvas.create_window((0,0), anchor='nw', window=self.frame, tags='self.frame')
+#         self.frame.bind('<Configure>', self.onFrameConfigure)
+#
+#         # add Continue button
+#         self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
+#         self.continue_button.grid(row=1000, column=2, pady=20, padx=20, sticky='e')
+#
+#     def onFrameConfigure(self, event):
+#         '''Reset scroll region to encompass inner frame'''
+#         self.canvas.configure(scrollregion=self.canvas.bbox('all'))
+#
+#     def save_and_continue(self):
+#         print(self.var)
+#         print(self.ndcs['NDC'])
+#         self.selected_ndcs = [self.ndcs['NDC'][i] for i in range(len(self.ndcs))
+#                                       if self.var[i].get() == 1]
+#         self.master.destroy()
 
 ##----------------------------------------------------------------------
 ## WINDOW: ENTER EXCEL FILEPATH
