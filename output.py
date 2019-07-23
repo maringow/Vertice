@@ -68,7 +68,7 @@ def insert_result(conn, results):
 def insert_forecast(conn, annual_forecast):
     sql = """INSERT INTO annual_forecast(scenario_id, run_id, forecast_year, number_gx_competitors, profit_share,
             milestone_payments, research_development_cost, price_pct_of_mkt, net_sales, cogs, ebit, fcf, exit_value, moic)
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)"""
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
     cur = conn.cursor()
     cur.execute(sql, annual_forecast)
     return cur.lastrowid
