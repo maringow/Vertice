@@ -166,8 +166,9 @@ def valuation_calculations(parameters, df_gfm):
               'discounted_payback_period': discounted_payback_period,
               'run_name': parameters['run_name']}
 
-    return result, df_gfm[['Number of Gx Players', 'Profit Share %', 'Milestone Payments', 'R&D', 'Net Sales', 'COGS', 'EBIT',
-                    'FCF', 'Exit Values', 'MOIC']] #yearly data
+    return result, df_gfm[['Number of Gx Players', 'Profit Share %', 'Milestone Payments', 'R&D',
+                           'Vertice Price as % of WAC','Net Sales', 'COGS', 'EBIT',
+                            'FCF', 'Exit Values', 'MOIC']] #yearly data
 
 
 def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):

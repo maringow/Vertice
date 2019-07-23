@@ -284,7 +284,7 @@ df_result['run_id'] = run_id
 df_annual_forecast['run_id'] = run_id
 
 df_annual_forecast.columns = ['Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D', 'Net Sales',
-                              'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC', 'scenario_id', 'run_id']
+                              'Vertice Price as % of WAC', 'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC', 'scenario_id', 'run_id']
 
 # creating a forecast year column
 df_annual_forecast['forecast_year'] = df_annual_forecast.index.values
@@ -296,7 +296,8 @@ df_result = df_result[['scenario_id', 'run_id', 'run_name', 'brand_name', 'combi
                       'wac_increase', 'api_cost_per_unit','years_discounted', 'cogs_variation',
                       'gx_players_adj', 'npv', 'irr', 'discounted_payback_period']]
 df_annual_forecast = df_annual_forecast[['scenario_id', 'run_id', 'forecast_year', 'Number of Gx Players', 'Profit Share',
-                                         'Milestone Payments','R&D','Net Sales','COGS','EBIT','FCF', 'Exit Values', 'MOIC']]
+                                         'Milestone Payments','R&D','Vertice Price as % of WAC', 'Net Sales','COGS',
+                                         'EBIT','FCF', 'Exit Values', 'MOIC']]
 
 
 # OPEN CONNECTION TO DB

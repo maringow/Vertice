@@ -67,7 +67,7 @@ def insert_result(conn, results):
 
 def insert_forecast(conn, annual_forecast):
     sql = """INSERT INTO annual_forecast(scenario_id, run_id, forecast_year, number_gx_competitors, profit_share,
-            milestone_payments, research_development_cost, net_sales, cogs, ebit, fcf, exit_value, moic)
+            milestone_payments, research_development_cost, price_pct_of_mkt, net_sales, cogs, ebit, fcf, exit_value, moic)
             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)"""
     cur = conn.cursor()
     cur.execute(sql, annual_forecast)
@@ -114,6 +114,7 @@ annual_forecast_ddl = """CREATE TABLE IF NOT EXISTS annual_forecast (
                             profit_share real,
                             milestone_payments real,
                             research_development_cost real,
+                            price_pct_of_mkt real,
                             net_sales real,
                             cogs real,
                             ebit real,
