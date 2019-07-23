@@ -153,39 +153,38 @@ class ConfirmBrand:
 
 class SelectNDCs():
 
-    def __init__(self, master, df_merged_data, df_detail):
+    def __init__(self, master, df_merged_data):
 
         self.master = master
         master.title("Generics Forecasting Model")
+        master.geometry("600x400")
 
         # create window header
         self.title = Label(master, text='Generics Forecasting Model: Select NDCs', font='Helvetica 9 bold')
-        self.title.grid(row=0, columnspan=2, pady=20, padx=20)
+        self.title.grid(row=0, columnspan=4, pady=20, padx=20)
 
         # create canvas and scrollbar
-        self.canvas = Canvas(master, borderwidth=2, scrollregion=(0,0,500,500))
-        self.canvas.grid(row=1, columnspan=2)
+        self.canvas = Canvas(master, borderwidth=2, scrollregion=(0,0,500,500), height=250, width=570)
+        self.canvas.grid(row=1, columnspan=4)
         self.scrollbar = Scrollbar(master, orient='vertical', command=self.canvas.yview)
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
-        self.scrollbar.grid(row=0, rowspan=100, column=3)
-        #self.scrollbar.pack(side='right')
-
+        self.scrollbar.grid(row=0, rowspan=100, column=5)
 
         # create frame to lay out objects within the canvas
         self.frame = Frame(self.canvas, borderwidth=2)
-        self.frame.grid(row=0, columnspan=2)
+        self.frame.grid(row=0, columnspan=4)
 
         # set up variables to store user selections
-        self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])['NDC']
+        self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])['NDC'].reset_index(drop=True)
         print(self.ndcs)
         self.selected_ndcs = []
         self.var = []
 
         m = 0
-        header = ['NDC', 'Manufacturer', 'Dosage Form']
+        header = ['NDC', 'Manufacturer', 'Dosage Form', 'Pack']
         for h in header:
             label = Label(self.frame,text=h, font='Helvetica 8 bold')
-            label.grid(row=0, column=m, padx=4)
+            label.grid(row=0, column=m, padx=8)
             m+=1
 
         n = 1
@@ -198,9 +197,11 @@ class SelectNDCs():
             box.grid(row=n, column=0, sticky='w', padx=2)
             self.var.append(v)
             self.manufacturer_label = Label(self.frame, text=row['Manufacturer'])
-            self.manufacturer_label.grid(row=n, column=1, sticky='w', padx=2)
+            self.manufacturer_label.grid(row=n, column=1, sticky='w', padx=8)
             self.form_label = Label(self.frame, text=row['Prod Form3'])
-            self.form_label.grid(row=n, column=2, sticky='w', padx=2)
+            self.form_label.grid(row=n, column=2, sticky='w', padx=8)
+            self.pack_label = Label(self.frame, text=row['Pack'])
+            self.pack_label.grid(row=n, column=3, sticky='w', padx=8)
             n+=1
 
         self.canvas.create_window((0,0), anchor='nw', window=self.frame, tags='self.frame')
@@ -218,6 +219,9 @@ class SelectNDCs():
         print(self.ndcs)
         self.selected_ndcs = [self.ndcs[i] for i in range(len(self.ndcs))
                                       if self.var[i].get() == 1]
+        print(self.selected_ndcs)
+        for i in range(len(self.var)):
+            print(i, self.var[i].get())
         self.master.destroy()
 
 ##----------------------------------------------------------------------

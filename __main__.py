@@ -93,10 +93,17 @@ window = Tk()
 window3 = gui.ConfirmBrand(window, parameters, df_detail)
 window.mainloop()
 
+
+##----------------------------------------------------------------------
+## WINDOW2: OPEN SelectNDCs WINDOW AND SAVE
+
 # open window
 window=Tk()
-window10 = gui.SelectNDCs(window, df_merged_data, df_detail)
+window8 = gui.SelectNDCs(window, df_merged_data)
 window.mainloop()
+
+selected_NDCs = window8.selected_ndcs
+print(selected_NDCs)
 
 
 ##----------------------------------------------------------------------

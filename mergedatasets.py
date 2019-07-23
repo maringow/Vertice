@@ -37,6 +37,8 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
     # join price and therapeutic equivalents on NDC
     df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
 
+
+
     # fill in blank prices with lowest WAC price
     df_merged_data['WACPrice'].fillna(min(df_merged_data['WACPrice']))
 
