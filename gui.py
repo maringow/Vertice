@@ -489,3 +489,61 @@ class ShowResults:
         # add Finish button
         run_model_button = Button(master, text='Finish', command=master.destroy)
         run_model_button.pack(pady=20)
+
+
+##----------------------------------------------------------------------
+## WINDOW: PRINT DETAILED RESULTS
+
+class ShowDetailedResults():
+
+    def __init__(self, master, parameters, df_gfm):
+
+        self.master = master
+        master.title('Generics Forecasting Model')
+        # master.geometry("600x400")
+
+        Label(master, text='Generics Forecasting Model: Results Summary', font='Helvetica 9 bold').grid(row=0, column=0,
+                                                                                                        sticky=N,
+                                                                                                        columnspan=12)
+        Label(master, text='Did not opt to do the parameter scan. No results saves to the database.',
+              font='Helvetica 9').grid(row=1, column=0, sticky=N, columnspan=12)
+
+        Label(master, text='').grid(row=2, rowspan=2)
+
+        Label(master, text='NPV:  ', font='Helvetica 9 bold').grid(row=4, column=0, sticky=E, columnspan=6)
+        Label(master, text='IRR:  ', font='Helvetica 9 bold').grid(row=5, column=0, sticky=E, columnspan=6)
+        Label(master, text='Payback:  ', font='Helvetica 9 bold').grid(row=6, column=0, sticky=E, columnspan=6)
+        Label(master, text='Exit value in 2021:  ', font='Helvetica 9 bold').grid(row=7, column=0, sticky=E,
+                                                                                  columnspan=6)
+        Label(master, text='MOIC in 2021:  ', font='Helvetica 9 bold').grid(row=8, column=0, sticky=E, columnspan=6)
+
+        Label(master, text='${} million'.format(parameters['npv'])).grid(row=4, column=6, sticky=W, columnspan=6)
+        Label(master, text='{}%'.format(parameters['irr'])).grid(row=5, column=6, sticky=W, columnspan=6)
+        Label(master, text='{} years'.format(parameters['payback'])).grid(row=6, column=6, sticky=W, columnspan=6)
+        Label(master, text='${} million'.format(parameters['exit_value'])).grid(row=7, column=6, sticky=W, columnspan=6)
+        Label(master, text='{}x'.format(parameters['moic'])).grid(row=8, column=6, sticky=W, columnspan=6)
+
+        Label(master, text='').grid(row=9, columnspan=12)
+
+        Label(master, text="Net Sales", font='Helvetica 9 bold').grid(row=11, column=0)
+        Label(master, text="COGS", font='Helvetica 9 bold').grid(row=12, column=0)
+        Label(master, text="EBIT", font='Helvetica 9 bold').grid(row=13, column=0)
+        Label(master, text="FCF", font='Helvetica 9 bold').grid(row=14, column=0)
+
+        c = 1
+        for i in range(parameters['present_year'], parameters['present_year'] + 11):
+            Label(master, text=i, font='Helvetica 9 bold').grid(row=10, column=c)
+            c = c + 1
+
+        df = round(df_gfm[['Net Sales', 'COGS', 'EBIT', 'FCF']].loc[parameters['present_year']:].transpose(), 2)
+
+        r = 11
+        for x in ['Net Sales', 'COGS', 'EBIT', 'FCF']:
+            c = 1
+            for y in range(parameters['present_year'], parameters['present_year'] + 11):
+                Label(master, text=df[y].loc[x], font='Helvetica 9').grid(row=r, column=c)
+                c = c + 1
+            r = r + 1
+
+        Label(master, text='').grid(row=15, rowspan=2)
+        Button(master, text='Finish', command=master.destroy).grid(row=16, columnspan=12, pady=10)
