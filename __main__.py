@@ -17,6 +17,7 @@ import mergedatasets
 import output
 import time
 from sklearn.model_selection import ParameterGrid
+import sys
 # import warnings
 # warnings.filterwarnings('ignore')
 
@@ -170,7 +171,15 @@ parameters['moic'] = round(annual_forecast.loc[2021]['MOIC'], 2)
 
 ##----------------------------------------------------------------------
 ## PRINT RESULTS TO WINDOW
-#
+
+#If user does not opt to do parameter scan and save output:
+# parameters['scan_and_save'] = 'No'
+if parameters['scan_and_save'] == 'No':
+    window = Tk()
+    window7 = gui.ShowDetailedResults(window, parameters, df_gfm)
+    window.mainloop()
+    sys.exit()
+
 # open window
 window = Tk()
 window6 = gui.ShowResults(window, parameters)
