@@ -343,7 +343,7 @@ class EnterCOGS:
         self.outer_frame.rowconfigure(0, weight=1)
         self.outer_frame.columnconfigure(0, weight=1)
 
-        self.canvas = Canvas(self.outer_frame)
+        self.canvas = Canvas(self.outer_frame, height=100)
         self.canvas.grid(sticky="nsew")
 
         self.inner_frame = Frame(self.canvas)
