@@ -181,7 +181,7 @@ class SelectNDCs():
         self.canvas.create_window(0, 0, window=self.inner_frame, anchor='nw')
 
         # set up variables to store user selections
-        self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])[['NDC', 'Manufacturer', 'Prod Form3']]
+        self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])[['NDC', 'Manufacturer', 'Prod Form3','2018_Units','2019_Units','WACPrice']].reset_index(drop=True)
         self.ndcs = self.ndcs.drop_duplicates().reset_index()
         print('df_merged_data', df_merged_data)
         print('self.ndcs', self.ndcs)
@@ -190,7 +190,7 @@ class SelectNDCs():
 
         m = 0
 
-        header = ['NDC', 'Manufacturer', 'Dosage Form']
+        header = ['NDC', 'Manufacturer', 'Dosage Form', '2018 Volume', '2019 Volume','WAC Price ($)']
         for h in header:
             label = Label(self.inner_frame,text=h, font='Helvetica 8 bold')
             label.grid(row=0, column=m, padx=8)
@@ -198,7 +198,7 @@ class SelectNDCs():
 
         n = 1
 
-        # add ndc checkboxes
+        # add ndc checkboxes #TODO somehow only select boxes that have volumes?
         for index, row in self.ndcs.iterrows():
             v=IntVar()
             v.set(1)
@@ -209,6 +209,14 @@ class SelectNDCs():
             self.manufacturer_label.grid(row=n, column=1, sticky='w', padx=8)
             self.form_label = Label(self.inner_frame, text=row['Prod Form3'])
             self.form_label.grid(row=n, column=2, sticky='w', padx=8)
+            self.units_2018 = Label(self.inner_frame, text=row['2018_Units'])
+            self.units_2018.grid(row=n, column=3, sticky='w', padx=8)
+            self.units_2019 = Label(self.inner_frame, text=row['2019_Units'])
+            self.units_2019.grid(row=n, column=4, sticky='w', padx=8)
+            self.wacprice = Label(self.inner_frame, text=row['WACPrice'])
+            self.wacprice.grid(row=n, column=5, sticky='w', padx=8)
+            self.addt_spacing = Label(self.inner_frame, text='            ')
+            self.addt_spacing.grid(row=n, column=6, sticky='w', padx=8)
             n+=1
 
         self.scroll = Scrollbar(self.outer_frame, orient=VERTICAL)
@@ -337,7 +345,6 @@ class EnterCOGS:
         self.entries = []  # save entries created in list so that they can be accessed to store values
         i = 0  # start placing labels below the already assigned rows
 
-
         self.outer_frame = Frame(master)
         self.outer_frame.grid(row=10, column=0, columnspan=2)
         self.outer_frame.rowconfigure(0, weight=1)
@@ -352,10 +359,12 @@ class EnterCOGS:
 
         self.packs = df_equivalents['Pack'].unique()
         for p in self.packs:
+            # pack_label = Label(self.inner_frame, text='                              ')
+            # pack_label.grid(row=i, column=0, padx=5)
             pack_label = Label(self.inner_frame, text=p)
-            pack_label.grid(row=i, column=0, padx=5, sticky='e')
+            pack_label.grid(row=i, column=1, padx=5, sticky='e')
             pack_entry = Entry(self.inner_frame)
-            pack_entry.grid(row=i, column=1, padx=5, sticky='w')
+            pack_entry.grid(row=i, column=2, padx=5, sticky='e')
             self.entries.append(pack_entry)
             i += 1
 
@@ -429,42 +438,50 @@ class ShowDetailedResults():
         master.title('Generics Forecasting Model')
         # master.geometry("600x400")
 
-        Label(master, text='Generics Forecasting Model: Results Summary', font='Helvetica 9 bold').grid(row=0, column=0,
-                                                                                                        sticky=N,
-                                                                                                        columnspan=12)
-        Label(master, text='Did not opt to do the parameter scan. No results saves to the database.',
+        Label(master, text='Generics Forecasting Model: Results Summary',
+              font='Helvetica 9 bold').grid(row=0, column=0, sticky=N, columnspan=12)
+        Label(master, text='Did not opt to do the parameter scan. No results saved to the database.',
               font='Helvetica 9').grid(row=1, column=0, sticky=N, columnspan=12)
 
         Label(master, text='').grid(row=2, rowspan=2)
 
-        Label(master, text='NPV:  ', font='Helvetica 9 bold').grid(row=4, column=0, sticky=E, columnspan=6)
-        Label(master, text='IRR:  ', font='Helvetica 9 bold').grid(row=5, column=0, sticky=E, columnspan=6)
-        Label(master, text='Payback:  ', font='Helvetica 9 bold').grid(row=6, column=0, sticky=E, columnspan=6)
-        Label(master, text='Exit value in 2021:  ', font='Helvetica 9 bold').grid(row=7, column=0, sticky=E,
-                                                                                  columnspan=6)
-        Label(master, text='MOIC in 2021:  ', font='Helvetica 9 bold').grid(row=8, column=0, sticky=E, columnspan=6)
+        if parameters['search_type'] == 'brand':
+            search_type = 'Brand Name'
+            drug_id = parameters['brand_name']
+        else:
+            search_type = 'Molecule'
+            drug_id = parameters['molecule_name']
 
-        Label(master, text='${} million'.format(parameters['npv'])).grid(row=4, column=6, sticky=W, columnspan=6)
-        Label(master, text='{}%'.format(parameters['irr'])).grid(row=5, column=6, sticky=W, columnspan=6)
-        Label(master, text='{} years'.format(parameters['payback'])).grid(row=6, column=6, sticky=W, columnspan=6)
-        Label(master, text='${} million'.format(parameters['exit_value'])).grid(row=7, column=6, sticky=W, columnspan=6)
-        Label(master, text='{}x'.format(parameters['moic'])).grid(row=8, column=6, sticky=W, columnspan=6)
+        Label(master, text='{}:  '.format(search_type), font='Helvetica 9 bold').grid(row=4, column=0, sticky=E, columnspan=6)
+        Label(master, text='NPV:  ', font='Helvetica 9 bold').grid(row=5, column=0, sticky=E, columnspan=6)
+        Label(master, text='IRR:  ', font='Helvetica 9 bold').grid(row=6, column=0, sticky=E, columnspan=6)
+        Label(master, text='Payback:  ', font='Helvetica 9 bold').grid(row=7, column=0, sticky=E, columnspan=6)
+        Label(master, text='Exit value in 2021:  ', font='Helvetica 9 bold').grid(row=8, column=0, sticky=E, columnspan=6)
+        Label(master, text='MOIC in 2021:  ', font='Helvetica 9 bold').grid(row=9, column=0, sticky=E, columnspan=6)
 
-        Label(master, text='').grid(row=9, columnspan=12)
+        Label(master, text='{}'.format(drug_id)).grid(row=4, column=6, sticky=W, columnspan=6)
+        Label(master, text='${} million'.format(parameters['npv'])).grid(row=5, column=6, sticky=W, columnspan=6)
+        Label(master, text='{}%'.format(parameters['irr'])).grid(row=6, column=6, sticky=W, columnspan=6)
+        Label(master, text='{} years'.format(parameters['payback'])).grid(row=7, column=6, sticky=W, columnspan=6)
+        Label(master, text='${} million'.format(parameters['exit_value'])).grid(row=8, column=6, sticky=W, columnspan=6)
+        Label(master, text='{}x'.format(parameters['moic'])).grid(row=9, column=6, sticky=W, columnspan=6)
 
-        Label(master, text="Net Sales", font='Helvetica 9 bold').grid(row=11, column=0)
-        Label(master, text="COGS", font='Helvetica 9 bold').grid(row=12, column=0)
-        Label(master, text="EBIT", font='Helvetica 9 bold').grid(row=13, column=0)
-        Label(master, text="FCF", font='Helvetica 9 bold').grid(row=14, column=0)
+        Label(master, text='').grid(row=10, columnspan=12)
+
+        Label(master, text="($m)", font='Helvetica 9').grid(row=11, column=0)
+        Label(master, text="Net Sales", font='Helvetica 9 bold').grid(row=12, column=0)
+        Label(master, text="COGS", font='Helvetica 9 bold').grid(row=13, column=0)
+        Label(master, text="EBIT", font='Helvetica 9 bold').grid(row=14, column=0)
+        Label(master, text="FCF", font='Helvetica 9 bold').grid(row=15, column=0)
 
         c = 1
         for i in range(parameters['present_year'], parameters['present_year'] + 11):
-            Label(master, text=i, font='Helvetica 9 bold').grid(row=10, column=c)
+            Label(master, text=i, font='Helvetica 9 bold').grid(row=11, column=c)
             c = c + 1
 
         df = round(df_gfm[['Net Sales', 'COGS', 'EBIT', 'FCF']].loc[parameters['present_year']:].transpose(), 2)
 
-        r = 11
+        r = 12
         for x in ['Net Sales', 'COGS', 'EBIT', 'FCF']:
             c = 1
             for y in range(parameters['present_year'], parameters['present_year'] + 11):
@@ -472,5 +489,5 @@ class ShowDetailedResults():
                 c = c + 1
             r = r + 1
 
-        Label(master, text='').grid(row=15, rowspan=2)
+        Label(master, text='').grid(row=16, rowspan=2)
         Button(master, text='Finish', command=master.destroy).grid(row=16, columnspan=12, pady=10)
