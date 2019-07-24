@@ -212,7 +212,7 @@ class SelectNDCs():
             self.units_2018 = Label(self.inner_frame, text=row['2018_Units'])
             self.units_2018.grid(row=n, column=3, sticky='w', padx=8)
             self.units_2019 = Label(self.inner_frame, text=row['2019_Units'])
-            self.units_2019.grid(row=n, column=4, sticky='w', padx=8) # TODO make it so the 2 new columns are seen
+            self.units_2019.grid(row=n, column=4, sticky='w', padx=8)
             n+=1
 
         self.scroll = Scrollbar(self.outer_frame, orient=VERTICAL)
@@ -341,7 +341,6 @@ class EnterCOGS:
         self.entries = []  # save entries created in list so that they can be accessed to store values
         i = 0  # start placing labels below the already assigned rows
 
-
         self.outer_frame = Frame(master)
         self.outer_frame.grid(row=10, column=0, columnspan=2)
         self.outer_frame.rowconfigure(0, weight=1)
@@ -356,10 +355,12 @@ class EnterCOGS:
 
         self.packs = df_equivalents['Pack'].unique()
         for p in self.packs:
+            pack_label = Label(self.inner_frame, text='                              ')
+            pack_label.grid(row=i, column=0, padx=5)
             pack_label = Label(self.inner_frame, text=p)
-            pack_label.grid(row=i, column=0, padx=5, sticky='e')
+            pack_label.grid(row=i, column=1, padx=5, sticky='e')
             pack_entry = Entry(self.inner_frame)
-            pack_entry.grid(row=i, column=1, padx=5, sticky='w')
+            pack_entry.grid(row=i, column=2, padx=5, sticky='e')
             self.entries.append(pack_entry)
             i += 1
 
