@@ -81,8 +81,6 @@ parameters['dosage_forms'] = '; '.join(parameters['dosage_forms'])
 ##----------------------------------------------------------------------
 ## WINDOW2: OPEN ConfirmBrand WINDOW AND SAVE
 
-# TODO maybe add volume and price numbers to this - could help user forecast growth and confirm code is working
-
 # set parameters to display in confirmation window
 parameters['count_competitors'] = len(df_equivalents.loc[pd.isnull(df_equivalents['2018_Units']) == False]
                                       ['Manufacturer'].unique())  #TODO - years - will need to update when we have new annual data

@@ -58,8 +58,10 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
     # map units and price into df_detail
     for year in columns:
         if year[1] in df_merged_data.columns:
-            df_detail['Units'].loc[year[0]][df_merged_data['NDC']] = pd.to_numeric(
-                df_merged_data[year[1]].str.replace(',', ''))
+            df_merged_data_agg = df_merged_data[['NDC', year[1]]]   # using df_merged_data_agg to sum units across duplicate NDCs
+            df_merged_data_agg[year[1]] = pd.to_numeric(df_merged_data_agg[year[1]].str.replace(',', ''))
+            df_merged_data_agg[year[1]] = df_merged_data_agg.groupby('NDC')[year[1]].transform('sum')
+            df_detail['Units'].loc[year[0]][df_merged_data_agg['NDC']] = df_merged_data_agg[year[1]]
             df_detail['Price'].loc[year[0]][df_merged_data['NDC']] = df_merged_data['WACPrice']
         else:
             break
