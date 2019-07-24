@@ -192,62 +192,62 @@ results['scenario_id'] = scenario_id
 annual_forecast['scenario_id'] = scenario_id
 
 #creating the df that will be inserted to the SQL db
-df_result = pd.DataFrame.from_dict(data=results, orient='index')
-df_result = df_result.transpose()
-df_annual_forecast = pd.DataFrame()
-print('results: {}'.format(results))
-df_annual_forecast = df_annual_forecast.append(annual_forecast)
+# df_result = pd.DataFrame.from_dict(data=results, orient='index')
+# df_result = df_result.transpose()
+# df_annual_forecast = pd.DataFrame()
+# print('results: {}'.format(results))
+# df_annual_forecast = df_annual_forecast.append(annual_forecast)
 
-t0 = time.time()
-# Parameters to scan
-years_to_discount = [5,10]
-probability_of_success = [.75,1]
-launch_delay_years = [0,1]
-overall_cogs_increase = [-.3,0,.3]
-volume_growth = [parameters['historical_growth_rate']-.05,parameters['historical_growth_rate'],parameters['historical_growth_rate']+.05]
-gx_players_adj = [-2, -1, 0, 1, 2] #TODO make sure there is no negative numbers?
-base_gx_players = df_gfm['Number of Gx Players']
+# t0 = time.time()
+# # Parameters to scan
+# years_to_discount = [5,10]
+# probability_of_success = [.75,1]
+# launch_delay_years = [0,1]
+# overall_cogs_increase = [-.3,0,.3]
+# volume_growth = [parameters['historical_growth_rate']-.05,parameters['historical_growth_rate'],parameters['historical_growth_rate']+.05]
+# gx_players_adj = [-2, -1, 0, 1, 2] #TODO make sure there is no negative numbers?
+# base_gx_players = df_gfm['Number of Gx Players']
 
 # timefincalc = []
 # timevalcalc = []
+#
+# for i in years_to_discount:
+#     for j in probability_of_success:
+#         for k in launch_delay_years:
+#             for l in overall_cogs_increase:
+#                 for m in volume_growth:
+#                     for n in gx_players_adj:
+#                        # global scenario_id, df_results, df_annual_forecast, parameters, df_gfm, df_detail, df_analog
+#                         scenario_id = scenario_id + 1
+#
+#                         parameters['years_discounted'] = i
+#                         parameters['pos'] = j
+#                         parameters['launch_delay'] = k
+#                         parameters['cogs_variation'] = l
+#                         parameters['volume_growth_rate'] = m
+#                         parameters['gx_players_adj'] = n
+#
+#                         df_gfm['Number of Gx Players'] = base_gx_players + n
+#                         fincalcstart = time.time()
+#                         x, y = fincalcs.forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog)
+#                         valcalcstart = time.time()
+#                         v, w = fincalcs.valuation_calculations(parameters, x)
+#                         calcend = time.time()
+#                         # add scenario number to these results
+#                         v['scenario_id'] = scenario_id
+#                         w['scenario_id'] = scenario_id
+#
+#                         # adding results to df that will go to SQL
+#                         df_result = df_result.append(pd.Series(v, index=df_result.columns), ignore_index=True)
+#
+#                         df_annual_forecast = df_annual_forecast.append(w)
 
-for i in years_to_discount:
-    for j in probability_of_success:
-        for k in launch_delay_years:
-            for l in overall_cogs_increase:
-                for m in volume_growth:
-                    for n in gx_players_adj:
-                       # global scenario_id, df_results, df_annual_forecast, parameters, df_gfm, df_detail, df_analog
-                        scenario_id = scenario_id + 1
-
-                        parameters['years_discounted'] = i
-                        parameters['pos'] = j
-                        parameters['launch_delay'] = k
-                        parameters['cogs_variation'] = l
-                        parameters['volume_growth_rate'] = m
-                        parameters['gx_players_adj'] = n
-
-                        df_gfm['Number of Gx Players'] = base_gx_players + n
-                        fincalcstart = time.time()
-                        x, y = fincalcs.forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog)
-                        valcalcstart = time.time()
-                        v, w = fincalcs.valuation_calculations(parameters, x)
-                        calcend = time.time()
-                        # add scenario number to these results
-                        v['scenario_id'] = scenario_id
-                        w['scenario_id'] = scenario_id
-
-                        # adding results to df that will go to SQL
-                        df_result = df_result.append(pd.Series(v, index=df_result.columns), ignore_index=True)
-
-                        df_annual_forecast = df_annual_forecast.append(w)
-
-                        print(scenario_id)
-                        print('Time taken to run financial_calculations: {} seconds'.format(round(valcalcstart-fincalcstart,4)))
-                        print('Time taken to run valuation_calculations: {} seconds'.format(round(calcend-valcalcstart,4)))
-t1 = time.time()
-total = t1-t0
-print(total)
+#                         print(scenario_id)
+#                         print('Time taken to run financial_calculations: {} seconds'.format(round(valcalcstart-fincalcstart,4)))
+#                         print('Time taken to run valuation_calculations: {} seconds'.format(round(calcend-valcalcstart,4)))
+# t1 = time.time()
+# total = t1-t0
+# print(total)
 # print(np.std(timefincalc), np.mean(timefincalc))
 # print(np.std(timevalcalc), np.mean(timevalcalc))
 
@@ -287,15 +287,16 @@ x = param_mat.apply(lambda row: parameterscan(row['years_to_discount'], row['pro
                                                  parameters, df_gfm, df_detail, df_analog), axis=1, result_type='expand')
 for i in x[0]:
     df_result = df_result.append(pd.DataFrame.from_dict(data=i, orient='index').transpose())
+
 df_result.scenario_id = np.arange(0, len(df_result.scenario_id))
 for i in x[1]:
     scenario_id = scenario_id + 1
     i['scenario_id']=scenario_id
     df_annual_forecast = df_annual_forecast.append(i)
 
-t1 = time.time()
-total = t1-t0
-print('Time taken to run parameter scan: {} seconds'.format(round(total,1)))
+# t1 = time.time()
+# total = t1-t0
+# print('Time taken to run parameter scan: {} seconds'.format(round(total,1)))
 
 ### FORMATTING THE RESULTS TO PUT INTO DB ----------------------------
 
@@ -325,6 +326,7 @@ df_annual_forecast = df_annual_forecast[['scenario_id', 'run_id', 'forecast_year
 
 # OPEN CONNECTION TO DB
 conn = output.create_connection('C:\\sqlite\\db\\pythonsqlite.db')
+print('connection created')
 
 # create tables - only needed on first run
 output.create_table(conn, output.model_results_ddl)
@@ -356,6 +358,7 @@ for index, row in df_result.iterrows():
 for index, row in df_annual_forecast.iterrows():
     # print(row)
     output.insert_forecast(conn, row)
+print('rows written')
 
 conn.commit()
 

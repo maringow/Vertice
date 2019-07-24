@@ -194,16 +194,11 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
         df_detail.loc[i]['Units'] = df_detail.loc[i - 1]['Units'] * (1 + parameters['volume_growth_rate'])
     #TODO times it by an array and see if this is faster
     #look into np.mul function so not a for loop?
-    rate_array = np.ones(parameters['present_year'], parameters['last_forecasted_year'] + 1)
+    #rate_array = np.ones(parameters['present_year'], parameters['last_forecasted_year'] + 1)
 
     # rate_array = np.ones(10) + 1 * parameters['volume_growth_rate']
     # cum_years = np.arange(10) + 1
     # comp_growth = rate_array ** cum_years
-
-
-
-
-    time_C = time.time()
 
     # Adjust volumes for launch year and if there is a partial year
     parameters['vertice_launch_year'] = parameters['launch_delay'] + parameters['vertice_launch_year']
@@ -215,10 +210,10 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
             vol_adj.append((13 - parameters['vertice_launch_month']) / 12)
         else:
             vol_adj.append(1)
-    time_D = time.time()
+
     # Assign Vertice GX Market Share based on analog
     df_gfm['Vertice Gx Market Share'] = df_analog.loc[df_gfm['Number of Gx Players'],[parameters['channel'] + ' Market Share']].values
-    time_E = time.time()
+
     df_vertice_ndc_volumes = df_detail['Units'].mul(vol_adj * df_gfm['Gx Penetration'], level=0, fill_value=0).mul(
     df_gfm['Vertice Gx Market Share'], level=0, fill_value=0)
     df_vertice_ndc_volumes = df_vertice_ndc_volumes * parameters['pos']
@@ -251,6 +246,5 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
     df_gfm['FCF'] = df_gfm['Operating Income'] + df_gfm['Profit Tax'] + df_gfm['Tax depreciation'] + df_gfm[
         'Additional Non-cash Effects'] - df_gfm['Change in Net Current Assets'] + df_gfm['Capital Avoidance'] + df_gfm[
                         'Total Capitalized'] - df_gfm['Write-off of Residual Tax Value']
-    time_E = time.time()
-    print(time_B-time_A,time_C-time_B, time_D-time_C,time_E-time_D)
+
     return(df_gfm, df_detail) #TODO don't return every column? If it saves time?
