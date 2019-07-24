@@ -194,7 +194,7 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
         df_detail.loc[i]['Units'] = df_detail.loc[i - 1]['Units'] * (1 + parameters['volume_growth_rate'])
     #TODO times it by an array and see if this is faster
     #look into np.mul function so not a for loop?
-    rate_array = np.ones(parameters['present_year'], parameters['last_forecasted_year'] + 1)
+    # rate_array = np.ones(parameters['present_year'], parameters['last_forecasted_year'] + 1)
 
     # rate_array = np.ones(10) + 1 * parameters['volume_growth_rate']
     # cum_years = np.arange(10) + 1

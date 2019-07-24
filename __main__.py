@@ -173,7 +173,7 @@ parameters['moic'] = round(annual_forecast.loc[2021]['MOIC'], 1)
 ## PRINT RESULTS TO WINDOW
 
 #If user does not opt to do parameter scan and save output:
-parameters['scan_and_save'] = 'No'
+parameters['scan_and_save'] = 'Yes'
 if parameters['scan_and_save'] == 'No':
     window = Tk()
     window7 = gui.ShowDetailedResults(window, parameters, df_gfm)
@@ -258,45 +258,45 @@ df_result = df_result.transpose()
 df_annual_forecast = pd.DataFrame()
 print('results: {}'.format(results))
 df_annual_forecast = df_annual_forecast.append(annual_forecast)
-
-
-t0 = time.time()
-
-base_gx_players = df_gfm['Number of Gx Players']
-
-param_grid = {'years_to_discount': [5,10],
-              'probability_of_success': [.75,1],
-              'launch_delay_years': [0,1],
-              'overall_cogs_increase': [-.3,0,.3],
-              'volume_growth': [parameters['historical_growth_rate']-.05,parameters['historical_growth_rate'],parameters['historical_growth_rate']+.05],
-              'gx_players_adj': [-2,-1,0,1,2]}
-
-param_mat = pd.DataFrame(ParameterGrid(param_grid))
-
-def parameterscan(years_to_discount, probability_of_success, launch_delay_years, overall_cogs_increase, volume_growth, gx_players_adj, parameters, df_gfm, df_detail, df_analog):
-    parameters['years_discounted'] = years_to_discount
-    parameters['pos'] = probability_of_success
-    parameters['launch_delay'] = launch_delay_years
-    parameters['cogs_variation'] = overall_cogs_increase
-    parameters['volume_growth_rate'] = volume_growth
-    df_gfm['Number of Gx Players'] = base_gx_players + gx_players_adj
-    x, y = fincalcs.forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog)
-    return fincalcs.valuation_calculations(parameters, x)
-
-x = param_mat.apply(lambda row: parameterscan(row['years_to_discount'], row['probability_of_success'],
-                                                 row['launch_delay_years'], row['overall_cogs_increase'],
-                                                 row['volume_growth'], row['gx_players_adj'],
-                                                 parameters, df_gfm, df_detail, df_analog), axis=1, result_type='expand')
-for i in x[0]:
-    df_result = df_result.append(pd.DataFrame.from_dict(data=i, orient='index').transpose())
-df_result.scenario_id = np.arange(0, len(df_result.scenario_id))
-for i in x[1]:
-    scenario_id = scenario_id + 1
-    i['scenario_id']=scenario_id
-    df_annual_forecast = df_annual_forecast.append(i)
-
-t1 = time.time()
-total = t1-t0
+#
+#
+# t0 = time.time()
+#
+# base_gx_players = df_gfm['Number of Gx Players']
+#
+# param_grid = {'years_to_discount': [5,10],
+#               'probability_of_success': [.75,1],
+#               'launch_delay_years': [0,1],
+#               'overall_cogs_increase': [-.3,0,.3],
+#               'volume_growth': [parameters['historical_growth_rate']-.05,parameters['historical_growth_rate'],parameters['historical_growth_rate']+.05],
+#               'gx_players_adj': [-2,-1,0,1,2]}
+#
+# param_mat = pd.DataFrame(ParameterGrid(param_grid))
+#
+# def parameterscan(years_to_discount, probability_of_success, launch_delay_years, overall_cogs_increase, volume_growth, gx_players_adj, parameters, df_gfm, df_detail, df_analog):
+#     parameters['years_discounted'] = years_to_discount
+#     parameters['pos'] = probability_of_success
+#     parameters['launch_delay'] = launch_delay_years
+#     parameters['cogs_variation'] = overall_cogs_increase
+#     parameters['volume_growth_rate'] = volume_growth
+#     df_gfm['Number of Gx Players'] = base_gx_players + gx_players_adj
+#     x, y = fincalcs.forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog)
+#     return fincalcs.valuation_calculations(parameters, x)
+#
+# x = param_mat.apply(lambda row: parameterscan(row['years_to_discount'], row['probability_of_success'],
+#                                                  row['launch_delay_years'], row['overall_cogs_increase'],
+#                                                  row['volume_growth'], row['gx_players_adj'],
+#                                                  parameters, df_gfm, df_detail, df_analog), axis=1, result_type='expand')
+# for i in x[0]:
+#     df_result = df_result.append(pd.DataFrame.from_dict(data=i, orient='index').transpose())
+# df_result.scenario_id = np.arange(0, len(df_result.scenario_id))
+# for i in x[1]:
+#     scenario_id = scenario_id + 1
+#     i['scenario_id']=scenario_id
+#     df_annual_forecast = df_annual_forecast.append(i)
+#
+# t1 = time.time()
+# total = t1-t0
 print('Time taken to run parameter scan: {} seconds'.format(round(total,1)))
 
 ### FORMATTING THE RESULTS TO PUT INTO DB ----------------------------
