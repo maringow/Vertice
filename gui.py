@@ -181,7 +181,7 @@ class SelectNDCs():
         self.canvas.create_window(0, 0, window=self.inner_frame, anchor='nw')
 
         # set up variables to store user selections
-        self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])[['NDC', 'Manufacturer', 'Prod Form3','2018_Units','2019_Units']].reset_index(drop=True)
+        self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])[['NDC', 'Manufacturer', 'Prod Form3','2018_Units','2019_Units','WACPrice']].reset_index(drop=True)
         self.ndcs = self.ndcs.drop_duplicates().reset_index()
         print('df_merged_data', df_merged_data)
         print('self.ndcs', self.ndcs)
@@ -190,7 +190,7 @@ class SelectNDCs():
 
         m = 0
 
-        header = ['NDC', 'Manufacturer', 'Dosage Form', '2018 Volume', '2019 Volume']
+        header = ['NDC', 'Manufacturer', 'Dosage Form', '2018 Volume', '2019 Volume','WAC Price ($)']
         for h in header:
             label = Label(self.inner_frame,text=h, font='Helvetica 8 bold')
             label.grid(row=0, column=m, padx=8)
@@ -198,7 +198,7 @@ class SelectNDCs():
 
         n = 1
 
-        # add ndc checkboxes
+        # add ndc checkboxes #TODO somehow only select boxes that have volumes?
         for index, row in self.ndcs.iterrows():
             v=IntVar()
             v.set(1)
@@ -213,6 +213,10 @@ class SelectNDCs():
             self.units_2018.grid(row=n, column=3, sticky='w', padx=8)
             self.units_2019 = Label(self.inner_frame, text=row['2019_Units'])
             self.units_2019.grid(row=n, column=4, sticky='w', padx=8)
+            self.wacprice = Label(self.inner_frame, text=row['WACPrice'])
+            self.wacprice.grid(row=n, column=5, sticky='w', padx=8)
+            self.addt_spacing = Label(self.inner_frame, text='            ')
+            self.addt_spacing.grid(row=n, column=6, sticky='w', padx=8)
             n+=1
 
         self.scroll = Scrollbar(self.outer_frame, orient=VERTICAL)
@@ -355,8 +359,8 @@ class EnterCOGS:
 
         self.packs = df_equivalents['Pack'].unique()
         for p in self.packs:
-            pack_label = Label(self.inner_frame, text='                              ')
-            pack_label.grid(row=i, column=0, padx=5)
+            # pack_label = Label(self.inner_frame, text='                              ')
+            # pack_label.grid(row=i, column=0, padx=5)
             pack_label = Label(self.inner_frame, text=p)
             pack_label.grid(row=i, column=1, padx=5, sticky='e')
             pack_entry = Entry(self.inner_frame)
@@ -441,14 +445,21 @@ class ShowDetailedResults():
 
         Label(master, text='').grid(row=2, rowspan=2)
 
-        Label(master, text='Molecule:  ', font='Helvetica 9 bold').grid(row=4, column=0, sticky=E, columnspan=6)
+        if parameters['search_type'] == 'brand':
+            search_type = 'Brand Name'
+            drug_id = parameters['brand_name']
+        else:
+            search_type = 'Molecule'
+            drug_id = parameters['molecule_name']
+
+        Label(master, text='{}:  '.format(search_type), font='Helvetica 9 bold').grid(row=4, column=0, sticky=E, columnspan=6)
         Label(master, text='NPV:  ', font='Helvetica 9 bold').grid(row=5, column=0, sticky=E, columnspan=6)
         Label(master, text='IRR:  ', font='Helvetica 9 bold').grid(row=6, column=0, sticky=E, columnspan=6)
         Label(master, text='Payback:  ', font='Helvetica 9 bold').grid(row=7, column=0, sticky=E, columnspan=6)
         Label(master, text='Exit value in 2021:  ', font='Helvetica 9 bold').grid(row=8, column=0, sticky=E, columnspan=6)
         Label(master, text='MOIC in 2021:  ', font='Helvetica 9 bold').grid(row=9, column=0, sticky=E, columnspan=6)
 
-        Label(master, text='{}'.format(parameters['molecule_name'])).grid(row=4, column=6, sticky=W, columnspan=6)
+        Label(master, text='{}'.format(drug_id)).grid(row=4, column=6, sticky=W, columnspan=6)
         Label(master, text='${} million'.format(parameters['npv'])).grid(row=5, column=6, sticky=W, columnspan=6)
         Label(master, text='{}%'.format(parameters['irr'])).grid(row=6, column=6, sticky=W, columnspan=6)
         Label(master, text='{} years'.format(parameters['payback'])).grid(row=7, column=6, sticky=W, columnspan=6)
