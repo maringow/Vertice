@@ -174,7 +174,7 @@ class SelectNDCs():
         self.outer_frame.rowconfigure(0, weight=1)
         self.outer_frame.columnconfigure(0, weight=1)
 
-        self.canvas = Canvas(self.outer_frame)
+        self.canvas = Canvas(self.outer_frame, width=600)
         self.canvas.grid(sticky="nsew", padx=40)
 
         self.inner_frame = Frame(self.canvas)
