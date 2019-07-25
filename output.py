@@ -1,5 +1,6 @@
 import sqlite3
 from sqlite3 import Error
+import numpy as np
 
 
 def create_connection(db_file):
@@ -53,6 +54,7 @@ def select_max_ids(conn):
 
     return row
 
+# sqlite3.register_adapter(np.int64, lambda val: int(val))  ## potential code for forcing int datatype
 
 def insert_result(conn, results):
     print(results)

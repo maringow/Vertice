@@ -176,9 +176,9 @@ def valuation_calculations(parameters, df_gfm):
               'discounted_payback_period': discounted_payback_period,
               'run_name': parameters['run_name']}
 
-    print('API cost per unit: ', result['api_cost_per_unit'])
-    print('base year volume: ', result['base_year_volume'])
-    print('base year sales: ', result['base_year_market_size'])
+    # print('API cost per unit: ', result['api_cost_per_unit'])
+    # print('base year volume: ', result['base_year_volume'])
+    # print('base year sales: ', result['base_year_market_size'])
 
     return result, df_gfm[['Number of Gx Players', 'Profit Share %', 'Milestone Payments', 'R&D',
                            'Vertice Price as % of WAC','Net Sales', 'COGS', 'EBIT',
