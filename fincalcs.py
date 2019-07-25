@@ -118,7 +118,7 @@ def valuation_calculations(parameters, df_gfm):
     # Discounted Payback Period
     df_gfm['FCF PV'] = 0
     df_gfm['FCF PV'].loc[parameters['present_year']:parameters['present_year'] + parameters['years_discounted']] = pv
-    df_gfm['Cumulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[parameters['present_year']:parameters['present_year'] + parameters['years_discounted']])
+    df_gfm['Cumulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[parameters['present_year']:parameters['present_year'] + parameters['years_discounted']+1])
     df_gfm['Cumulative Discounted FCF'] = df_gfm['Cumulative Discounted FCF'].fillna(0)
     idx = df_gfm[df_gfm['Cumulative Discounted FCF'] <= 0].index.max()  # last full year for payback calc
     if idx == parameters['last_forecasted_year']:
@@ -200,6 +200,11 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
     # cum_years = np.arange(10) + 1
     # comp_growth = rate_array ** cum_years
 
+
+
+
+    time_C = time.time()
+
     # Adjust volumes for launch year and if there is a partial year
     parameters['vertice_launch_year'] = parameters['launch_delay'] + parameters['vertice_launch_year']
     vol_adj = []
@@ -210,7 +215,7 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
             vol_adj.append((13 - parameters['vertice_launch_month']) / 12)
         else:
             vol_adj.append(1)
-
+    time_D = time.time()
     # Assign Vertice GX Market Share based on analog
     df_gfm['Vertice Gx Market Share'] = df_analog.loc[df_gfm['Number of Gx Players'],[parameters['channel'] + ' Market Share']].values
 
@@ -246,5 +251,6 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
     df_gfm['FCF'] = df_gfm['Operating Income'] + df_gfm['Profit Tax'] + df_gfm['Tax depreciation'] + df_gfm[
         'Additional Non-cash Effects'] - df_gfm['Change in Net Current Assets'] + df_gfm['Capital Avoidance'] + df_gfm[
                         'Total Capitalized'] - df_gfm['Write-off of Residual Tax Value']
-
+    time_E = time.time()
+    # print(time_B-time_A,time_C-time_B, time_D-time_C,time_E-time_D)
     return(df_gfm, df_detail) #TODO don't return every column? If it saves time?

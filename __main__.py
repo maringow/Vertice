@@ -31,7 +31,7 @@ prospectoRx = pd.read_csv('prospecto_all_one_year_20190708.csv')
 
 # get valid brands from IMS file
 # TODO remove NaNs from these lists
-brands = sorted(IMS.loc[IMS['Brand/Generic'] == 'BRAND']['Product Sum'].unique())
+brands = sorted(IMS.loc[IMS['Brand/Generic'] == 'BRAND']['Product Sum'].unique())  #TODO what about BRANDED GENERIC?
 molecules = IMS['Combined Molecule'].unique().tolist()
 
 parameters = {}
@@ -197,7 +197,7 @@ annual_forecast['scenario_id'] = scenario_id
 # df_annual_forecast = pd.DataFrame()
 # print('results: {}'.format(results))
 # df_annual_forecast = df_annual_forecast.append(annual_forecast)
-
+#
 # t0 = time.time()
 # # Parameters to scan
 # years_to_discount = [5,10]
@@ -207,9 +207,6 @@ annual_forecast['scenario_id'] = scenario_id
 # volume_growth = [parameters['historical_growth_rate']-.05,parameters['historical_growth_rate'],parameters['historical_growth_rate']+.05]
 # gx_players_adj = [-2, -1, 0, 1, 2] #TODO make sure there is no negative numbers?
 # base_gx_players = df_gfm['Number of Gx Players']
-
-# timefincalc = []
-# timevalcalc = []
 #
 # for i in years_to_discount:
 #     for j in probability_of_success:
@@ -241,6 +238,13 @@ annual_forecast['scenario_id'] = scenario_id
 #                         df_result = df_result.append(pd.Series(v, index=df_result.columns), ignore_index=True)
 #
 #                         df_annual_forecast = df_annual_forecast.append(w)
+#
+#                         print(scenario_id)
+#                         print('Time taken to run financial_calculations: {} seconds'.format(round(valcalcstart-fincalcstart,4)))
+#                         print('Time taken to run valuation_calculations: {} seconds'.format(round(calcend-valcalcstart,4)))
+# t1 = time.time()
+# total = t1-t0
+# print('Time taken to run parameter scan: {} seconds'.format(round(total,1)))
 
 #                         print(scenario_id)
 #                         print('Time taken to run financial_calculations: {} seconds'.format(round(valcalcstart-fincalcstart,4)))
@@ -256,7 +260,7 @@ df_result = df_result.transpose()
 df_annual_forecast = pd.DataFrame()
 print('results: {}'.format(results))
 df_annual_forecast = df_annual_forecast.append(annual_forecast)
-
+#
 
 t0 = time.time()
 
