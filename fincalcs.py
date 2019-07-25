@@ -195,18 +195,27 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
         df_gfm['Vertice Price as % of WAC'] = (1 - parameters['gtn_%']) * (1 - df_gfm['Price Discount of Current Gx Net Price'])
     time_B = time.time()
     # Calculating volume of market in future
-    for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
-        df_detail.loc[i]['Units'] = df_detail.loc[i - 1]['Units'] * (1 + parameters['volume_growth_rate'])
-    #TODO times it by an array and see if this is faster
-    #look into np.mul function so not a for loop?
-    #rate_array = np.ones(parameters['present_year'], parameters['last_forecasted_year'] + 1)
+    # for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
+    #     df_detail.loc[i]['Units'] = df_detail.loc[i - 1]['Units'] * (1 + parameters['volume_growth_rate'])
 
-    # rate_array = np.ones(10) + 1 * parameters['volume_growth_rate']
-    # cum_years = np.arange(10) + 1
-    # comp_growth = rate_array ** cum_years
-
-
-
+    n_years = parameters['last_forecasted_year'] + 1 - parameters['present_year']
+    rate_array = np.ones(n_years) + 1 * .05
+    cum_years = np.arange(n_years) + 1
+    comp_growth = rate_array ** cum_years
+    get_volumes = lambda x: np.asarray(x) * np.asarray(comp_growth)
+    df = df_detail.loc[parameters['present_year']-1]['Units'].apply(get_volumes)
+    df = pd.DataFrame(np.concatenate(df.values),
+                      index=pd.MultiIndex.from_product([df.index.values, np.arange(parameters['present_year'],
+                                                                                   parameters[
+                                                                                       'last_forecasted_year'] + 1)],
+                                                       names=['ndc_index', 'year_index']))
+    df.columns = ['Units']
+    df = df.swaplevel(1, 0).sort_values(by=['year_index'])
+    df_detail = pd.merge(df_detail, df, on=['year_index', 'ndc_index'], how='left')
+    df = df_detail.Units_x.loc[:parameters['present_year']-1]
+    df = df.append(df_detail.Units_y.loc[parameters['present_year']:])
+    df_detail['Units'] = df.values
+    df_detail = df_detail.drop(['Units_x', 'Units_y'], axis=1)
 
     time_C = time.time()
 
@@ -223,7 +232,7 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
     time_D = time.time()
     # Assign Vertice GX Market Share based on analog
     df_gfm['Vertice Gx Market Share'] = df_analog.loc[df_gfm['Number of Gx Players'],[parameters['channel'] + ' Market Share']].values
-
+    time_E = time.time()
     df_vertice_ndc_volumes = df_detail['Units'].mul(vol_adj * df_gfm['Gx Penetration'], level=0, fill_value=0).mul(
     df_gfm['Vertice Gx Market Share'], level=0, fill_value=0)
     df_vertice_ndc_volumes = df_vertice_ndc_volumes * parameters['pos']
@@ -257,5 +266,8 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
         'Additional Non-cash Effects'] - df_gfm['Change in Net Current Assets'] + df_gfm['Capital Avoidance'] + df_gfm[
                         'Total Capitalized'] - df_gfm['Write-off of Residual Tax Value']
     time_E = time.time()
-    # print(time_B-time_A,time_C-time_B, time_D-time_C,time_E-time_D)
+    print(round(time_B-time_A,3),
+          round(time_C-time_B,3),
+          round(time_D-time_C,3),
+          round(time_E-time_D,3))
     return(df_gfm, df_detail) #TODO don't return every column? If it saves time?
