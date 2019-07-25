@@ -174,7 +174,7 @@ parameters['moic'] = round(annual_forecast.loc[2021]['MOIC'], 1)
 ## PRINT RESULTS TO WINDOW
 
 #If user does not opt to do parameter scan and save output:
-# parameters['scan_and_save'] = 'No'
+parameters['scan_and_save'] = 'Yes'
 if parameters['scan_and_save'] == 'No':
     window = Tk()
     window7 = gui.ShowDetailedResults(window, parameters, df_gfm)
@@ -268,6 +268,7 @@ df_annual_forecast = df_annual_forecast.append(annual_forecast)
 t0 = time.time()
 
 base_gx_players = df_gfm['Number of Gx Players']
+base_launch_year = parameters['vertice_launch_year']
 
 param_grid = {'years_to_discount': [5,10],
               'probability_of_success': [.75,1],
@@ -281,7 +282,7 @@ param_mat = pd.DataFrame(ParameterGrid(param_grid))
 def parameterscan(years_to_discount, probability_of_success, launch_delay_years, overall_cogs_increase, volume_growth, gx_players_adj, parameters, df_gfm, df_detail, df_analog):
     parameters['years_discounted'] = years_to_discount
     parameters['pos'] = probability_of_success
-    parameters['launch_delay'] = launch_delay_years
+    parameters['vertice_launch_year'] = base_launch_year + launch_delay_years
     parameters['cogs_variation'] = overall_cogs_increase
     parameters['volume_growth_rate'] = volume_growth
     df_gfm['Number of Gx Players'] = base_gx_players + gx_players_adj
@@ -365,7 +366,7 @@ for index, row in df_result.iterrows():
 for index, row in df_annual_forecast.iterrows():
     # print(row)
     output.insert_forecast(conn, row)
-print('rows written')
+# print('rows written')
 
 conn.commit()
 
