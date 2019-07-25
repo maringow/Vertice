@@ -49,7 +49,7 @@ print(parameters)
 ## FIND DOSAGE FORMS, OPEN DOSAGE FORM WINDOW AND SAVE SELECTIONS
 
 parameters = mergedatasets.get_dosage_forms(parameters, IMS)
-print(parameters['dosage_forms'])
+# print(parameters['dosage_forms'])
 
 
 ##----------------------------------------------------------------------
@@ -102,10 +102,11 @@ window.mainloop()
 
 selected_NDCs = window8.selected_ndcs
 print(selected_NDCs)
-print('Before drop: {}'.format(df_detail))
+print('Before drop: {}'.format(df_equivalents['NDC']))
 df_detail = df_detail[df_detail['NDC'].isin(selected_NDCs)]
-print('After drop: {}'.format(df_detail))
-
+df_merged_data = df_merged_data[df_merged_data['NDC'].isin(selected_NDCs)]
+df_equivalents = df_equivalents[df_equivalents['NDC'].isin(selected_NDCs)]
+print('After drop: {}'.format(df_equivalents['NDC']))
 
 ##----------------------------------------------------------------------
 ## WINDOW4: OPEN EnterFilepath WINDOW AND SAVE VALUES
