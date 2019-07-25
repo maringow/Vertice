@@ -100,13 +100,13 @@ window=Tk()
 window8 = gui.SelectNDCs(window, df_merged_data)
 window.mainloop()
 
-selected_NDCs = window8.selected_ndcs
-print(selected_NDCs)
+parameters['selected_NDCs'] = window8.selected_ndcs
 print('Before drop: {}'.format(df_equivalents['NDC']))
-df_detail = df_detail[df_detail['NDC'].isin(selected_NDCs)]
-df_merged_data = df_merged_data[df_merged_data['NDC'].isin(selected_NDCs)]
-df_equivalents = df_equivalents[df_equivalents['NDC'].isin(selected_NDCs)]
+df_detail = df_detail[df_detail['NDC'].isin(parameters['selected_NDCs'])]
+df_merged_data = df_merged_data[df_merged_data['NDC'].isin(parameters['selected_NDCs'])]
+df_equivalents = df_equivalents[df_equivalents['NDC'].isin(parameters['selected_NDCs'])]
 print('After drop: {}'.format(df_equivalents['NDC']))
+parameters['selected_NDCs'] = str(parameters['selected_NDCs'])  #.replace(['[', ']'], '')
 
 ##----------------------------------------------------------------------
 ## WINDOW4: OPEN EnterFilepath WINDOW AND SAVE VALUES
@@ -318,7 +318,7 @@ df_annual_forecast['forecast_year'] = df_annual_forecast.index.values
 
 # ordering the columns
 df_result = df_result[['scenario_id', 'run_id', 'run_name', 'brand_name', 'combined_molecules', 'dosage_forms',
-                       'channel', 'indication', 'presentation', 'internal_external', 'brand_status','comments',
+                       'selected_NDCs', 'channel', 'indication', 'presentation', 'internal_external', 'brand_status','comments',
                        'vertice_filing_month', 'vertice_filing_year','vertice_launch_month', 'vertice_launch_year',
                        'pos', 'exit_multiple', 'discount_rate', 'tax_rate', 'base_year_volume','base_year_market_size',
                        'volume_growth_rate', 'wac_increase', 'api_cost_per_unit', 'api_cost_unit', 'profit_margin_override',

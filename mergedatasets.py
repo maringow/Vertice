@@ -73,3 +73,4 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
     df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
 
     return(df_merged_data, df_detail)
+
