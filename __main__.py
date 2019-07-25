@@ -157,6 +157,8 @@ df_gfm, df_detail = fincalcs.financial_calculations(parameters, df_gfm, df_detai
 
 results, annual_forecast = fincalcs.valuation_calculations(parameters, df_gfm)
 
+print('DEBUG', annual_forecast)
+
 print(annual_forecast[['Net Sales','COGS','EBIT','FCF']])
 
 ##----------------------------------------------------------------------
@@ -310,8 +312,8 @@ run_id = 0
 df_result['run_id'] = run_id
 df_annual_forecast['run_id'] = run_id
 
-df_annual_forecast.columns = ['Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D', 'Net Sales',
-                              'Vertice Price as % of WAC', 'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC', 'scenario_id', 'run_id']
+df_annual_forecast.columns = ['Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D', 'Vertice Price as % of WAC',
+                             'Net Sales', 'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC', 'scenario_id', 'run_id']
 
 # creating a forecast year column
 df_annual_forecast['forecast_year'] = df_annual_forecast.index.values

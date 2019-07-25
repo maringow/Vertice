@@ -181,7 +181,7 @@ def valuation_calculations(parameters, df_gfm):
     # print('base year sales: ', result['base_year_market_size'])
 
     return result, df_gfm[['Number of Gx Players', 'Profit Share %', 'Milestone Payments', 'R&D',
-                           'Vertice Price as % of WAC','Net Sales', 'COGS', 'EBIT',
+                           'Vertice Price as % of WAC', 'Net Sales', 'COGS', 'EBIT',
                             'FCF', 'Exit Values', 'MOIC']] #yearly data
 
 
