@@ -66,8 +66,7 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
         else:
             break
 
-    # TODO add a check here that data has successfully populated df_detail Units and Price - this
-    #    will catch column name changes
+    # TODO add a check here that data has successfully populated df_detail Units and Price - this will catch column name changes
 
     # calculate Sales as Units * Price
     df_detail['Sales'] = df_detail['Units'] * df_detail['Price']

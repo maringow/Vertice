@@ -208,7 +208,7 @@ annual_forecast['scenario_id'] = scenario_id
 # launch_delay_years = [0,1]
 # overall_cogs_increase = [-.3,0,.3]
 # volume_growth = [parameters['historical_growth_rate']-.05,parameters['historical_growth_rate'],parameters['historical_growth_rate']+.05]
-# gx_players_adj = [-2, -1, 0, 1, 2] #TODO make sure there is no negative numbers?
+# gx_players_adj = [-2, -1, 0, 1, 2]
 # base_gx_players = df_gfm['Number of Gx Players']
 #
 # for i in years_to_discount:
@@ -285,6 +285,7 @@ def parameterscan(years_to_discount, probability_of_success, launch_delay_years,
     parameters['vertice_launch_year'] = base_launch_year + launch_delay_years
     parameters['cogs_variation'] = overall_cogs_increase
     parameters['volume_growth_rate'] = volume_growth
+    parameters['gx_players_adj'] = gx_players_adj
     df_gfm['Number of Gx Players'] = base_gx_players + gx_players_adj
     x, y = fincalcs.forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog)
     return fincalcs.valuation_calculations(parameters, x)
