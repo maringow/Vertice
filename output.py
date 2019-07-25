@@ -63,8 +63,8 @@ def insert_result(conn, results):
     vertice_filing_year, vertice_launch_month, vertice_launch_year, pos, exit_multiple, discount_rate,  
     tax_rate, base_year_volume, base_year_sales, volume_growth_rate, wac_price_growth_rate, api_cost_per_unit,  
     api_cost_unit, profit_margin_override, standard_cogs_entry, years_to_discount, cogs_increase, 
-    gx_players_adj, npv, irr, payback)
-            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
+    gx_players_adj, npv, irr, payback, is_base_case)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
     cur = conn.cursor()
     cur.execute(sql, results)
     return cur.lastrowid
@@ -116,7 +116,8 @@ model_results_ddl = """CREATE TABLE IF NOT EXISTS model_results (
                         gx_players_adj int,
                         npv real,
                         irr real,
-                        payback real
+                        payback real,
+                        is_base_case text
                         ); """
 
 

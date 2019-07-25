@@ -266,5 +266,5 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
         'Additional Non-cash Effects'] - df_gfm['Change in Net Current Assets'] + df_gfm['Capital Avoidance'] + df_gfm[
                         'Total Capitalized'] - df_gfm['Write-off of Residual Tax Value']
     time_E = time.time()
-    print(round(time_E-time_A,3))
+    # print(round(time_E-time_A,3))
     return(df_gfm, df_detail) #TODO don't return every column? If it saves time?

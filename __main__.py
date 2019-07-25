@@ -274,7 +274,7 @@ param_grid = {'years_to_discount': [5,10],
               'probability_of_success': [.75,1],
               'launch_delay_years': [0,1],
               'overall_cogs_increase': [-.3,0,.3],
-              'volume_growth': [parameters['historical_growth_rate']-.05,parameters['historical_growth_rate'],parameters['historical_growth_rate']+.05],
+              'volume_growth': [parameters['volume_growth_rate']-.05,parameters['volume_growth_rate'],parameters['volume_growth_rate']+.05],
               'gx_players_adj': [-2,-1,0,1,2]}
 
 param_mat = pd.DataFrame(ParameterGrid(param_grid))
@@ -295,12 +295,15 @@ x = param_mat.apply(lambda row: parameterscan(row['years_to_discount'], row['pro
                                                  parameters, df_gfm, df_detail, df_analog), axis=1, result_type='expand')
 for i in x[0]:
     df_result = df_result.append(pd.DataFrame.from_dict(data=i, orient='index').transpose())
+s = df_result['scenario_id']
+df_result['is_base_case'] = np.where(s==0, 'Y', 'N')
 
 df_result.scenario_id = np.arange(0, len(df_result.scenario_id))
 for i in x[1]:
     scenario_id = scenario_id + 1
     i['scenario_id']=scenario_id
     df_annual_forecast = df_annual_forecast.append(i)
+
 
 # t1 = time.time()
 # total = t1-t0
@@ -326,7 +329,7 @@ df_result = df_result[['scenario_id', 'run_id', 'run_name', 'brand_name', 'combi
                        'pos', 'exit_multiple', 'discount_rate', 'tax_rate', 'base_year_volume','base_year_market_size',
                        'volume_growth_rate', 'wac_increase', 'api_cost_per_unit', 'api_cost_unit', 'profit_margin_override',
                        'standard_cogs_entry', 'years_discounted', 'cogs_variation', 'gx_players_adj', 'npv', 'irr',
-                       'discounted_payback_period']]
+                       'discounted_payback_period', 'is_base_case']]
 df_annual_forecast = df_annual_forecast[['scenario_id', 'run_id', 'forecast_year', 'Number of Gx Players', 'Profit Share',
                                          'Milestone Payments','R&D','Vertice Price as % of WAC', 'Net Sales','COGS',
                                          'EBIT','FCF', 'Exit Values', 'MOIC']]
@@ -339,6 +342,8 @@ print('connection created')
 # create tables - only needed on first run
 output.create_table(conn, output.model_results_ddl)
 output.create_table(conn, output.annual_forecast_ddl)
+
+# output.add_column(conn, 'model_results', 'is_base_case', 'text')
 
 # get max values for run_id and scenario_id
 try:
