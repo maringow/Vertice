@@ -23,7 +23,7 @@ class BrandSelection:
         # add label and combobox for brand selection
         self.brand_label = Label(master, text='Select a brand name drug: ')
         self.brand_label.pack()
-        self.brand_combo = ttk.Combobox(master, values=brands)
+        self.brand_combo = ttk.Combobox(master, values=brands, width=30, height=15) #15 rows to display
         self.brand_combo.pack()
         self.brand_combo.bind("<<ComboboxSelected>>", self.get_brand)
 
@@ -33,7 +33,7 @@ class BrandSelection:
         # add label and combobox for molecule selection
         self.molecule_label = Label(master, text='Select a molecule: ')
         self.molecule_label.pack()
-        self.molecule_combo = ttk.Combobox(master, values=molecules)
+        self.molecule_combo = ttk.Combobox(master, values=molecules, width=30, height=15)
         self.molecule_combo.pack()
         self.molecule_combo.bind("<<ComboboxSelected>>", self.get_molecule)
 
@@ -254,20 +254,20 @@ class EnterFilepath:
         master.geometry("600x400")
 
         # create window header
-        self.title = Label(master, text='Generics Forecasting Model: Set Filepath and Run Tag', font='Helvetica 9 bold')
+        self.title = Label(master, text='Generics Forecasting Model: Set File Path and Run Tag', font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
         # add entry for filepath and populate
         self.filepath_label = Label(master, text='Enter filepath for Excel parameters:')
         self.filepath_label.pack(pady=10)
-        self.filepath_entry = Entry(master)
+        self.filepath_entry = Entry(master, width=50)
         self.filepath_entry.insert(END, 'Model Inputs.xlsx')
         self.filepath_entry.pack()
 
         # add entry for run name
         self.run_name_label = Label(master, text='Enter a run tag (optional):')
         self.run_name_label.pack(pady=10)
-        self.run_name_entry = Entry(master)
+        self.run_name_entry = Entry(master, width = 50)
         self.run_name_entry.pack()
 
         # add Save and Continue button
@@ -309,11 +309,11 @@ class EnterCOGS:
 
         self.or_label = Label(master, text='OR', font='Helvetica 9 bold')
         self.or_label.grid(row=2, columnspan=2, pady=10, padx=10)
-        self.subtitle = Label(master, text="Enter Standard COGS", font='Helvetica 9 bold')
+        self.subtitle = Label(master, text="Enter Standard API Cost", font='Helvetica 9 bold')
         self.subtitle.grid(row=3, columnspan=2, pady=10, padx=10)
 
         # add entry boxes for desired units and API cost per unit
-        self.standard_cogs_label = Label(master, text='Standard COGS ($): ')
+        self.standard_cogs_label = Label(master, text='Standard API Cost ($): ')
         self.standard_cogs_label.grid(row=4, column=0, sticky='e')
         self.standard_cogs_entry = Entry(master)
         self.standard_cogs_entry.grid(row=4, column=1, sticky='w')
