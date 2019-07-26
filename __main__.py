@@ -172,7 +172,7 @@ parameters['moic'] = round(annual_forecast.loc[2021]['MOIC'], 1)
 
 ##----------------------------------------------------------------------
 ## PRINT RESULTS TO WINDOW
-
+print(parameters)
 #If user does not opt to do parameter scan and save output:
 parameters['scan_and_save'] = 'No'
 if parameters['scan_and_save'] == 'No':
