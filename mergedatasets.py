@@ -41,7 +41,7 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
     # join price and therapeutic equivalents on NDC
     df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
 
-    # fill in blank prices with lowest WAC price, try by matching pack size first, otherwise min
+    # fill in blank prices with lowest WAC price, try by matching pack size first, then strength&quantity, otherwise overall min
     for i in df_merged_data.index:
         if math.isnan(df_merged_data['WACPrice'].iloc[i]):
             try:
@@ -49,9 +49,12 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
                     df_merged_data[df_merged_data['Pack'] == df_merged_data['Pack'].iloc[6]]['WACPrice'].dropna())
             except:
                 try:
-                    df_merged_data['WACPrice'].iloc[i] = min(df_merged_data['WACPrice'].dropna())
+                    df_merged_data['WACPrice'].iloc[i] = min(df_merged_data[(df_merged_data['Strength'] == df_merged_data['Strength'].iloc[20]) & (df_merged_data['Pack Quantity'] == df_merged_data['Pack Quantity'].iloc[20])]['WACPrice'].dropna())
                 except:
-                    df_merged_data['WACPrice'].iloc[i] = 0
+                    try:
+                        df_merged_data['WACPrice'].iloc[i] = min(df_merged_data['WACPrice'].dropna())
+                    except:
+                        df_merged_data['WACPrice'].iloc[i] = 0
 
     # build hierarchical index on Year and NDC
     year_range = [int(i) for i in np.array(range(2016, 2035))]
