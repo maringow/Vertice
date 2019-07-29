@@ -1,3 +1,5 @@
+import math
+
 #find all IMS records that match the Combined Molecule and Prod Form2
 def get_equiv(IMS, parameters):
     return  IMS.loc[(IMS['Combined Molecule'].isin(parameters['combined_molecules'])) & (IMS['Prod Form2'].isin(parameters['dosage_forms']))]
