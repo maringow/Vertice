@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import time
+import math
 
 #Function to get 2yr volume CAGR #TODO - years - will need to update when we have new annual data
 def get_growth_rate(df):
@@ -106,6 +107,8 @@ def valuation_calculations(parameters, df_gfm):
 
     # IRR
     irr = np.irr(df_gfm.FCF.loc[parameters['present_year']:parameters['present_year'] + parameters['years_discounted']])
+    if math.isnan(irr):
+        irr = 'N/A'
 
     # NPV
     x = 0
@@ -122,7 +125,7 @@ def valuation_calculations(parameters, df_gfm):
     df_gfm['Cumulative Discounted FCF'] = df_gfm['Cumulative Discounted FCF'].fillna(0)
     idx = df_gfm[df_gfm['Cumulative Discounted FCF'] <= 0].index.max()  # last full year for payback calc
     if idx == parameters['last_forecasted_year']:
-        discounted_payback_period = np.nan
+        discounted_payback_period = '> 10'
     else:
         discounted_payback_period = idx - parameters['present_year'] + 1 - df_gfm['Cumulative Discounted FCF'].loc[
             idx] / df_gfm['FCF PV'].loc[idx + 1]

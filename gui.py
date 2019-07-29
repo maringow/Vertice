@@ -423,8 +423,28 @@ class ShowResults:
         self.unit_label.pack()
 
         # add Finish button
+        run_model_button = Button(master, text='Run Parameter Scan', command=master.destroy)
+        run_model_button.pack(pady=20)
+
+
+##----------------------------------------------------------------------
+## WINDOW: PRINT RESULTS
+
+class SuccessfulRun:
+
+    def __init__(self, master):
+
+        self.master = master
+        master.title('Generics Forecasting Model')
+        master.geometry("600x400")
+
+        self.title = Label(master, text='Successful parameter scan. Results saved to the database.', font='Helvetica 9 bold')
+        self.title.pack(pady=10)
+
+        # add Finish button
         run_model_button = Button(master, text='Finish', command=master.destroy)
         run_model_button.pack(pady=20)
+
 
 
 ##----------------------------------------------------------------------

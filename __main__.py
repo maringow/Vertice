@@ -165,8 +165,14 @@ print(annual_forecast[['Net Sales','COGS','EBIT','FCF']])
 ##SHOW RESULTS
 
 parameters['npv'] = round(results['npv'], 2)
-parameters['irr'] = round(results['irr']*100, 1)
-parameters['payback'] = round(results['discounted_payback_period'], 2)
+if results['irr'] == 'N/A':
+    parameters['irr'] = 'N/A'
+else:
+    parameters['irr'] = round(results['irr'], 2)
+if results['discounted_payback_period'] == '> 10':
+    parameters['payback'] = '> 10'
+else:
+    parameters['payback'] = round(results['discounted_payback_period'], 2)
 parameters['exit_value'] = round(annual_forecast.loc[2021]['Exit Values'], 2)
 parameters['moic'] = round(annual_forecast.loc[2021]['MOIC'], 1)
 
@@ -174,7 +180,7 @@ parameters['moic'] = round(annual_forecast.loc[2021]['MOIC'], 1)
 ## PRINT RESULTS TO WINDOW
 print(parameters)
 #If user does not opt to do parameter scan and save output:
-parameters['scan_and_save'] = 'No'
+parameters['scan_and_save'] = 'Yes'
 if parameters['scan_and_save'] == 'No':
     window = Tk()
     window7 = gui.ShowDetailedResults(window, parameters, df_gfm)
@@ -380,3 +386,8 @@ conn.commit()
 #output.select_all_results(conn)
 
 conn.close()
+
+# open window
+window = Tk()
+window9 = gui.SuccessfulRun(window)
+window.mainloop()
