@@ -174,14 +174,14 @@ class SelectNDCs():
         self.outer_frame.rowconfigure(0, weight=1)
         self.outer_frame.columnconfigure(0, weight=1)
 
-        self.canvas = Canvas(self.outer_frame, width=800)
+        self.canvas = Canvas(self.outer_frame, width=900)
         self.canvas.grid(sticky="nsew", padx=40)
 
         self.inner_frame = Frame(self.canvas)
         self.canvas.create_window(0, 0, window=self.inner_frame, anchor='nw')
 
         # set up variables to store user selections
-        self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])[['NDC', 'Manufacturer', 'Prod Form3','2018_Units','2019_Units','WACPrice']].reset_index(drop=True)
+        self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])[['NDC', 'Manufacturer', 'Prod Form3','2018_Units','2019_Units','WACPrice','Pack']].reset_index(drop=True)
         self.ndcs = self.ndcs.drop_duplicates().reset_index()
         print('df_merged_data', df_merged_data)
         print('self.ndcs', self.ndcs)
@@ -190,7 +190,7 @@ class SelectNDCs():
 
         m = 0
 
-        header = ['NDC', 'Manufacturer', 'Dosage Form', '2018 Volume', '2019 Volume','WAC Price ($)']
+        header = ['NDC', 'Manufacturer', 'Dosage Form', '2018 Volume', '2019 Volume','WAC Price ($)','Pack']
         for h in header:
             label = Label(self.inner_frame,text=h, font='Helvetica 8 bold')
             label.grid(row=0, column=m, padx=8)
@@ -215,7 +215,7 @@ class SelectNDCs():
             self.units_2019.grid(row=n, column=4, sticky='w', padx=8)
             self.wacprice = Label(self.inner_frame, text=row['WACPrice'])
             self.wacprice.grid(row=n, column=5, sticky='w', padx=8)
-            self.addt_spacing = Label(self.inner_frame, text='            ')
+            self.addt_spacing = Label(self.inner_frame, text=row['Pack'])
             self.addt_spacing.grid(row=n, column=6, sticky='w', padx=8)
             n+=1
 

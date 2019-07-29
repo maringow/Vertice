@@ -49,6 +49,9 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
                     df_merged_data[df_merged_data['Pack'] == df_merged_data['Pack'].iloc[6]]['WACPrice'].dropna())
             except:
                 try:
+                    # x = df_merged_data[df_merged_data['Strength'] == df_merged_data['Strength'].iloc[i]][['WACPrice', 'Pack Quantity']].dropna()  # find same strengths e.g. 100MG
+                    # x["WACPrice_OneUnit_ByStrength"] = x['WACPrice'] / x['Pack Quantity']  # find unit price... price / quantity
+                    # df_merged_data['WACPrice'].iloc[i] = min(x["WACPrice_OneUnit_ByStrength"]) * df_merged_data['Pack Quantity'].iloc[i]  # get price.. unit price * units
                     df_merged_data['WACPrice'].iloc[i] = min(df_merged_data[(df_merged_data['Strength'] == df_merged_data['Strength'].iloc[20]) & (df_merged_data['Pack Quantity'] == df_merged_data['Pack Quantity'].iloc[20])]['WACPrice'].dropna())
                 except:
                     try:
