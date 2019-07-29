@@ -30,9 +30,9 @@ IMS = pd.read_csv('full_extract_6.26.csv')
 prospectoRx = pd.read_csv('prospecto_all_one_year_20190708.csv')
 
 # get valid brands from IMS file
-# TODO remove NaNs from these lists
-brands = sorted(IMS.loc[IMS['Brand/Generic'] == 'BRAND']['Product Sum'].unique())  #TODO what about BRANDED GENERIC?
-molecules = IMS['Combined Molecule'].unique().tolist()
+brands = sorted(IMS.loc[IMS['Brand/Generic'] == 'BRAND']['Product Sum'].dropna().unique())
+# brands = sorted(IMS.loc[(IMS['Brand/Generic'] == 'BRAND') | (IMS['Brand/Generic'] == 'BRANDED GENERIC')]['Product Sum'].dropna().unique()) #do we want to included BRANDED GENERICS too?
+molecules = IMS['Combined Molecule'].dropna().unique().tolist()
 
 parameters = {}
 
