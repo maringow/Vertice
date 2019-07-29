@@ -378,7 +378,6 @@ for index, row in df_result.iterrows():
 for index, row in df_annual_forecast.iterrows():
     # print(row)
     output.insert_forecast(conn, row)
-# print('rows written')
 
 conn.commit()
 

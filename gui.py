@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 import tkinter.tix as tix
 import pandas as pd
+import numpy as np
 
 ##----------------------------------------------------------------------
 ## WINDOW: SELECT BRAND NAME
@@ -198,10 +199,13 @@ class SelectNDCs():
 
         n = 1
 
-        # add ndc checkboxes #TODO somehow only select boxes that have volumes?
+        # add ndc checkboxes
         for index, row in self.ndcs.iterrows():
             v=IntVar()
-            v.set(1)
+            if row['2019_Units'] != row['2019_Units']: #if nan
+                v.set(0)
+            else:
+                v.set(1)
             box = Checkbutton(self.inner_frame, text=row['NDC'], variable=v)
             box.grid(row=n, column=0, sticky='w', padx=2)
             self.var.append(v)
@@ -435,10 +439,12 @@ class SuccessfulRun:
     def __init__(self, master):
 
         self.master = master
-        master.title('Generics Forecasting Model')
-        master.geometry("600x400")
+        master.title('')
+        master.geometry("300x150")
 
-        self.title = Label(master, text='Successful parameter scan. Results saved to the database.', font='Helvetica 9 bold')
+        self.title = Label(master, text='Successful parameter scan.', font='Helvetica 9 bold')
+        self.title.pack(pady=10)
+        self.title = Label(master, text='Results saved to the database.', font='Helvetica 9')
         self.title.pack(pady=10)
 
         # add Finish button
