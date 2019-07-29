@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 import tkinter.tix as tix
+from tkinter import filedialog
 import pandas as pd
 import numpy as np
 
@@ -248,10 +249,13 @@ class EnterFilepath:
         self.title.pack(pady=10)
 
         # add entry for filepath and populate
+        self.filename =  filedialog.askopenfilename(initialdir = "C:\\Users\\aeitrheim\\Documents\\Vertice\\", #TODO update this
+                                                    title = "Select Model Input file",
+                                                    filetypes = (("excel files","*.xlsx"),("all files","*.*")))
         self.filepath_label = Label(master, text='Enter filepath for Excel parameters:')
         self.filepath_label.pack(pady=10)
-        self.filepath_entry = Entry(master, width=50)
-        self.filepath_entry.insert(END, 'Model Inputs.xlsx')
+        self.filepath_entry = Entry(master, width=75)
+        self.filepath_entry.insert(END, self.filename)
         self.filepath_entry.pack()
 
         # add entry for run name
