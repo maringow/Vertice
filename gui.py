@@ -1,7 +1,9 @@
 from tkinter import *
 from tkinter import ttk
 import tkinter.tix as tix
+from tkinter import filedialog
 import pandas as pd
+import numpy as np
 
 ##----------------------------------------------------------------------
 ## WINDOW: SELECT BRAND NAME
@@ -57,7 +59,6 @@ class BrandSelection:
 ##----------------------------------------------------------------------
 ## WINDOW: SELECT DOSAGE FORMS
 
-
 class DosageForms:
 
     def __init__(self, master, dosage_forms):
@@ -92,7 +93,6 @@ class DosageForms:
 
 ##----------------------------------------------------------------------
 ## WINDOW: CONFIRM BRAND
-
 # TODO make a function for label creation & packing
 
 class ConfirmBrand:
@@ -148,12 +148,6 @@ class ConfirmBrand:
         self.continue_button = Button(master, text='Continue', command=master.destroy)
         self.continue_button.pack(pady=10)
 
-
-
-
-
-
-
 ##----------------------------------------------------------------------
 ## WINDOW: SELECT NDCS V2
 
@@ -174,14 +168,14 @@ class SelectNDCs():
         self.outer_frame.rowconfigure(0, weight=1)
         self.outer_frame.columnconfigure(0, weight=1)
 
-        self.canvas = Canvas(self.outer_frame, width=800)
+        self.canvas = Canvas(self.outer_frame, width=900)
         self.canvas.grid(sticky="nsew", padx=40)
 
         self.inner_frame = Frame(self.canvas)
         self.canvas.create_window(0, 0, window=self.inner_frame, anchor='nw')
 
         # set up variables to store user selections
-        self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])[['NDC', 'Manufacturer', 'Prod Form3','2018_Units','2019_Units','WACPrice']].reset_index(drop=True)
+        self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])[['NDC', 'Manufacturer', 'Prod Form3','2018_Units','2019_Units','WACPrice','Pack']].reset_index(drop=True)
         self.ndcs = self.ndcs.drop_duplicates().reset_index()
         print('df_merged_data', df_merged_data)
         print('self.ndcs', self.ndcs)
@@ -190,7 +184,7 @@ class SelectNDCs():
 
         m = 0
 
-        header = ['NDC', 'Manufacturer', 'Dosage Form', '2018 Volume', '2019 Volume','WAC Price ($)']
+        header = ['NDC', 'Manufacturer', 'Dosage Form', '2018 Volume', '2019 Volume','WAC Price ($)','Pack']
         for h in header:
             label = Label(self.inner_frame,text=h, font='Helvetica 8 bold')
             label.grid(row=0, column=m, padx=8)
@@ -198,10 +192,13 @@ class SelectNDCs():
 
         n = 1
 
-        # add ndc checkboxes #TODO somehow only select boxes that have volumes?
+        # add ndc checkboxes
         for index, row in self.ndcs.iterrows():
             v=IntVar()
-            v.set(1)
+            if row['2019_Units'] != row['2019_Units']: #if nan
+                v.set(0)
+            else:
+                v.set(1)
             box = Checkbutton(self.inner_frame, text=row['NDC'], variable=v)
             box.grid(row=n, column=0, sticky='w', padx=2)
             self.var.append(v)
@@ -215,7 +212,7 @@ class SelectNDCs():
             self.units_2019.grid(row=n, column=4, sticky='w', padx=8)
             self.wacprice = Label(self.inner_frame, text=row['WACPrice'])
             self.wacprice.grid(row=n, column=5, sticky='w', padx=8)
-            self.addt_spacing = Label(self.inner_frame, text='            ')
+            self.addt_spacing = Label(self.inner_frame, text=row['Pack'])
             self.addt_spacing.grid(row=n, column=6, sticky='w', padx=8)
             n+=1
 
@@ -240,7 +237,6 @@ class SelectNDCs():
     def update_scrollregion(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-
 ##----------------------------------------------------------------------
 ## WINDOW: ENTER EXCEL FILEPATH
 
@@ -260,8 +256,8 @@ class EnterFilepath:
         # add entry for filepath and populate
         self.filepath_label = Label(master, text='Enter filepath for Excel parameters (with .xlsx):')
         self.filepath_label.pack(pady=10)
-        self.filepath_entry = Entry(master, width=50)
-        self.filepath_entry.insert(END, 'Model Inputs.xlsx')
+        self.filepath_entry = Entry(master, width=75)
+        self.filepath_entry.insert(END, self.filename)
         self.filepath_entry.pack()
 
         # add entry for run name
@@ -279,7 +275,6 @@ class EnterFilepath:
         self.parameters['run_name'] = self.run_name_entry.get()
 
         self.master.destroy()
-
 
 ##----------------------------------------------------------------------
 ## WINDOW: ENTER API COGS
@@ -356,7 +351,6 @@ class EnterCOGS:
         self.inner_frame = Frame(self.canvas)
         self.canvas.create_window(0, 0, window=self.inner_frame, anchor='nw')
 
-
         self.packs = df_equivalents['Pack'].unique()
         for p in self.packs:
             # pack_label = Label(self.inner_frame, text='                              ')
@@ -394,8 +388,6 @@ class EnterCOGS:
     def update_scrollregion(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-
-
 ##----------------------------------------------------------------------
 ## WINDOW: PRINT RESULTS
 
@@ -421,6 +413,25 @@ class ShowResults:
         self.unit_label.pack()
         self.unit_label = Label(master, text='MOIC in 2021: {}x'.format(parameters['moic']))
         self.unit_label.pack()
+
+        # add Finish button
+        run_model_button = Button(master, text='Run Parameter Scan', command=master.destroy)
+        run_model_button.pack(pady=20)
+
+##----------------------------------------------------------------------
+## WINDOW: PRINT RESULTS
+class SuccessfulRun:
+
+    def __init__(self, master):
+
+        self.master = master
+        master.title('')
+        master.geometry("300x150")
+
+        self.title = Label(master, text='Successful parameter scan.', font='Helvetica 9 bold')
+        self.title.pack(pady=10)
+        self.title = Label(master, text='Results saved to the database.', font='Helvetica 9')
+        self.title.pack(pady=10)
 
         # add Finish button
         run_model_button = Button(master, text='Finish', command=master.destroy)
