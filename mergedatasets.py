@@ -82,7 +82,6 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
             df_detail['Price'].loc[year[0]][df_merged_data['NDC']] = df_merged_data['WACPrice']
         else:
             break
-    # TODO add a check here that data has successfully populated df_detail Units and Price - this will catch column name changes
     df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
     return(df_merged_data, df_detail)
 

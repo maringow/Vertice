@@ -91,7 +91,6 @@ class DosageForms:
 
 ##----------------------------------------------------------------------
 ## WINDOW: CONFIRM BRAND
-# TODO make a function for label creation & packing
 class ConfirmBrand:
 
     def __init__(self, master, parameters, df_detail):
@@ -424,7 +423,9 @@ class SuccessfulRun:
         master.title('')
         master.geometry("300x150")
 
-        self.title = Label(master, text='Successful parameter scan.', font='Helvetica 9 bold')
+        self.title = Label(master, text='Generics Forecasting Model: Successful Model Run', font='Helvetica 9 bold')
+        self.title.pack(pady=10)
+        self.title = Label(master, text='Parameter scan complete.', font='Helvetica 9')
         self.title.pack(pady=10)
         self.title = Label(master, text='Results saved to the database.', font='Helvetica 9')
         self.title.pack(pady=10)
