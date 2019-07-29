@@ -88,9 +88,6 @@ df_equivalents['NDC'].fillna(999, inplace=True)  ## if NDC is "NDC NOT AVAILABLE
 prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
 df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
 
-# TODO if no price match on NDC is found, use the lowest price for the same strength and package units
-#     if no record with the same strength and package units, use the lowest overall price
-
 # build hierarchical index on Year and NDC
 year_range = [int(i) for i in np.array(range(2016, 2030))]
 NDCs = [int(i) for i in df_equivalents['NDC'].unique()]
@@ -112,9 +109,6 @@ for year in columns:
         df_detail['Price'].loc[year[0]][df_merged_data['NDC']] = df_merged_data['WACPrice']
     else:
         break
-
-# TODO add a check here that data has successfully populated df_detail Units and Price - this
-#  will catch column name changes
 
 # calculate Sales as Units * Price
 df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
@@ -148,7 +142,6 @@ df_analog['Pct Profit Share'] = \
 #   df_gfm: Year-wise data frame for "cross-molecule" assumptions and aggregated results
 
 # Set up df_detail data frame
-# TODO Finish initializing data frame
 df_detail = pd.DataFrame()
 df_detail['Year'] = list(range(2015, 2030, 1))
 df_detail = df_detail.set_index(['Year'])

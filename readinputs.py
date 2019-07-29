@@ -3,9 +3,12 @@ import openpyxl as xl
 import pandas as pd
 import numpy as np
 
-# TODO parse filename - correct backslashes and add .xlsx if not already there
 def read_model_inputs(parameters):
-    wb = xl.load_workbook(filename=parameters['excel_filepath'], read_only=True, data_only=True) #data_only so it doesn't return the formulas
+    if '.' not in parameters['excel_filepath']: #making sure there is a file extension
+        parameters['excel_filepath'] = parameters['excel_filepath'] + '.xlsx'
+    # file_path = 'C:\\Users\\aeitrheim\\Documents\\Vertice\\' + parameters['excel_filepath'] #TODO UPDATE THE FOLDER NAME AND REMOVE LINE OF CODE BELOW
+    file_path = parameters['excel_filepath']
+    wb = xl.load_workbook(filename=file_path, read_only=True, data_only=True) #data_only so it doesn't return the formulas
     sheet = wb['Input']
 
     # Assign single-value variables from Excel cells into parameters dictionary
