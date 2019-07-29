@@ -40,7 +40,7 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
     df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
 
     # fill in blank prices with lowest WAC price
-    df_merged_data['WACPrice'].fillna(min(df_merged_data['WACPrice']))
+    df_merged_data['WACPrice'].fillna(min(df_merged_data['WACPrice'].dropna()))
 
     # build hierarchical index on Year and NDC
     year_range = [int(i) for i in np.array(range(2016, 2035))]
