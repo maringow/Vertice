@@ -189,7 +189,7 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
 
     # Calculating volume of market in future
     n_years = parameters['last_forecasted_year'] + 1 - parameters['present_year']
-    rate_array = np.ones(n_years) + 1 * .05
+    rate_array = np.ones(n_years) + 1 * parameters['volume_growth_rate']
     cum_years = np.arange(n_years) + 1
     comp_growth = rate_array ** cum_years
     get_volumes = lambda x: np.asarray(x) * np.asarray(comp_growth)
