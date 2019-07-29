@@ -1,4 +1,6 @@
 import math
+import pandas as pd
+import numpy as np
 
 #find all IMS records that match the Combined Molecule and Prod Form2
 def get_equiv(IMS, parameters):
@@ -23,9 +25,6 @@ def get_dosage_forms(parameters, IMS):
 
 #join IMS and prospecto data
 def merge_ims_prospecto(df_equivalents, prospectoRx):
-    import pandas as pd
-    import numpy as np
-
     def strip_non_numeric(df_column):
         df_column = df_column.str.replace('[^0-9]', '')
         df_column = pd.to_numeric(df_column)
@@ -83,11 +82,7 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
             df_detail['Price'].loc[year[0]][df_merged_data['NDC']] = df_merged_data['WACPrice']
         else:
             break
-
     # TODO add a check here that data has successfully populated df_detail Units and Price - this will catch column name changes
-
-    # calculate Sales as Units * Price
     df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
-
     return(df_merged_data, df_detail)
 
