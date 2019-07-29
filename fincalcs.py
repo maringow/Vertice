@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import time
 import math
 
 #Function to get 2yr volume CAGR #TODO - years - will need to update when we have new annual data
@@ -179,28 +178,20 @@ def valuation_calculations(parameters, df_gfm):
               'discounted_payback_period': discounted_payback_period,
               'run_name': parameters['run_name']}
 
-    # print('API cost per unit: ', result['api_cost_per_unit'])
-    # print('base year volume: ', result['base_year_volume'])
-    # print('base year sales: ', result['base_year_market_size'])
-
     return result, df_gfm[['Number of Gx Players', 'Profit Share %', 'Milestone Payments', 'R&D',
                            'Vertice Price as % of WAC', 'Net Sales', 'COGS', 'EBIT',
                             'FCF', 'Exit Values', 'MOIC']] #yearly data
 
 
 def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
-    time_A = time.time()
     # Assign Vertice price as % of either BWAC or GWAC
     if parameters['brand_status'] == 'Brand':
         col_name = [parameters['channel'] + ' Net Price Pct BWAC']
         df_gfm['Vertice Price as % of WAC'] = df_analog.loc[df_gfm['Number of Gx Players'], col_name].values
     else:
         df_gfm['Vertice Price as % of WAC'] = (1 - parameters['gtn_%']) * (1 - df_gfm['Price Discount of Current Gx Net Price'])
-    # time_B = time.time()
-    # Calculating volume of market in future
-    # for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
-    #     df_detail.loc[i]['Units'] = df_detail.loc[i - 1]['Units'] * (1 + parameters['volume_growth_rate'])
 
+    # Calculating volume of market in future
     n_years = parameters['last_forecasted_year'] + 1 - parameters['present_year']
     rate_array = np.ones(n_years) + 1 * .05
     cum_years = np.arange(n_years) + 1
@@ -220,10 +211,7 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
     df_detail['Units'] = df.values
     df_detail = df_detail.drop(['Units_x', 'Units_y'], axis=1)
 
-    # time_C = time.time()
-
     # Adjust volumes for launch year and if there is a partial year
-    # parameters['vertice_launch_year'] = parameters['launch_delay'] + parameters['vertice_launch_year']
     vol_adj = []
     for i in range(2016, parameters['last_forecasted_year'] + 1):
         if i < parameters['vertice_launch_year']:
@@ -232,10 +220,10 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
             vol_adj.append((13 - parameters['vertice_launch_month']) / 12)
         else:
             vol_adj.append(1)
-    # time_D = time.time()
+
     # Assign Vertice GX Market Share based on analog
     df_gfm['Vertice Gx Market Share'] = df_analog.loc[df_gfm['Number of Gx Players'],[parameters['channel'] + ' Market Share']].values
-    # time_E = time.time()
+
     df_vertice_ndc_volumes = df_detail['Units'].mul(vol_adj * df_gfm['Gx Penetration'], level=0, fill_value=0).mul(
     df_gfm['Vertice Gx Market Share'], level=0, fill_value=0)
     df_vertice_ndc_volumes = df_vertice_ndc_volumes * parameters['pos']
@@ -268,6 +256,4 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
     df_gfm['FCF'] = df_gfm['Operating Income'] + df_gfm['Profit Tax'] + df_gfm['Tax depreciation'] + df_gfm[
         'Additional Non-cash Effects'] - df_gfm['Change in Net Current Assets'] + df_gfm['Capital Avoidance'] + df_gfm[
                         'Total Capitalized'] - df_gfm['Write-off of Residual Tax Value']
-    time_E = time.time()
-    # print(round(time_E-time_A,3))
-    return(df_gfm, df_detail) #TODO don't return every column? If it saves time?
+    return(df_gfm, df_detail)
