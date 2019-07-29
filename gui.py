@@ -6,7 +6,6 @@ import numpy as np
 
 ##----------------------------------------------------------------------
 ## WINDOW: SELECT BRAND NAME
-
 class BrandSelection:
 
     w1_parameters = {}
@@ -57,8 +56,6 @@ class BrandSelection:
 
 ##----------------------------------------------------------------------
 ## WINDOW: SELECT DOSAGE FORMS
-
-
 class DosageForms:
 
     def __init__(self, master, dosage_forms):
@@ -93,9 +90,7 @@ class DosageForms:
 
 ##----------------------------------------------------------------------
 ## WINDOW: CONFIRM BRAND
-
 # TODO make a function for label creation & packing
-
 class ConfirmBrand:
 
     def __init__(self, master, parameters, df_detail):
@@ -149,15 +144,8 @@ class ConfirmBrand:
         self.continue_button = Button(master, text='Continue', command=master.destroy)
         self.continue_button.pack(pady=10)
 
-
-
-
-
-
-
 ##----------------------------------------------------------------------
 ## WINDOW: SELECT NDCS V2
-
 class SelectNDCs():
 
     def __init__(self, master, df_merged_data):
@@ -244,10 +232,8 @@ class SelectNDCs():
     def update_scrollregion(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-
 ##----------------------------------------------------------------------
 ## WINDOW: ENTER EXCEL FILEPATH
-
 class EnterFilepath:
 
     parameters = {}
@@ -284,10 +270,8 @@ class EnterFilepath:
 
         self.master.destroy()
 
-
 ##----------------------------------------------------------------------
 ## WINDOW: ENTER API COGS
-
 class EnterCOGS:
 
     COGS = {}
@@ -360,7 +344,6 @@ class EnterCOGS:
         self.inner_frame = Frame(self.canvas)
         self.canvas.create_window(0, 0, window=self.inner_frame, anchor='nw')
 
-
         self.packs = df_equivalents['Pack'].unique()
         for p in self.packs:
             # pack_label = Label(self.inner_frame, text='                              ')
@@ -398,11 +381,8 @@ class EnterCOGS:
     def update_scrollregion(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-
-
 ##----------------------------------------------------------------------
 ## WINDOW: PRINT RESULTS
-
 class ShowResults:
 
     def __init__(self, master, parameters):
@@ -430,10 +410,8 @@ class ShowResults:
         run_model_button = Button(master, text='Run Parameter Scan', command=master.destroy)
         run_model_button.pack(pady=20)
 
-
 ##----------------------------------------------------------------------
 ## WINDOW: PRINT RESULTS
-
 class SuccessfulRun:
 
     def __init__(self, master):
@@ -451,11 +429,8 @@ class SuccessfulRun:
         run_model_button = Button(master, text='Finish', command=master.destroy)
         run_model_button.pack(pady=20)
 
-
-
 ##----------------------------------------------------------------------
 ## WINDOW: PRINT DETAILED RESULTS
-
 class ShowDetailedResults():
 
     def __init__(self, master, parameters, df_gfm):

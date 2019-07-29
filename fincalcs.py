@@ -17,9 +17,7 @@ def get_growth_rate(df):
     return growth_rate
 
 
-#Function to do financial calculations, these are all dependent on previous data
 def financial_calculations(parameters, df_gfm, df_detail, df_analog):
-
     # Assign Vertice price as % of either BWAC or GWAC
     if parameters['brand_status'] == 'Brand':
         col_name = [parameters['channel'] + ' Net Price Pct BWAC']
@@ -98,12 +96,10 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
     df_gfm['FCF'] = df_gfm['Operating Income'] + df_gfm['Profit Tax'] + df_gfm['Tax depreciation'] + df_gfm[
         'Additional Non-cash Effects'] - df_gfm['Change in Net Current Assets'] + df_gfm['Capital Avoidance'] + df_gfm[
                         'Total Capitalized'] - df_gfm['Write-off of Residual Tax Value']
-
     return(df_gfm, df_detail)
 
 
 def valuation_calculations(parameters, df_gfm):
-
     # IRR
     irr = np.irr(df_gfm.FCF.loc[parameters['present_year']:parameters['present_year'] + parameters['years_discounted']])
     if math.isnan(irr):
