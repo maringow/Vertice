@@ -78,7 +78,7 @@ parameters['dosage_forms'] = '; '.join(parameters['dosage_forms'])
 ## OPEN ConfirmBrand WINDOW AND SAVE
 # set parameters to display in confirmation window
 parameters['count_competitors'] = len(df_equivalents.loc[pd.isnull(df_equivalents['2018_Units']) == False]
-                                      ['Manufacturer'].unique())  #TODO - years - will need to update when we have new annual data
+                                      ['Manufacturer'].unique())  # TODO update when there is new annual data
 parameters['historical_growth_rate'] = fincalcs.get_growth_rate(df_detail)
 
 window = Tk()
@@ -252,7 +252,7 @@ df_annual_forecast = df_annual_forecast[
      'Vertice Price as % of WAC', 'Net Sales', 'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC']]
 
 # open connection to db
-conn = output.create_connection('C:\\sqlite\\db\\pythonsqlite.db')
+conn = output.create_connection('C:\\sqlite\\db\\pythonsqlite.db') #TODO update this
 print('connection created')
 
 # create tables - only needed on first run
