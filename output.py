@@ -29,6 +29,7 @@ def add_column(conn, table_name, column_name, datatype):  # datatype options are
     except Error as e:
         print(e)
 
+
 def select_all_results(conn):
     cur = conn.cursor()
     cur.execute("SELECT * FROM model_results")
@@ -55,6 +56,7 @@ def select_max_ids(conn):
     return row
 
 # sqlite3.register_adapter(np.int64, lambda val: int(val))  ## potential code for forcing int datatype
+
 
 def insert_result(conn, results):
     print(results)
@@ -120,7 +122,6 @@ model_results_ddl = """CREATE TABLE IF NOT EXISTS model_results (
                         is_base_case text
                         ); """
 
-
 annual_forecast_ddl = """CREATE TABLE IF NOT EXISTS annual_forecast (
                             id integer PRIMARY KEY,
                             scenario_id int,
@@ -138,5 +139,3 @@ annual_forecast_ddl = """CREATE TABLE IF NOT EXISTS annual_forecast (
                             exit_value real,
                             moic real
                             ); """
-
-
