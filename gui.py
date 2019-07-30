@@ -247,7 +247,7 @@ class EnterFilepath:
         self.filepath_label = Label(master, text='Enter filepath for Excel parameters:')
         self.filepath_label.pack(pady=10)
         self.filepath_entry = Entry(master, width=75)
-        self.filepath_entry.insert(END, self.filename)
+        self.filepath_entry.insert(END, "Model Inputs.xlsx")
         self.filepath_entry.pack()
 
         # add entry for run name

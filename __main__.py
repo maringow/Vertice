@@ -18,12 +18,17 @@ import output
 import time
 from sklearn.model_selection import ParameterGrid
 import sys
-# import warnings
-# warnings.filterwarnings('ignore')
+import warnings
 
 
 ##----------------------------------------------------------------------
 ## INGEST DATA (IMS, ProspectoRx)
+
+# turn off pandas warning for SettingWithCopy
+pd.set_option('mode.chained_assignment', None)
+warnings.filterwarnings("ignore", category=FutureWarning)
+
+# read in files
 IMS = pd.read_csv('full_extract_6.26.csv')
 prospectoRx = pd.read_csv('prospecto_all_one_year_20190708.csv')
 
