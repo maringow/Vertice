@@ -377,7 +377,7 @@ class ShowResults:
     def __init__(self, master, parameters):
         self.master = master
         master.title('Generics Forecasting Model')
-        master.geometry("600x400")
+        master.geometry("500x300")
 
         self.title = Label(master, text='Generics Forecasting Model: Results Summary', font='Helvetica 9 bold')
         self.title.pack(pady=10)
@@ -395,6 +395,13 @@ class ShowResults:
 
         run_model_button = Button(master, text='Run Parameter Scan', command=master.destroy)
         run_model_button.pack(pady=20)
+
+        def stop_model():
+            import sys
+            sys.exit()
+
+        stop_model_button = Button(master, text='Cancel Parameter Scan', command=stop_model)
+        stop_model_button.pack()
 
 ##----------------------------------------------------------------------
 ## WINDOW: PRINT RESULTS
