@@ -34,7 +34,6 @@ molecules = IMS['Combined Molecule'].dropna().unique().tolist()
 
 parameters = {}
 
-
 ##----------------------------------------------------------------------
 ## OPEN BRAND SELECTION AND SAVE PARAMETERS
 window = Tk()
@@ -60,6 +59,7 @@ print(parameters['dosage_forms'])
 
 ##----------------------------------------------------------------------
 ## FIND THERAPEUTIC EQUIVALENTS AND JOIN IMS AND PROSPECTO DATASETS
+
 # find all IMS records that match the Combined Molecule and Prod Form2
 df_equivalents = mergedatasets.get_equiv(IMS, parameters)
 parameters['count_eqs'] = len(df_equivalents)
@@ -69,7 +69,6 @@ df_merged_data, df_detail = mergedatasets.merge_ims_prospecto(df_equivalents, pr
 # turn arrays into strings now that we are done using them (SQLite does not support arrays)
 parameters['combined_molecules'] = '; '.join(parameters['combined_molecules'])
 parameters['dosage_forms'] = '; '.join(parameters['dosage_forms'])
-
 
 ##----------------------------------------------------------------------
 ## OPEN ConfirmBrand WINDOW AND SAVE
@@ -99,7 +98,6 @@ df_equivalents = df_equivalents[df_equivalents['NDC'].isin(parameters['selected_
 print('After drop: {}'.format(df_equivalents['NDC']))
 parameters['selected_NDCs'] = str(parameters['selected_NDCs'])  #.replace(['[', ']'], '')
 
-
 ##----------------------------------------------------------------------
 ## OPEN EnterFilepath WINDOW AND SAVE VALUES
 window = Tk()
@@ -107,7 +105,6 @@ window5 = gui.EnterFilepath(window)
 window.mainloop()
 
 parameters.update(window5.parameters)
-
 
 ##----------------------------------------------------------------------
 ## OPEN EnterCOGS WINDOW AND SAVE VALUES
@@ -148,7 +145,6 @@ results, annual_forecast = fincalcs.valuation_calculations(parameters, df_gfm)
 
 print('DEBUG', annual_forecast)
 print(annual_forecast[['Net Sales','COGS','EBIT','FCF']])
-
 
 ##----------------------------------------------------------------------
 ## PRINT RESULTS TO WINDOW
@@ -253,6 +249,7 @@ df_result = df_result[['scenario_id', 'run_id', 'run_name', 'brand_name', 'combi
 df_annual_forecast = df_annual_forecast[['scenario_id', 'run_id', 'forecast_year', 'Number of Gx Players', 'Profit Share',
                                          'Milestone Payments','R&D','Vertice Price as % of WAC', 'Net Sales','COGS',
                                          'EBIT','FCF', 'Exit Values', 'MOIC']]
+
 
 # OPEN CONNECTION TO DB
 conn = output.create_connection('C:\\sqlite\\db\\pythonsqlite.db')
