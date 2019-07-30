@@ -29,9 +29,8 @@ prospectoRx = pd.read_csv('prospecto_all_one_year_20190708.csv')
 
 # get valid brands from IMS file
 brands = sorted(IMS.loc[IMS['Brand/Generic'] == 'BRAND']['Product Sum'].dropna().unique())
-# brands = sorted(IMS.loc[(IMS['Brand/Generic'] == 'BRAND') | (IMS['Brand/Generic'] == 'BRANDED GENERIC')]['Product Sum'].dropna().unique()) #do we want to included BRANDED GENERICS too?
+# brands = sorted(IMS.loc[(IMS['Brand/Generic'] == 'BRAND') | (IMS['Brand/Generic'] == 'BRANDED GENERIC')]['Product Sum'].dropna().unique()) #if we want to included BRANDED GENERICS too
 molecules = IMS['Combined Molecule'].dropna().unique().tolist()
-
 parameters = {}
 
 ##----------------------------------------------------------------------
@@ -77,7 +76,6 @@ parameters['count_competitors'] = len(df_equivalents.loc[pd.isnull(df_equivalent
                                       ['Manufacturer'].unique())  #TODO - years - will need to update when we have new annual data
 parameters['historical_growth_rate'] = fincalcs.get_growth_rate(df_detail)
 
-# open window
 window = Tk()
 window3 = gui.ConfirmBrand(window, parameters, df_detail)
 window.mainloop()
@@ -85,8 +83,7 @@ window.mainloop()
 
 ##----------------------------------------------------------------------
 ## OPEN SelectNDCs WINDOW AND SAVE
-# open window
-window=Tk()
+window = Tk()
 window4 = gui.SelectNDCs(window, df_merged_data)
 window.mainloop()
 
@@ -96,7 +93,7 @@ df_detail = df_detail[df_detail['NDC'].isin(parameters['selected_NDCs'])]
 df_merged_data = df_merged_data[df_merged_data['NDC'].isin(parameters['selected_NDCs'])]
 df_equivalents = df_equivalents[df_equivalents['NDC'].isin(parameters['selected_NDCs'])]
 print('After drop: {}'.format(df_equivalents['NDC']))
-parameters['selected_NDCs'] = str(parameters['selected_NDCs'])  #.replace(['[', ']'], '')
+parameters['selected_NDCs'] = str(parameters['selected_NDCs'])
 
 ##----------------------------------------------------------------------
 ## OPEN EnterFilepath WINDOW AND SAVE VALUES
@@ -133,18 +130,15 @@ print(df_detail)
 ## READ EXCEL
 parameters, df_gfm, df_analog = readinputs.read_model_inputs(parameters)
 
-#Financial Calcs
+# parameters for base case
 parameters['years_discounted'] = 10
 parameters['launch_delay'] = 0
 parameters['cogs_variation'] = 0
 parameters['gx_players_adj'] = 0
 
 df_gfm, df_detail = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
-
 results, annual_forecast = fincalcs.valuation_calculations(parameters, df_gfm)
-
-print('DEBUG', annual_forecast)
-print(annual_forecast[['Net Sales','COGS','EBIT','FCF']])
+print(annual_forecast[['Net Sales', 'COGS', 'EBIT', 'FCF']])
 
 ##----------------------------------------------------------------------
 ## PRINT RESULTS TO WINDOW
@@ -161,7 +155,7 @@ parameters['exit_value'] = round(annual_forecast.loc[2021]['Exit Values'], 2)
 parameters['moic'] = round(annual_forecast.loc[2021]['MOIC'], 1)
 print(parameters)
 
-#If user does not opt to do parameter scan and save output:
+# if user does not opt to do parameter scan and save output:
 # parameters['scan_and_save'] = 'Yes'
 if parameters['scan_and_save'] == 'No':
     window = Tk()
@@ -169,7 +163,7 @@ if parameters['scan_and_save'] == 'No':
     window.mainloop()
     sys.exit()
 
-# open window
+# if user opts to do parameter scan and save output:
 window = Tk()
 window8 = gui.ShowResults(window, parameters)
 window.mainloop()
@@ -199,7 +193,8 @@ param_grid = {'years_to_discount': [5,10],
 
 param_mat = pd.DataFrame(ParameterGrid(param_grid))
 
-def parameterscan(years_to_discount, probability_of_success, launch_delay_years, overall_cogs_increase, volume_growth, gx_players_adj, parameters, df_gfm, df_detail, df_analog):
+def parameterscan(years_to_discount, probability_of_success, launch_delay_years, overall_cogs_increase, volume_growth,
+                  gx_players_adj, parameters, df_gfm, df_detail, df_analog):
     parameters['years_discounted'] = years_to_discount
     parameters['pos'] = probability_of_success
     parameters['vertice_launch_year'] = base_launch_year + launch_delay_years
@@ -217,12 +212,12 @@ x = param_mat.apply(lambda row: parameterscan(row['years_to_discount'], row['pro
 for i in x[0]:
     df_result = df_result.append(pd.DataFrame.from_dict(data=i, orient='index').transpose())
 s = df_result['scenario_id']
-df_result['is_base_case'] = np.where(s==0, 'Y', 'N')
+df_result['is_base_case'] = np.where(s == 0, 'Y', 'N')
 
 df_result.scenario_id = np.arange(0, len(df_result.scenario_id))
 for i in x[1]:
     scenario_id = scenario_id + 1
-    i['scenario_id']=scenario_id
+    i['scenario_id'] = scenario_id
     df_annual_forecast = df_annual_forecast.append(i)
 
 
@@ -232,26 +227,26 @@ run_id = 0
 df_result['run_id'] = run_id
 df_annual_forecast['run_id'] = run_id
 
-df_annual_forecast.columns = ['Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D', 'Vertice Price as % of WAC',
-                             'Net Sales', 'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC', 'scenario_id', 'run_id']
+df_annual_forecast.columns = ['Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D',
+                              'Vertice Price as % of WAC', 'Net Sales', 'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC',
+                              'scenario_id', 'run_id']
 
 # creating a forecast year column
 df_annual_forecast['forecast_year'] = df_annual_forecast.index.values
 
 # ordering the columns
-df_result = df_result[['scenario_id', 'run_id', 'run_name', 'brand_name', 'combined_molecules', 'dosage_forms',
-                       'selected_NDCs', 'channel', 'indication', 'presentation', 'internal_external', 'brand_status','comments',
-                       'vertice_filing_month', 'vertice_filing_year','vertice_launch_month', 'vertice_launch_year',
-                       'pos', 'exit_multiple', 'discount_rate', 'tax_rate', 'base_year_volume','base_year_market_size',
-                       'volume_growth_rate', 'wac_increase', 'api_cost_per_unit', 'api_cost_unit', 'profit_margin_override',
-                       'standard_cogs_entry', 'years_discounted', 'cogs_variation', 'gx_players_adj', 'npv', 'irr',
-                       'discounted_payback_period', 'is_base_case']]
-df_annual_forecast = df_annual_forecast[['scenario_id', 'run_id', 'forecast_year', 'Number of Gx Players', 'Profit Share',
-                                         'Milestone Payments','R&D','Vertice Price as % of WAC', 'Net Sales','COGS',
-                                         'EBIT','FCF', 'Exit Values', 'MOIC']]
+df_result = df_result[
+    ['scenario_id', 'run_id', 'run_name', 'brand_name', 'combined_molecules', 'dosage_forms', 'selected_NDCs',
+     'channel', 'indication', 'presentation', 'internal_external', 'brand_status', 'comments', 'vertice_filing_month',
+     'vertice_filing_year', 'vertice_launch_month', 'vertice_launch_year', 'pos', 'exit_multiple', 'discount_rate',
+     'tax_rate', 'base_year_volume', 'base_year_market_size', 'volume_growth_rate', 'wac_increase', 'api_cost_per_unit',
+     'api_cost_unit', 'profit_margin_override', 'standard_cogs_entry', 'years_discounted', 'cogs_variation',
+     'gx_players_adj', 'npv', 'irr', 'discounted_payback_period', 'is_base_case']]
+df_annual_forecast = df_annual_forecast[
+    ['scenario_id', 'run_id', 'forecast_year', 'Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D',
+     'Vertice Price as % of WAC', 'Net Sales', 'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC']]
 
-
-# OPEN CONNECTION TO DB
+# open connection to db
 conn = output.create_connection('C:\\sqlite\\db\\pythonsqlite.db')
 print('connection created')
 
@@ -273,7 +268,7 @@ except Error as e:
     run_id = 1
     scenario_id = 1
 
-#adding the max run_id and scenario_id to the 0-base numbers
+# adding the max run_id and scenario_id to the 0-base numbers
 df_result['run_id'] = df_result['run_id'] + run_id
 df_annual_forecast['run_id'] = df_annual_forecast['run_id'] + run_id
 df_result['scenario_id'] = df_result['scenario_id'] + scenario_id
@@ -281,11 +276,9 @@ df_annual_forecast['scenario_id'] = df_annual_forecast['scenario_id'] + scenario
 
 # insert data
 for index, row in df_result.iterrows():
-    # print(row)
     output.insert_result(conn, row)
 
 for index, row in df_annual_forecast.iterrows():
-    # print(row)
     output.insert_forecast(conn, row)
 
 conn.commit()
@@ -293,7 +286,6 @@ conn.commit()
 #output.select_all_results(conn)
 conn.close()
 
-# open window
 window = Tk()
 window9 = gui.SuccessfulRun(window)
 window.mainloop()

@@ -2,9 +2,11 @@ import math
 import pandas as pd
 import numpy as np
 
-#find all IMS records that match the Combined Molecule and Prod Form2
+# find all IMS records that match the Combined Molecule and Prod Form2
 def get_equiv(IMS, parameters):
-    return  IMS.loc[(IMS['Combined Molecule'].isin(parameters['combined_molecules'])) & (IMS['Prod Form2'].isin(parameters['dosage_forms']))]
+    return IMS.loc[(IMS['Combined Molecule'].isin(parameters['combined_molecules'])) & (
+        IMS['Prod Form2'].isin(parameters['dosage_forms']))]
+
 
 def get_dosage_forms(parameters, IMS):
     try:
@@ -23,7 +25,8 @@ def get_dosage_forms(parameters, IMS):
 
     return parameters
 
-#join IMS and prospecto data
+
+# join IMS and prospecto data
 def merge_ims_prospecto(df_equivalents, prospectoRx):
     def strip_non_numeric(df_column):
         df_column = df_column.str.replace('[^0-9]', '')
@@ -32,7 +35,7 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
 
     # parse NDC columns from IMS and ProspectoRx
     df_equivalents['NDC'] = strip_non_numeric(df_equivalents['NDC'].str.split('\s', expand=True)[0])
-    df_equivalents['NDC'].fillna(999, inplace=True)  ## if NDC is "NDC NOT AVAILABLE" or other invalid value, fill with 999
+    df_equivalents['NDC'].fillna(999, inplace=True)  # if NDC is "NDC NOT AVAILABLE" or other invalid value, fill with 999
     df_equivalents['NDC'] = df_equivalents['NDC'].astype(np.int64)
     prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
     prospectoRx['NDC'] = strip_non_numeric(prospectoRx['NDC'])
@@ -40,7 +43,7 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
     # join price and therapeutic equivalents on NDC
     df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
 
-    # fill in blank prices with lowest WAC price, try by matching pack size first, then strength&quantity, otherwise overall min
+    # fill blank prices with lowest WAC price, try by matching pack first, then strength&quantity, otherwise overall min
     for i in df_merged_data.index:
         if math.isnan(df_merged_data['WACPrice'].iloc[i]):
             try:
@@ -51,7 +54,13 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
                     # x = df_merged_data[df_merged_data['Strength'] == df_merged_data['Strength'].iloc[i]][['WACPrice', 'Pack Quantity']].dropna()  # find same strengths e.g. 100MG
                     # x["WACPrice_OneUnit_ByStrength"] = x['WACPrice'] / x['Pack Quantity']  # find unit price... price / quantity
                     # df_merged_data['WACPrice'].iloc[i] = min(x["WACPrice_OneUnit_ByStrength"]) * df_merged_data['Pack Quantity'].iloc[i]  # get price.. unit price * units
-                    df_merged_data['WACPrice'].iloc[i] = min(df_merged_data[(df_merged_data['Strength'] == df_merged_data['Strength'].iloc[i]) & (df_merged_data['Pack Quantity'] == df_merged_data['Pack Quantity'].iloc[i])]['WACPrice'].dropna())
+                    df_merged_data['WACPrice'].iloc[i] = min(df_merged_data[(df_merged_data['Strength'] ==
+                                                                             df_merged_data['Strength'].iloc[i]) & (
+                                                                                        df_merged_data[
+                                                                                            'Pack Quantity'] ==
+                                                                                        df_merged_data[
+                                                                                            'Pack Quantity'].iloc[i])][
+                                                                 'WACPrice'].dropna())
                 except:
                     try:
                         df_merged_data['WACPrice'].iloc[i] = min(df_merged_data['WACPrice'].dropna())
@@ -75,14 +84,13 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
     # map units and price into df_detail
     for year in columns:
         if year[1] in df_merged_data.columns:
-            df_merged_data_agg = df_merged_data[['NDC', year[1]]]   # using df_merged_data_agg to sum units across duplicate NDCs
+            df_merged_data_agg = df_merged_data[
+                ['NDC', year[1]]]  # using df_merged_data_agg to sum units across duplicate NDCs
             df_merged_data_agg[year[1]] = pd.to_numeric(df_merged_data_agg[year[1]].str.replace(',', ''))
             df_merged_data_agg[year[1]] = df_merged_data_agg.groupby('NDC')[year[1]].transform('sum')
             df_detail['Units'].loc[year[0]][df_merged_data_agg['NDC']] = df_merged_data_agg[year[1]]
             df_detail['Price'].loc[year[0]][df_merged_data['NDC']] = df_merged_data['WACPrice']
         else:
             break
-    # TODO add a check here that data has successfully populated df_detail Units and Price - this will catch column name changes
     df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
-    return(df_merged_data, df_detail)
-
+    return (df_merged_data, df_detail)
