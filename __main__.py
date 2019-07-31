@@ -251,10 +251,6 @@ df_annual_forecast = df_annual_forecast[
     ['scenario_id', 'run_id', 'forecast_year', 'Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D',
      'Vertice Price as % of WAC', 'Net Sales', 'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC']]
 
-# selecting which years to save to db
-df_result = df_result[parameters['present_year']:]
-df_annual_forecast = df_annual_forecast[parameters['present_year']:]
-
 # open connection to db
 conn = output.create_connection('C:\\sqlite\\db\\pythonsqlite.db') #TODO update this
 print('connection created')

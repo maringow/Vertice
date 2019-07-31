@@ -48,7 +48,7 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
     df_vertice_ndc_volumes = df_detail['Units'].mul(vol_adj * df_gfm['Gx Penetration'], level=0, fill_value=0).mul(
         df_gfm['Vertice Gx Market Share'], level=0, fill_value=0)
     df_vertice_ndc_volumes = df_vertice_ndc_volumes * parameters['pos']
-    df_vertice_ndc_volumes = round(df_vertice_ndc_volumes,0).fillna(0).astype(int)
+    df_vertice_ndc_volumes = round(df_vertice_ndc_volumes,0)
 
     # calculating price (WAC) in future
     for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
