@@ -27,13 +27,31 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
                 1 - df_gfm['Price Discount of Current Gx Net Price'])
 
     # keep market unit sales for reference
-    df_gfm['Market Volume'] = df_detail['Units'].groupby(level=[0]).sum()
-    df_gfm['Market Size'] = df_detail['Sales'].groupby(level=[0]).sum()
+    df_gfm['Market Volume'] = df_detail['Units'].groupby(level=[0]).sum().astype(int)
+    df_gfm['Market Size'] = round(df_detail['Sales'].groupby(level=[0]).sum(),0).astype(int)
 
     # calculating volume of market in future
     df_detail['Units'] = df_detail['Units'].fillna(0)
-    for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
-        df_detail.loc[i]['Units'] = df_detail.loc[i - 1]['Units'] * (1 + parameters['volume_growth_rate'])
+    # for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
+    #     df_detail.loc[i]['Units'] = df_detail.loc[i - 1]['Units'] * (1 + parameters['volume_growth_rate'])
+    n_years = parameters['last_forecasted_year'] + 1 - parameters['present_year']
+    rate_array = np.ones(n_years) + (1 * parameters['volume_growth_rate'])
+    cum_years = np.arange(n_years) + 1
+    comp_growth = rate_array ** cum_years
+    get_volumes = lambda x: np.asarray(x) * np.asarray(comp_growth)
+    df = df_detail.loc[parameters['present_year'] - 1]['Units'].apply(get_volumes)
+    df = pd.DataFrame(np.concatenate(df.values),
+                      index=pd.MultiIndex.from_product([df.index.values, np.arange(parameters['present_year'],
+                                                                                   parameters[
+                                                                                       'last_forecasted_year'] + 1)],
+                                                       names=['ndc_index', 'year_index']))
+    df.columns = ['Units']
+    df = df.swaplevel(1, 0).sort_values(by=['year_index'])
+    df_detail = pd.merge(df_detail, df, on=['year_index', 'ndc_index'], how='left')
+    df = df_detail.Units_x.loc[:parameters['present_year'] - 1]
+    df = df.append(df_detail.Units_y.loc[parameters['present_year']:])
+    df_detail['Units'] = df.values
+    df_detail = df_detail.drop(['Units_x', 'Units_y'], axis=1)
 
     # adjust volumes for launch year and if there is a partial year
     vol_adj = []
@@ -48,6 +66,7 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
     df_vertice_ndc_volumes = df_detail['Units'].mul(vol_adj * df_gfm['Gx Penetration'], level=0, fill_value=0).mul(
         df_gfm['Vertice Gx Market Share'], level=0, fill_value=0)
     df_vertice_ndc_volumes = df_vertice_ndc_volumes * parameters['pos']
+    df_vertice_ndc_volumes = round(df_vertice_ndc_volumes,0).fillna(0).astype(int)
 
     # calculating price (WAC) in future
     for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
