@@ -123,25 +123,16 @@ def valuation_calculations(parameters, df_gfm):
     # discounted payback period
     df_gfm['FCF PV'] = 0
     df_gfm['FCF PV'].loc[parameters['present_year']:parameters['present_year'] + parameters['years_discounted']] = pv
-    # df_gfm['Cumulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[
-    #                                                 parameters['present_year']:parameters['present_year'] + parameters[
-    #                                                     'years_discounted'] + 1])
-    # df_gfm['Cumulative Discounted FCF'] = df_gfm['Cumulative Discounted FCF'].fillna(0)
-    # idx = df_gfm[df_gfm['Cumulative Discounted FCF'] <= 0].index.max()  # last full year for payback calc
-    # if idx == parameters['last_forecasted_year']:
-    #     discounted_payback_period = '> 10'
-    # else:
-    #     discounted_payback_period = idx - parameters['present_year'] + 1 - df_gfm['Cumulative Discounted FCF'].loc[
-    #         idx] / df_gfm['FCF PV'].loc[idx + 1]
-
-    # payback period
-    df_gfm['Cumulative FCF'] = np.cumsum(df_gfm["FCF"].loc[parameters['present_year']:parameters['present_year'] + parameters['years_discounted'] + 1])
-    df_gfm['Cumulative FCF'] = df_gfm['Cumulative FCF'].fillna(0)
-    idx = df_gfm[df_gfm['Cumulative FCF'] <= 0].index.max()  # last full year for payback calc
+    df_gfm['Cumulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[
+                                                    parameters['present_year']:parameters['present_year'] + parameters[
+                                                        'years_discounted'] + 1])
+    df_gfm['Cumulative Discounted FCF'] = df_gfm['Cumulative Discounted FCF'].fillna(0)
+    idx = df_gfm[df_gfm['Cumulative Discounted FCF'] <= 0].index.max()  # last full year for payback calc
     if idx == parameters['last_forecasted_year']:
-        payback_period = '> 10'
+        discounted_payback_period = '> 10'
     else:
-        payback_period = idx - parameters['present_year'] + 1 - df_gfm['Cumulative FCF'].loc[idx] / df_gfm['FCF'].loc[idx + 1]
+        discounted_payback_period = idx - parameters['present_year'] + 1 - df_gfm['Cumulative Discounted FCF'].loc[
+            idx] / df_gfm['FCF PV'].loc[idx + 1]
 
     # exit values
     df_gfm['Exit Values'] = df_gfm['EBIT'] * parameters['exit_multiple']
@@ -189,7 +180,7 @@ def valuation_calculations(parameters, df_gfm):
               'gx_players_adj': parameters['gx_players_adj'],
               'npv': npv,
               'irr': irr,
-              'payback_period': payback_period,
+              'discounted_payback_period': discounted_payback_period,
               'run_name': parameters['run_name']}
 
     return result, df_gfm[
