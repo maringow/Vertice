@@ -24,7 +24,7 @@ import warnings
 ##----------------------------------------------------------------------
 ## INGEST DATA (IMS, ProspectoRx)
 
-# turn off pandas warning for SettingWithCopy
+# turn off warnings for SettingWithCopy and Future
 pd.set_option('mode.chained_assignment', None)
 warnings.filterwarnings("ignore", category=FutureWarning)
 
