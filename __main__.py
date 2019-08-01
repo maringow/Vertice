@@ -29,8 +29,8 @@ pd.set_option('mode.chained_assignment', None)
 warnings.filterwarnings("ignore", category=FutureWarning)
 
 # read in files
-IMS = pd.read_csv('full_extract_6.26.csv')
-prospectoRx = pd.read_csv('prospecto_all_one_year_20190708.csv')
+IMS = pd.read_csv('C:\\Users\\mgow\\Documents\\Clients\\5. Vertice\\Model Inputs\\IMS\\full_extract_6.26.csv')
+prospectoRx = pd.read_csv('C:\\Users\\mgow\\Documents\\Clients\\5. Vertice\\Model Inputs\\ProspectoRx\\prospecto_all_one_year_20190708.csv')
 
 # get valid brands from IMS file
 brands = sorted(IMS.loc[IMS['Brand/Generic'] == 'BRAND']['Product Sum'].dropna().unique())
@@ -151,7 +151,7 @@ parameters['npv'] = round(results['npv'], 2)
 if results['irr'] == 'N/A':
     parameters['irr'] = 'N/A'
 else:
-    parameters['irr'] = round(results['irr'], 2)
+    parameters['irr'] = round(results['irr'], 3) * 100
 if results['discounted_payback_period'] == '> 10':
     parameters['payback'] = '> 10'
 else:
