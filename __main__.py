@@ -152,10 +152,10 @@ if results['irr'] == 'N/A':
     parameters['irr'] = 'N/A'
 else:
     parameters['irr'] = round(results['irr'], 3) * 100
-if results['discounted_payback_period'] == '> 10':
+if results['payback_period'] == '> 10':
     parameters['payback'] = '> 10'
 else:
-    parameters['payback'] = round(results['discounted_payback_period'], 2)
+    parameters['payback'] = round(results['payback_period'], 2)
 parameters['exit_value'] = round(annual_forecast.loc[2021]['Exit Values'], 2)
 parameters['moic'] = round(annual_forecast.loc[2021]['MOIC'], 1)
 print(parameters)
@@ -182,6 +182,7 @@ annual_forecast['scenario_id'] = scenario_id
 
 df_result = pd.DataFrame.from_dict(data=results, orient='index')
 df_result = df_result.transpose()
+df_result['is_base_case'] = 'Y'
 df_annual_forecast = pd.DataFrame()
 print('results: {}'.format(results))
 df_annual_forecast = df_annual_forecast.append(annual_forecast)
@@ -246,7 +247,7 @@ df_result = df_result[
      'vertice_filing_year', 'vertice_launch_month', 'vertice_launch_year', 'pos', 'exit_multiple', 'discount_rate',
      'tax_rate', 'base_year_volume', 'base_year_market_size', 'volume_growth_rate', 'wac_increase', 'api_cost_per_unit',
      'api_cost_unit', 'profit_margin_override', 'standard_cogs_entry', 'years_discounted', 'cogs_variation',
-     'gx_players_adj', 'npv', 'irr', 'discounted_payback_period', 'is_base_case']]
+     'gx_players_adj', 'npv', 'irr', 'payback_period', 'is_base_case']]
 df_annual_forecast = df_annual_forecast[
     ['scenario_id', 'run_id', 'forecast_year', 'Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D',
      'Vertice Price as % of WAC', 'Net Sales', 'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC']]
