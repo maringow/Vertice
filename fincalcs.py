@@ -121,12 +121,12 @@ def valuation_calculations(parameters, df_gfm):
     npv = sum(pv)
 
     # discounted payback period
-    df_gfm['FCF PV'] = 0
-    df_gfm['FCF PV'].loc[parameters['present_year']:parameters['present_year'] + parameters['years_discounted']] = pv
-    df_gfm['Cumulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[
-                                                    parameters['present_year']:parameters['present_year'] + parameters[
-                                                        'years_discounted'] + 1])
-    df_gfm['Cumulative Discounted FCF'] = df_gfm['Cumulative Discounted FCF'].fillna(0)
+    # df_gfm['FCF PV'] = 0
+    # df_gfm['FCF PV'].loc[parameters['present_year']:parameters['present_year'] + parameters['years_discounted']] = pv
+    # df_gfm['Cumulative Discounted FCF'] = np.cumsum(df_gfm["FCF PV"].loc[
+    #                                                 parameters['present_year']:parameters['present_year'] + parameters[
+    #                                                     'years_discounted'] + 1])
+    # df_gfm['Cumulative Discounted FCF'] = df_gfm['Cumulative Discounted FCF'].fillna(0)
     # idx = df_gfm[df_gfm['Cumulative Discounted FCF'] <= 0].index.max()  # last full year for payback calc
     # if idx == parameters['last_forecasted_year']:
     #     discounted_payback_period = '> 10'
@@ -246,6 +246,7 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
     df_vertice_ndc_volumes = df_detail['Units'].mul(vol_adj * df_gfm['Gx Penetration'], level=0, fill_value=0).mul(
         df_gfm['Vertice Gx Market Share'], level=0, fill_value=0)
     df_vertice_ndc_volumes = df_vertice_ndc_volumes * parameters['pos']
+    df_vertice_ndc_volumes = round(df_vertice_ndc_volumes, 0)
 
     df_vertice_ndc_prices = df_detail['Price'].mul(df_gfm['Vertice Price as % of WAC'], level=0, fill_value=0)
     df_gfm['Net Sales'] = (df_vertice_ndc_prices * df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
@@ -254,6 +255,14 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
     df_gfm['Gross Sales'] = df_gfm['Net Sales'] / (1 - parameters['gtn_%'])
     df_gfm['Distribution'] = -df_gfm['Gross Sales'] * parameters['cogs']['distribution']
     df_gfm['Write-offs'] = -df_gfm['Gross Sales'] * parameters['cogs']['writeoffs']
+
+    # if stmt for margin approach or API approach
+    if parameters['profit_margin_override'] != '':
+        df_gfm['Standard COGS'] = -df_gfm['Net Sales'] * (1 - pd.to_numeric(parameters['profit_margin_override']))
+    else:
+        df_gfm['Standard COGS'] = -(df_detail['std_cost_per_unit'] * df_vertice_ndc_volumes).groupby(
+            level=[0]).sum() / 1000000
+
     df_gfm['Profit Share'] = -(
                 df_gfm['Net Sales'] + df_gfm['Standard COGS'] + df_gfm['Distribution'] + df_gfm['Write-offs']) * df_gfm[
                                  'Profit Share %']

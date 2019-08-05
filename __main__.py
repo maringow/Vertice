@@ -29,8 +29,8 @@ pd.set_option('mode.chained_assignment', None)
 warnings.filterwarnings("ignore", category=FutureWarning)
 
 # read in files
-IMS = pd.read_csv('C:\\Users\\mgow\\Documents\\Clients\\5. Vertice\\Model Inputs\\IMS\\full_extract_6.26.csv')
-prospectoRx = pd.read_csv('C:\\Users\\mgow\\Documents\\Clients\\5. Vertice\\Model Inputs\\ProspectoRx\\prospecto_all_one_year_20190708.csv')
+IMS = pd.read_csv('full_extract_6.26.csv')
+prospectoRx = pd.read_csv('prospecto_all_one_year_20190708.csv')
 
 # get valid brands from IMS file
 brands = sorted(IMS.loc[IMS['Brand/Generic'] == 'BRAND']['Product Sum'].dropna().unique())
@@ -190,12 +190,13 @@ df_annual_forecast = df_annual_forecast.append(annual_forecast)
 base_gx_players = df_gfm['Number of Gx Players']
 base_launch_year = parameters['vertice_launch_year']
 
-param_grid = {'years_to_discount': [5,10],
-              'probability_of_success': [.75,1],
-              'launch_delay_years': [0,1],
-              'overall_cogs_increase': [-.3,0,.3],
-              'volume_growth': [parameters['volume_growth_rate']-.05,parameters['volume_growth_rate'],parameters['volume_growth_rate']+.05],
-              'gx_players_adj': [-2,-1,0,1,2]}
+param_grid = {'years_to_discount': [5, 10],
+              'probability_of_success': [.75, 1],
+              'launch_delay_years': [0, 1],
+              'overall_cogs_increase': [-.3, 0, .3],
+              'volume_growth': [parameters['volume_growth_rate'] - .05, parameters['volume_growth_rate'],
+                                parameters['volume_growth_rate'] + .05],
+              'gx_players_adj': [-2, -1, 0, 1, 2]}
 
 param_mat = pd.DataFrame(ParameterGrid(param_grid))
 
