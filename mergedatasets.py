@@ -48,7 +48,7 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
         if math.isnan(df_merged_data['WACPrice'].iloc[i]):
             try:
                 df_merged_data['WACPrice'].iloc[i] = min(
-                    df_merged_data[df_merged_data['Pack'] == df_merged_data['Pack'].iloc[6]]['WACPrice'].dropna())
+                    df_merged_data[df_merged_data['Pack'] == df_merged_data['Pack'].iloc[i]]['WACPrice'].dropna())
             except:
                 try:
                     # x = df_merged_data[df_merged_data['Strength'] == df_merged_data['Strength'].iloc[i]][['WACPrice', 'Pack Quantity']].dropna()  # find same strengths e.g. 100MG
