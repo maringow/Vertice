@@ -161,7 +161,7 @@ parameters['moic'] = round(annual_forecast.loc[2021]['MOIC'], 1)
 print(parameters)
 
 # if user does not opt to do parameter scan and save output:
-parameters['scan_and_save'] = 'Yes'
+# parameters['scan_and_save'] = 'Yes'
 if parameters['scan_and_save'] == 'No':
     window = Tk()
     window7 = gui.ShowDetailedResults(window, parameters, df_gfm)
