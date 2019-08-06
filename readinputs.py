@@ -81,11 +81,11 @@ def read_model_inputs(parameters):
 
     def pull_analog_data(row_number):  # row you want data from
         x = []
-        for i in range(2, 18):
+        for i in range(2, 12):
             x.append(sheet.cell(row=row_number, column=i).value)
         return (x)
 
-    df_analog = pd.DataFrame(index=range(0, 16))
+    df_analog = pd.DataFrame(index=range(0, 10))
     df_analog['Retail Net Price Pct BWAC'] = pull_analog_data(2)
     df_analog['Clinic Net Price Pct BWAC'] = pull_analog_data(4)
     df_analog['Hospital Net Price Pct BWAC'] = pull_analog_data(6)
