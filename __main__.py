@@ -128,7 +128,6 @@ else:
         df_merged_data['API_units'].loc[df_merged_data['Pack'] == key] = pd.to_numeric(value)
     df_merged_data['API_cost'] = df_merged_data['API_units'] * parameters['api_cost_per_unit']
 df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC', 'API_cost']], on='NDC', how='left').set_index(['year_index', 'ndc_index'])
-print(df_detail)
 
 
 ##----------------------------------------------------------------------
@@ -143,7 +142,7 @@ parameters['gx_players_adj'] = 0
 
 df_gfm, df_detail = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
 results, annual_forecast = fincalcs.valuation_calculations(parameters, df_gfm)
-print(annual_forecast[['Net Sales', 'COGS', 'EBIT', 'FCF']])
+# print(annual_forecast[['Net Sales', 'COGS', 'EBIT', 'FCF']])
 
 ##----------------------------------------------------------------------
 ## PRINT RESULTS TO WINDOW
@@ -151,17 +150,16 @@ parameters['npv'] = round(results['npv'], 2)
 if results['irr'] == 'N/A':
     parameters['irr'] = 'N/A'
 else:
-    parameters['irr'] = round(results['irr'], 3) * 100
+    parameters['irr'] = round(results['irr'] * 100, 1)
 if results['payback_period'] == '> 10':
     parameters['payback'] = '> 10'
 else:
     parameters['payback'] = round(results['payback_period'], 2)
 parameters['exit_value'] = round(annual_forecast.loc[2021]['Exit Values'], 2)
 parameters['moic'] = round(annual_forecast.loc[2021]['MOIC'], 1)
-print(parameters)
 
 # if user does not opt to do parameter scan and save output:
-# parameters['scan_and_save'] = 'Yes'
+parameters['scan_and_save'] = 'Yes'
 if parameters['scan_and_save'] == 'No':
     window = Tk()
     window7 = gui.ShowDetailedResults(window, parameters, df_gfm)

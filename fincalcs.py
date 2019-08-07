@@ -27,8 +27,8 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
                 1 - df_gfm['Price Discount of Current Gx Net Price'])
 
     # keep market unit sales for reference
-    df_gfm['Market Volume'] = df_detail['Units'].groupby(level=[0]).sum().astype(int)
-    df_gfm['Market Size'] = round(df_detail['Sales'].groupby(level=[0]).sum(),0).astype(int)
+    df_gfm['Market Volume'] = df_detail['Units'].groupby(level=[0]).sum()
+    df_gfm['Market Size'] = df_detail['Sales'].groupby(level=[0]).sum() / 1000000
 
     # calculating volume of market in future
     df_detail['Units'] = df_detail['Units'].fillna(0)
