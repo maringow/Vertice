@@ -15,11 +15,11 @@ import fincalcs
 import readinputs
 import mergedatasets
 import output
+import parsedosage
 import time
 from sklearn.model_selection import ParameterGrid
 import sys
 import warnings
-
 
 ##----------------------------------------------------------------------
 ## INGEST DATA (IMS, ProspectoRx)
@@ -47,7 +47,6 @@ window.mainloop()
 parameters.update(window1.w1_parameters)
 print(parameters)
 
-
 ##----------------------------------------------------------------------
 ## OPEN DOSAGE FORM SELECTION IF MORE THAN ONE DOSAGE FORM IS FOUND
 parameters = mergedatasets.get_dosage_forms(parameters, IMS)
@@ -59,7 +58,6 @@ if len(parameters['dosage_forms']) > 1:
     parameters['dosage_forms'] = window2.selected_dosage_forms
 
 print(parameters['dosage_forms'])
-
 
 ##----------------------------------------------------------------------
 ## FIND THERAPEUTIC EQUIVALENTS AND JOIN IMS AND PROSPECTO DATASETS
@@ -85,7 +83,6 @@ window = Tk()
 window3 = gui.ConfirmBrand(window, parameters, df_detail)
 window.mainloop()
 
-
 ##----------------------------------------------------------------------
 ## OPEN SelectNDCs WINDOW AND SAVE
 window = Tk()
@@ -99,6 +96,7 @@ df_merged_data = df_merged_data[df_merged_data['NDC'].isin(parameters['selected_
 df_equivalents = df_equivalents[df_equivalents['NDC'].isin(parameters['selected_NDCs'])]
 print('After drop: {}'.format(df_equivalents['NDC']))
 parameters['selected_NDCs'] = str(parameters['selected_NDCs'])
+df_equivalents = parsedosage.get_base_units(df_equivalents)
 
 ##----------------------------------------------------------------------
 ## OPEN EnterFilepath WINDOW AND SAVE VALUES
@@ -127,8 +125,8 @@ else:
     for key, value in window6.COGS['units_per_pack'].items():
         df_merged_data['API_units'].loc[df_merged_data['Pack'] == key] = pd.to_numeric(value)
     df_merged_data['API_cost'] = df_merged_data['API_units'] * parameters['api_cost_per_unit']
-df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC', 'API_cost']], on='NDC', how='left').set_index(['year_index', 'ndc_index'])
-
+df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC', 'API_cost']], on='NDC', how='left').set_index(
+    ['year_index', 'ndc_index'])
 
 ##----------------------------------------------------------------------
 ## READ EXCEL
@@ -171,7 +169,6 @@ window = Tk()
 window8 = gui.ShowResults(window, parameters)
 window.mainloop()
 
-
 ##----------------------------------------------------------------------
 ## PARAMETER SCAN
 scenario_id = 0
@@ -198,6 +195,7 @@ param_grid = {'years_to_discount': [5, 10],
 
 param_mat = pd.DataFrame(ParameterGrid(param_grid))
 
+
 def parameterscan(years_to_discount, probability_of_success, launch_delay_years, overall_cogs_increase, volume_growth,
                   gx_players_adj, parameters, df_gfm, df_detail, df_analog):
     parameters['years_discounted'] = years_to_discount
@@ -211,9 +209,9 @@ def parameterscan(years_to_discount, probability_of_success, launch_delay_years,
     return fincalcs.valuation_calculations(parameters, x)
 
 x = param_mat.apply(lambda row: parameterscan(row['years_to_discount'], row['probability_of_success'],
-                                                 row['launch_delay_years'], row['overall_cogs_increase'],
-                                                 row['volume_growth'], row['gx_players_adj'],
-                                                 parameters, df_gfm, df_detail, df_analog), axis=1, result_type='expand')
+                                              row['launch_delay_years'], row['overall_cogs_increase'],
+                                              row['volume_growth'], row['gx_players_adj'],
+                                              parameters, df_gfm, df_detail, df_analog), axis=1, result_type='expand')
 for i in x[0]:
     df_result = df_result.append(pd.DataFrame.from_dict(data=i, orient='index').transpose())
 s = df_result['scenario_id']
@@ -224,7 +222,6 @@ for i in x[1]:
     scenario_id = scenario_id + 1
     i['scenario_id'] = scenario_id
     df_annual_forecast = df_annual_forecast.append(i)
-
 
 ##----------------------------------------------------------------------
 ## FORMATTING THE RESULTS TO PUT INTO DB
@@ -252,7 +249,7 @@ df_annual_forecast = df_annual_forecast[
      'Vertice Price as % of WAC', 'Net Sales', 'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC']]
 
 # open connection to db
-conn = output.create_connection('C:\\sqlite\\db\\pythonsqlite.db') #TODO update this
+conn = output.create_connection('C:\\sqlite\\db\\pythonsqlite.db')  # TODO update this
 print('connection created')
 
 # create tables - only needed on first run
@@ -287,8 +284,8 @@ for index, row in df_annual_forecast.iterrows():
     output.insert_forecast(conn, row)
 
 conn.commit()
-#output.select_all_forecasts(conn)
-#output.select_all_results(conn)
+# output.select_all_forecasts(conn)
+# output.select_all_results(conn)
 conn.close()
 
 window = Tk()

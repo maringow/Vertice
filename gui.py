@@ -312,6 +312,7 @@ class EnterCOGS:
         self.unit_label = Label(master, text='Base unit: ')
         self.unit_label.grid(row=7, column=0, sticky='e')
         self.unit_entry = Entry(master)
+        self.unit_entry.insert(END,df_equivalents['Base Unit'].iloc[0])
         self.unit_entry.grid(row=7, column=1, sticky='w')
 
         self.cost_per_unit_label = Label(master, text='API cost per unit ($): ')
@@ -337,11 +338,12 @@ class EnterCOGS:
         self.inner_frame = Frame(self.canvas)
         self.canvas.create_window(0, 0, window=self.inner_frame, anchor='nw')
 
-        self.packs = df_equivalents['Pack'].unique()
-        for p in self.packs:
-            pack_label = Label(self.inner_frame, text=p)
+        self.packs = df_equivalents[['Pack', 'Units']].drop_duplicates()['Pack'].values
+        for p in range(len(df_equivalents[['Pack', 'Units']].drop_duplicates())):
+            pack_label = Label(self.inner_frame, text=df_equivalents['Pack'].iloc[p])
             pack_label.grid(row=i, column=1, padx=5, sticky='e')
             pack_entry = Entry(self.inner_frame)
+            pack_entry.insert(END, df_equivalents['Units'].iloc[p])
             pack_entry.grid(row=i, column=2, padx=5, sticky='e')
             self.entries.append(pack_entry)
             i += 1
