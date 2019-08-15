@@ -1,6 +1,5 @@
 import sqlite3
 from sqlite3 import Error
-import numpy as np
 
 
 def create_connection(db_file):
@@ -25,7 +24,9 @@ def create_table(conn, create_table_sql):
 def add_column(conn, table_name, column_name, datatype):  # datatype options are text, integer, real
     try:
         cur = conn.cursor()
-        cur.execute("ALTER TABLE {tn} ADD COLUMN {cn} {dt}".format(tn=table_name, cn=column_name, dt=datatype))
+        cur.execute("ALTER TABLE {tn} ADD COLUMN {cn} {dt}".format(tn=table_name,
+                                                                   cn=column_name,
+                                                                   dt=datatype))
     except Error as e:
         print(e)
 
@@ -55,17 +56,16 @@ def select_max_ids(conn):
 
     return row
 
-# sqlite3.register_adapter(np.int64, lambda val: int(val))  ## potential code for forcing int datatype
-
 
 def insert_result(conn, results):
     print(results)
-    sql = """INSERT INTO model_results(scenario_id, run_id, run_name, brand_name, molecule, dosage_form, 
-    selected_NDCs, channel, indication, presentation, internal_external, brand_status, comments, vertice_filing_month, 
-    vertice_filing_year, vertice_launch_month, vertice_launch_year, pos, exit_multiple, discount_rate,  
-    tax_rate, base_year_volume, base_year_sales, volume_growth_rate, wac_price_growth_rate, api_cost_per_unit,  
-    api_cost_unit, profit_margin_override, standard_cogs_entry, years_to_discount, cogs_increase, 
-    gx_players_adj, npv, irr, payback, is_base_case)
+    sql = """INSERT INTO model_results(scenario_id, run_id, run_name, brand_name, molecule, 
+    dosage_form, selected_NDCs, channel, indication, presentation, internal_external, brand_status,
+    comments, vertice_filing_month, vertice_filing_year, vertice_launch_month, vertice_launch_year, 
+    pos, exit_multiple, discount_rate,  tax_rate, base_year_volume, base_year_sales, 
+    volume_growth_rate, wac_price_growth_rate, api_cost_per_unit, api_cost_unit, 
+    profit_margin_override, standard_cogs_entry, years_to_discount, cogs_increase, gx_players_adj, 
+    npv, irr, payback, is_base_case)
             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
     cur = conn.cursor()
     cur.execute(sql, results)
@@ -73,8 +73,9 @@ def insert_result(conn, results):
 
 
 def insert_forecast(conn, annual_forecast):
-    sql = """INSERT INTO annual_forecast(scenario_id, run_id, forecast_year, number_gx_competitors, profit_share,
-            milestone_payments, research_development_cost, price_pct_of_mkt, net_sales, cogs, ebit, fcf, exit_value, moic)
+    sql = """INSERT INTO annual_forecast(scenario_id, run_id, forecast_year, number_gx_competitors,
+     profit_share, milestone_payments, research_development_cost, price_pct_of_mkt, net_sales, 
+     cogs, ebit, fcf, exit_value, moic)
             VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
     cur = conn.cursor()
     cur.execute(sql, annual_forecast)

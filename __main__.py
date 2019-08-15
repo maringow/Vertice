@@ -1,25 +1,20 @@
-import operator
-import numpy as np
-import matplotlib as mpl
-import datetime as dt
-import pandas as pd
 import re
-import openpyxl as xl
+import sys
+import warnings
 import tkinter
 from tkinter import *
 from tkinter import ttk
 import sqlite3
 from sqlite3 import Error
+from sklearn.model_selection import ParameterGrid
+import pandas as pd
+import numpy as np
 import gui
 import fincalcs
 import readinputs
 import mergedatasets
 import output
 import parsedosage
-import time
-from sklearn.model_selection import ParameterGrid
-import sys
-import warnings
 
 
 ##----------------------------------------------------------------------
@@ -35,7 +30,9 @@ prospectoRx = pd.read_csv('prospecto_all_one_year_20190708.csv')
 
 # get valid brands from IMS file
 brands = sorted(IMS.loc[IMS['Brand/Generic'] == 'BRAND']['Product Sum'].dropna().unique())
-# brands = sorted(IMS.loc[(IMS['Brand/Generic'] == 'BRAND') | (IMS['Brand/Generic'] == 'BRANDED GENERIC')]['Product Sum'].dropna().unique()) #if we want to included BRANDED GENERICS too
+# brands = sorted(IMS.loc[(IMS['Brand/Generic'] == 'BRAND') |
+#   (IMS['Brand/Generic'] == 'BRANDED GENERIC')]['Product Sum'].dropna().unique())
+# ^ if we want to included BRANDED GENERICS too
 molecules = IMS['Combined Molecule'].dropna().unique().tolist()
 parameters = {}
 
@@ -76,8 +73,8 @@ parameters['dosage_forms'] = '; '.join(parameters['dosage_forms'])
 ##----------------------------------------------------------------------
 ## OPEN ConfirmBrand WINDOW AND SAVE
 # set parameters to display in confirmation window
-parameters['count_competitors'] = len(df_equivalents.loc[pd.isnull(df_equivalents['2018_Units']) == False]
-                                      ['Manufacturer'].unique())  # TODO update when there is new annual data
+parameters['count_competitors'] = len(df_equivalents.loc[pd.isnull(
+    df_equivalents['2018_Units']) == False]['Manufacturer'].unique()) # TODO update year w/ new data
 parameters['historical_growth_rate'] = fincalcs.get_growth_rate(df_detail)
 
 window = Tk()
@@ -126,8 +123,8 @@ else:
     for key, value in window6.COGS['units_per_pack'].items():
         df_merged_data['API_units'].loc[df_merged_data['Pack'] == key] = pd.to_numeric(value)
     df_merged_data['API_cost'] = df_merged_data['API_units'] * parameters['api_cost_per_unit']
-df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC', 'API_cost']], on='NDC', how='left').set_index(
-    ['year_index', 'ndc_index'])
+df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC', 'API_cost']],
+                     on='NDC', how='left').set_index(['year_index', 'ndc_index'])
 
 ##----------------------------------------------------------------------
 ## READ EXCEL
@@ -190,15 +187,17 @@ param_grid = {'years_to_discount': [5, 10],
               'probability_of_success': [.75, 1],
               'launch_delay_years': [0, 1],
               'overall_cogs_increase': [-.3, 0, .3],
-              'volume_growth': [parameters['volume_growth_rate'] - .05, parameters['volume_growth_rate'],
+              'volume_growth': [parameters['volume_growth_rate'] - .05,
+                                parameters['volume_growth_rate'],
                                 parameters['volume_growth_rate'] + .05],
               'gx_players_adj': [-2, -1, 0, 1, 2]}
 
 param_mat = pd.DataFrame(ParameterGrid(param_grid))
 
 
-def parameterscan(years_to_discount, probability_of_success, launch_delay_years, overall_cogs_increase, volume_growth,
-                  gx_players_adj, parameters, df_gfm, df_detail, df_analog):
+def parameterscan(years_to_discount, probability_of_success, launch_delay_years,
+                  overall_cogs_increase, volume_growth, gx_players_adj, parameters,
+                  df_gfm, df_detail, df_analog):
     parameters['years_discounted'] = years_to_discount
     parameters['pos'] = probability_of_success
     parameters['vertice_launch_year'] = base_launch_year + launch_delay_years
@@ -209,10 +208,14 @@ def parameterscan(years_to_discount, probability_of_success, launch_delay_years,
     x, y = fincalcs.forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog)
     return fincalcs.valuation_calculations(parameters, x)
 
-x = param_mat.apply(lambda row: parameterscan(row['years_to_discount'], row['probability_of_success'],
-                                              row['launch_delay_years'], row['overall_cogs_increase'],
-                                              row['volume_growth'], row['gx_players_adj'],
-                                              parameters, df_gfm, df_detail, df_analog), axis=1, result_type='expand')
+x = param_mat.apply(lambda row: parameterscan(row['years_to_discount'],
+                                              row['probability_of_success'],
+                                              row['launch_delay_years'],
+                                              row['overall_cogs_increase'],
+                                              row['volume_growth'],
+                                              row['gx_players_adj'],
+                                              parameters, df_gfm, df_detail, df_analog),
+                    axis=1, result_type='expand')
 for i in x[0]:
     df_result = df_result.append(pd.DataFrame.from_dict(data=i, orient='index').transpose())
 s = df_result['scenario_id']
@@ -231,23 +234,26 @@ df_result['run_id'] = run_id
 df_annual_forecast['run_id'] = run_id
 
 df_annual_forecast.columns = ['Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D',
-                              'Vertice Price as % of WAC', 'Net Sales', 'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC',
-                              'scenario_id', 'run_id']
+                              'Vertice Price as % of WAC', 'Net Sales', 'COGS', 'EBIT', 'FCF',
+                              'Exit Values', 'MOIC', 'scenario_id', 'run_id']
 
 # creating a forecast year column
 df_annual_forecast['forecast_year'] = df_annual_forecast.index.values
 
 # ordering the columns
 df_result = df_result[
-    ['scenario_id', 'run_id', 'run_name', 'brand_name', 'combined_molecules', 'dosage_forms', 'selected_NDCs',
-     'channel', 'indication', 'presentation', 'internal_external', 'brand_status', 'comments', 'vertice_filing_month',
-     'vertice_filing_year', 'vertice_launch_month', 'vertice_launch_year', 'pos', 'exit_multiple', 'discount_rate',
-     'tax_rate', 'base_year_volume', 'base_year_market_size', 'volume_growth_rate', 'wac_increase', 'api_cost_per_unit',
-     'api_cost_unit', 'profit_margin_override', 'standard_cogs_entry', 'years_discounted', 'cogs_variation',
-     'gx_players_adj', 'npv', 'irr', 'payback_period', 'is_base_case']]
+    ['scenario_id', 'run_id', 'run_name', 'brand_name', 'combined_molecules', 'dosage_forms',
+     'selected_NDCs', 'channel', 'indication', 'presentation', 'internal_external', 'brand_status',
+     'comments', 'vertice_filing_month', 'vertice_filing_year', 'vertice_launch_month',
+     'vertice_launch_year', 'pos', 'exit_multiple', 'discount_rate', 'tax_rate',
+     'base_year_volume', 'base_year_market_size', 'volume_growth_rate', 'wac_increase',
+     'api_cost_per_unit', 'api_cost_unit', 'profit_margin_override', 'standard_cogs_entry',
+     'years_discounted', 'cogs_variation', 'gx_players_adj', 'npv', 'irr', 'payback_period',
+     'is_base_case']]
 df_annual_forecast = df_annual_forecast[
-    ['scenario_id', 'run_id', 'forecast_year', 'Number of Gx Players', 'Profit Share', 'Milestone Payments', 'R&D',
-     'Vertice Price as % of WAC', 'Net Sales', 'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC']]
+    ['scenario_id', 'run_id', 'forecast_year', 'Number of Gx Players', 'Profit Share',
+     'Milestone Payments', 'R&D', 'Vertice Price as % of WAC', 'Net Sales', 'COGS', 'EBIT',
+     'FCF', 'Exit Values', 'MOIC']]
 
 # open connection to db
 conn = output.create_connection('C:\\sqlite\\db\\pythonsqlite.db')  # TODO update this

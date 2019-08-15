@@ -8,8 +8,8 @@ def get_equiv(IMS, parameters):
     Find all IMS records that match the Combined Molecule and Prod Form2.
 
     """
-    return IMS.loc[(IMS['Combined Molecule'].isin(parameters['combined_molecules'])) & (
-        IMS['Prod Form2'].isin(parameters['dosage_forms']))]
+    return IMS.loc[(IMS['Combined Molecule'].isin(parameters['combined_molecules'])) &
+                   (IMS['Prod Form2'].isin(parameters['dosage_forms']))]
 
 
 def get_dosage_forms(parameters, IMS):
@@ -20,9 +20,10 @@ def get_dosage_forms(parameters, IMS):
     """
     try:
         if parameters['search_type'] == 'brand':
-            parameters['combined_molecules'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']][
-                'Combined Molecule'].unique()
-            parameters['dosage_forms'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']]['Prod Form2'].unique()
+            parameters['combined_molecules'] = IMS.loc[IMS['Product Sum'] ==
+                                                       parameters['brand_name']]['Combined Molecule'].unique()
+            parameters['dosage_forms'] = IMS.loc[IMS['Product Sum'] ==
+                                                 parameters['brand_name']]['Prod Form2'].unique()
             parameters['molecule_name'] = 'Not specified'
         elif parameters['search_type'] == 'molecule':
             parameters['combined_molecules'] = [parameters['molecule_name']]
@@ -50,7 +51,7 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
     # parse NDC columns from IMS and ProspectoRx
     ##############################################################
     df_equivalents['NDC'] = strip_non_numeric(df_equivalents['NDC'].str.split('\s', expand=True)[0])
-    df_equivalents['NDC'].fillna(999, inplace=True)  # if NDC is "NDC NOT AVAILABLE" or other invalid value, fill with 999
+    df_equivalents['NDC'].fillna(999, inplace=True)  # e.g. if NDC is "NDC NOT AVAILABLE"
     df_equivalents['NDC'] = df_equivalents['NDC'].astype(np.int64)
     prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
     prospectoRx['NDC'] = strip_non_numeric(prospectoRx['NDC'])
@@ -61,25 +62,25 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
     df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
 
     ##############################################################
-    # fill blank prices with lowest WAC price, try by matching pack first, then strength&quantity, otherwise overall min
+    # fill blank prices with lowest WAC price
+    # try by matching pack first, then strength&quantity, otherwise overall min
     ##############################################################
     for i in df_merged_data.index:
         if math.isnan(df_merged_data['WACPrice'].iloc[i]):
             try:
                 df_merged_data['WACPrice'].iloc[i] = min(
-                    df_merged_data[df_merged_data['Pack'] == df_merged_data['Pack'].iloc[i]]['WACPrice'].dropna())
+                    df_merged_data[df_merged_data['Pack'] ==
+                                   df_merged_data['Pack'].iloc[i]]['WACPrice'].dropna())
             except:
                 try:
                     # x = df_merged_data[df_merged_data['Strength'] == df_merged_data['Strength'].iloc[i]][['WACPrice', 'Pack Quantity']].dropna()  # find same strengths e.g. 100MG
                     # x["WACPrice_OneUnit_ByStrength"] = x['WACPrice'] / x['Pack Quantity']  # find unit price... price / quantity
                     # df_merged_data['WACPrice'].iloc[i] = min(x["WACPrice_OneUnit_ByStrength"]) * df_merged_data['Pack Quantity'].iloc[i]  # get price.. unit price * units
-                    df_merged_data['WACPrice'].iloc[i] = min(df_merged_data[(df_merged_data['Strength'] ==
-                                                                             df_merged_data['Strength'].iloc[i]) & (
-                                                                                        df_merged_data[
-                                                                                            'Pack Quantity'] ==
-                                                                                        df_merged_data[
-                                                                                            'Pack Quantity'].iloc[i])][
-                                                                 'WACPrice'].dropna())
+                    df_merged_data['WACPrice'].iloc[i] = min(df_merged_data
+                                                             [(df_merged_data['Strength'] ==
+                                                               df_merged_data['Strength'].iloc[i]) &
+                                                              (df_merged_data['Pack Quantity'] ==
+                                                               df_merged_data['Pack Quantity'].iloc[i])]['WACPrice'].dropna())
                 except:
                     try:
                         df_merged_data['WACPrice'].iloc[i] = min(df_merged_data['WACPrice'].dropna())
@@ -103,8 +104,9 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
     ##############################################################
     # create list of Units columns from IMS data
     ##############################################################
-    columns = [[2016, '2016_Units'], [2017, '2017_Units'], [2018, '2018_Units'], [2019, '2019_Units'],
-               [2020, '2020_Units'], [2021, '2021_Units'], [2022, '2022_Units']]
+    columns = [[2016, '2016_Units'], [2017, '2017_Units'], [2018, '2018_Units'],
+               [2019, '2019_Units'], [2020, '2020_Units'], [2021, '2021_Units'],
+               [2022, '2022_Units']]
 
     ##############################################################
     # map units and price into df_detail

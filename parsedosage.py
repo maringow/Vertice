@@ -1,6 +1,6 @@
+import re
 import pandas as pd
 import numpy as np
-import re
 
 
 def get_base_units(df):
@@ -30,12 +30,13 @@ def get_base_units(df):
     # getting the Base Unit
     ##############################################################
     # getting most common unit sold, make Base Unit
-    df['unitssum'] = df['2013_Units'] + df['2014_Units'] + df['2015_Units'] + df['2016_Units'] + df['2017_Units'] + df[
-        '2018_Units'] + df['2019_Units']
-    x = df.groupby(['Combined Molecule', 'Strength'])['2019_Units', 'unitssum'].sum().sort_values(
-        ['Combined Molecule', 'unitssum'], ascending=[True, False]).reset_index()
+    df['unitssum'] = df['2013_Units'] + df['2014_Units'] + df['2015_Units'] + df['2016_Units'] + \
+                     df['2017_Units'] + df['2018_Units'] + df['2019_Units']
+    x = df.groupby(['Combined Molecule', 'Strength'])['2019_Units', 'unitssum'].sum()\
+        .sort_values(['Combined Molecule', 'unitssum'], ascending=[True, False]).reset_index()
     x = x.groupby('Combined Molecule').nth(1).drop(['2019_Units', 'unitssum'], axis=1)
-    df = df.merge(x, on='Combined Molecule', how='left', suffixes=['', 'Base Unit']).drop('unitssum', axis=1)
+    df = df.merge(x, on='Combined Molecule', how='left',
+                  suffixes=['', 'Base Unit']).drop('unitssum', axis=1)
     df = df.rename(columns={"StrengthBase Unit": "Base Unit1"})
     # if no sales, the most freq in the db
     x = df[df['Base Unit1'] != df['Base Unit1']]
@@ -63,7 +64,8 @@ def get_base_units(df):
         elif re.sub('[^-]', '', str(df.Strength.iloc[i])).find('-') == 0:
             df.Units[i] = ''
             # if only Strength or Base Unit is a ratio and the other isn't
-        elif re.sub('[^/]', '', str(df.Strength.iloc[i])) != re.sub('[^/]', '', str(df['Base Unit'].iloc[i])):
+        elif re.sub('[^/]', '', str(df.Strength.iloc[i])) != \
+                re.sub('[^/]', '', str(df['Base Unit'].iloc[i])):
             df.Units[i] = ''
         # if both ratios (when both Strength and Base Unit are ratios e.g. 10MG/20ML)
         elif re.sub('[^/]', '', str(df.Strength.iloc[i])).find('/') == 0:
@@ -92,7 +94,8 @@ def get_base_units(df):
                 else:
                     df.Units.iloc[i] = ''
         # if both Strength are Base Unit single units e.g. 10MG or 5ML
-        elif re.sub('[. 0-9]', '', str(df.Strength.iloc[i])) == re.sub('[.0-9]', '', str(df['Base Unit'].iloc[i])):
+        elif re.sub('[. 0-9]', '', str(df.Strength.iloc[i])) == \
+                re.sub('[.0-9]', '', str(df['Base Unit'].iloc[i])):
             x = re.sub('[. 0-9]', '', str(df.Strength.iloc[i]))
             a = list(filter(None, str(df.Strength.iloc[i]).split(x)))[0]
             b = list(filter(None, str(df['Base Unit'].iloc[i]).split(x)))[0]
@@ -108,8 +111,10 @@ def get_base_units(df):
     ##############################################################
     for i in range(len(df)):
         try:
-            df['Units'].iloc[i] = df['Units'].iloc[i] * df['Pack Quantity'].iloc[i] * df['Pack Size'].iloc[i]
+            df['Units'].iloc[i] = df['Units'].iloc[i] *\
+                                  df['Pack Quantity'].iloc[i] * \
+                                  df['Pack Size'].iloc[i]
         except:
             df['Units'].iloc[i] = df['Units'].iloc[i]
 
-    return (df)
+    return df

@@ -1,9 +1,7 @@
 from tkinter import *
 from tkinter import ttk
-import tkinter.tix as tix
 from tkinter import filedialog
 import pandas as pd
-import numpy as np
 
 
 class BrandSelection:
@@ -21,7 +19,8 @@ class BrandSelection:
         ##############################################################
         # create window header
         ##############################################################
-        self.title = Label(master, text='Generics Forecasting Model: Brand Selection', font='Helvetica 9 bold')
+        self.title = Label(master, text='Generics Forecasting Model: Brand Selection',
+                           font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
         ##############################################################
@@ -29,7 +28,7 @@ class BrandSelection:
         ##############################################################
         self.brand_label = Label(master, text='Select a brand name drug: ')
         self.brand_label.pack()
-        self.brand_combo = ttk.Combobox(master, values=brands, width=30, height=15)  # 15 rows to display
+        self.brand_combo = ttk.Combobox(master, values=brands, width=30, height=15)  # show 15 rows
         self.brand_combo.pack()
         self.brand_combo.bind("<<ComboboxSelected>>", self.get_brand)
 
@@ -73,7 +72,8 @@ class DosageForms:
         ##############################################################
         # create window header
         ##############################################################
-        self.title = Label(master, text='Generics Forecasting Model: Select Dosage Forms', font='Helvetica 9 bold')
+        self.title = Label(master, text='Generics Forecasting Model: Select Dosage Forms',
+                           font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
         self.dosage_forms = dosage_forms
@@ -114,7 +114,8 @@ class ConfirmBrand:
         ##############################################################
         # create window header
         ##############################################################
-        self.title = Label(master, text='Generics Forecasting Model: Review Therapeutic Equivalents',
+        self.title = Label(master,
+                           text='Generics Forecasting Model: Review Therapeutic Equivalents',
                            font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
@@ -122,23 +123,28 @@ class ConfirmBrand:
         # create label for brand selection and number of equivalents found
         ##############################################################
         if parameters['search_type'] == 'brand':
-            self.selection_label = Label(master, text='{} therapeutically equivalent NDCs found in IMS for brand {}'
+            self.selection_label = Label(master,
+                                         text='{} therapeutically equivalent NDCs found in IMS for brand {}'
                                          .format(parameters['count_eqs'], parameters['brand_name']))
             self.selection_label.pack(pady=20)
         elif parameters['search_type'] == 'molecule':
-            self.selection_label = Label(master, text='{} therapeutically equivalent NDCs found in IMS for molecule {}'
-                                         .format(parameters['count_eqs'], parameters['molecule_name']))
+            self.selection_label = Label(master,
+                                         text='{} therapeutically equivalent NDCs found in IMS for molecule {}'
+                                         .format(parameters['count_eqs'],
+                                                 parameters['molecule_name']))
             self.selection_label.pack(pady=20)
 
         ##############################################################
         # create labels for molecule and dosage form used
         ##############################################################
         self.combined_molecules = parameters['combined_molecules']
-        self.molecules_label = Label(master, text='Molecules searched: {}'.format(self.combined_molecules))
+        self.molecules_label = Label(master, text='Molecules searched: {}'
+                                     .format(self.combined_molecules))
         self.molecules_label.pack()
 
         self.dosage_forms = parameters['dosage_forms']
-        self.dosage_forms_label = Label(master, text='Dosage forms searched: {}'.format(self.dosage_forms))
+        self.dosage_forms_label = Label(master, text='Dosage forms searched: {}'
+                                        .format(self.dosage_forms))
         self.dosage_forms_label.pack()
 
         # create label for number of competitors found
@@ -174,7 +180,8 @@ class SelectNDCs():
         self.master = master
         master.title("Generics Forecasting Model")
 
-        self.title = Label(master, text='Generics Forecasting Model: Select NDCs', font='Helvetica 9 bold')
+        self.title = Label(master, text='Generics Forecasting Model: Select NDCs',
+                           font='Helvetica 9 bold')
         self.title.grid(row=0, columnspan=2, pady=20, padx=20)
 
         ##############################################################
@@ -195,8 +202,8 @@ class SelectNDCs():
         # set up variables to store user selections
         ##############################################################
         self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])[
-            ['NDC', 'Manufacturer', 'Prod Form3', '2018_Units', '2019_Units', 'WACPrice', 'Pack']].reset_index(
-            drop=True)
+            ['NDC', 'Manufacturer', 'Prod Form3', '2018_Units', '2019_Units', 'WACPrice', 'Pack']]\
+            .reset_index(drop=True)
         self.ndcs = self.ndcs.drop_duplicates().reset_index()
         print('df_merged_data', df_merged_data)
         print('self.ndcs', self.ndcs)
@@ -207,7 +214,8 @@ class SelectNDCs():
         # set up columns to show
         ##############################################################
         m = 0
-        header = ['NDC', 'Manufacturer', 'Dosage Form', '2018 Volume', '2019 Volume', 'WAC Price ($)', 'Pack']
+        header = ['NDC', 'Manufacturer', 'Dosage Form', '2018 Volume', '2019 Volume',
+                  'WAC Price ($)', 'Pack']
         for h in header:
             label = Label(self.inner_frame, text=h, font='Helvetica 8 bold')
             label.grid(row=0, column=m, padx=8)
@@ -247,7 +255,7 @@ class SelectNDCs():
         self.scroll.config(command=self.canvas.yview)
         self.canvas.config(yscrollcommand=self.scroll.set)
         self.scroll.grid(row=0, sticky="nse")
-        self.inner_frame.bind("<Configure>", self.update_scrollregion) #make the length of the scrollbar the full height
+        self.inner_frame.bind("<Configure>", self.update_scrollregion) #update height of scrollbar
 
         self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
         self.continue_button.grid(row=1000, column=1, pady=20, padx=20, sticky='e')
@@ -289,7 +297,8 @@ class EnterFilepath:
         ##############################################################
         self.filename = filedialog.askopenfilename(initialdir="C:\\Documents\\Demo Vertice 8.1",  # TODO update this
                                                    title="Select Model Input file",
-                                                   filetypes=(("excel files", "*.xlsx"), ("all files", "*.*")))
+                                                   filetypes=(("excel files", "*.xlsx"),
+                                                              ("all files", "*.*")))
         self.filepath_label = Label(master, text='Enter filepath for Excel parameters:')
         self.filepath_label.pack(pady=10)
         self.filepath_entry = Entry(master, width=75)
@@ -318,9 +327,9 @@ class EnterFilepath:
 class EnterCOGS:
     """
     GUI to enter drug costs with three options.
-    (1) Margin
-    (2) Standard cost applied to each NDC
-    (3) Cost per each NDC
+    1. Margin
+    2. Standard cost applied to each NDC
+    3. Cost per each NDC
 
     """
     COGS = {}
@@ -329,7 +338,7 @@ class EnterCOGS:
         self.master = master
         master.title('Generics Forecasting Model')
 
-        self.title = Label(master, text='Enter Gross Margin', font='Helvetica 9 bold')  # margin before Distribution, Write-offs, Profit Share, and Milestone Payments
+        self.title = Label(master, text='Enter Gross Margin', font='Helvetica 9 bold')
         self.title.grid(row=0, columnspan=2, pady=10)
 
         ##############################################################
@@ -372,7 +381,7 @@ class EnterCOGS:
         self.unit_label = Label(master, text='Base unit: ')
         self.unit_label.grid(row=7, column=0, sticky='e')
         self.unit_entry = Entry(master)
-        self.unit_entry.insert(END,df_equivalents['Base Unit'].iloc[0])
+        self.unit_entry.insert(END, df_equivalents['Base Unit'].iloc[0])
         self.unit_entry.grid(row=7, column=1, sticky='w')
 
         self.cost_per_unit_label = Label(master, text='API cost per unit ($): ')
@@ -383,10 +392,11 @@ class EnterCOGS:
         ##############################################################
         # add entry boxes for API units for each pack type found in therapeutic equivalents
         ##############################################################
-        self.API_costs_label = Label(master, text='Enter number of units for each pack type found: ')
+        self.API_costs_label = Label(master,
+                                     text='Enter number of units for each pack type found: ')
         self.API_costs_label.grid(row=9, columnspan=2, pady=10)
 
-        self.entries = []  # save entries created in list so that they can be accessed to store values
+        self.entries = []  # save entries created in list
         i = 0  # start placing labels below the already assigned rows
 
         ##############################################################
@@ -424,7 +434,7 @@ class EnterCOGS:
         self.canvas.config(yscrollcommand=self.scroll.set)
         self.scroll.grid(row=0, sticky="nse")
 
-        self.inner_frame.bind("<Configure>", self.update_scrollregion) #make the length of the scrollbar the full height
+        self.inner_frame.bind("<Configure>", self.update_scrollregion) #update height of scrollbar
 
         run_model_button = Button(master, text='Run Model', command=self.save_and_run)
         run_model_button.grid(row=11, column=1, pady=10)
@@ -455,7 +465,8 @@ class ShowResults:
         master.title('Generics Forecasting Model')
         master.geometry("500x300")
 
-        self.title = Label(master, text='Generics Forecasting Model: Results Summary', font='Helvetica 9 bold')
+        self.title = Label(master, text='Generics Forecasting Model: Results Summary',
+                           font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
         ##############################################################
@@ -467,7 +478,8 @@ class ShowResults:
         self.unit_label.pack()
         self.unit_label = Label(master, text='Payback: {} years'.format(parameters['payback']))
         self.unit_label.pack()
-        self.unit_label = Label(master, text='Exit value in 2021: ${} million'.format(parameters['exit_value']))
+        self.unit_label = Label(master, text='Exit value in 2021: ${} million'
+                                .format(parameters['exit_value']))
         self.unit_label.pack()
         self.unit_label = Label(master, text='MOIC in 2021: {}x'.format(parameters['moic']))
         self.unit_label.pack()
@@ -485,7 +497,7 @@ class ShowResults:
 
 class SuccessfulRun:
     """
-    GUI that shows that the parameter scan and writing of the results to the database was successful.
+    GUI that shows that the parameter scan and writing of results to the database was successful.
 
     """
     def __init__(self, master):
@@ -493,7 +505,8 @@ class SuccessfulRun:
         master.title('')
         master.geometry("300x150")
 
-        self.title = Label(master, text='Generics Forecasting Model: Successful Model Run', font='Helvetica 9 bold')
+        self.title = Label(master, text='Generics Forecasting Model: Successful Model Run',
+                           font='Helvetica 9 bold')
         self.title.pack(pady=10)
         self.title = Label(master, text='Parameter scan complete.', font='Helvetica 9')
         self.title.pack(pady=10)
@@ -515,7 +528,8 @@ class ShowDetailedResults():
 
         Label(master, text='Generics Forecasting Model: Results Summary',
               font='Helvetica 9 bold').grid(row=0, column=0, sticky=N, columnspan=12)
-        Label(master, text='Did not opt to do the parameter scan. No results saved to the database.',
+        Label(master,
+              text='Did not opt to do the parameter scan. No results saved to the database.',
               font='Helvetica 9').grid(row=1, column=0, sticky=N, columnspan=12)
 
         Label(master, text='').grid(row=2, rowspan=2)
@@ -533,19 +547,40 @@ class ShowDetailedResults():
         ##############################################################
         # printing the 5 calculated valuation metrics
         ##############################################################
-        Label(master, text='{}:  '.format(search_type), font='Helvetica 9 bold').grid(row=4, column=0, sticky=E,columnspan=6)
-        Label(master, text='NPV:  ', font='Helvetica 9 bold').grid(row=5, column=0, sticky=E, columnspan=6)
-        Label(master, text='IRR:  ', font='Helvetica 9 bold').grid(row=6, column=0, sticky=E, columnspan=6)
-        Label(master, text='Payback:  ', font='Helvetica 9 bold').grid(row=7, column=0, sticky=E, columnspan=6)
-        Label(master, text='Exit value in 2021:  ', font='Helvetica 9 bold').grid(row=8, column=0, sticky=E,columnspan=6)
-        Label(master, text='MOIC in 2021:  ', font='Helvetica 9 bold').grid(row=9, column=0, sticky=E, columnspan=6)
+        Label(master, text='{}:  '.format(search_type), font='Helvetica 9 bold').grid(row=4,
+                                                                                      column=0,
+                                                                                      sticky=E,
+                                                                                      columnspan=6)
+        Label(master, text='NPV:  ', font='Helvetica 9 bold').grid(row=5, column=0, sticky=E,
+                                                                   columnspan=6)
+        Label(master, text='IRR:  ', font='Helvetica 9 bold').grid(row=6, column=0, sticky=E,
+                                                                   columnspan=6)
+        Label(master, text='Payback:  ', font='Helvetica 9 bold').grid(row=7, column=0, sticky=E,
+                                                                       columnspan=6)
+        Label(master, text='Exit value in 2021:  ', font='Helvetica 9 bold').grid(row=8, column=0,
+                                                                                  sticky=E,
+                                                                                  columnspan=6)
+        Label(master, text='MOIC in 2021:  ', font='Helvetica 9 bold').grid(row=9, column=0,
+                                                                            sticky=E, columnspan=6)
 
-        Label(master, text='{}'.format(drug_id)).grid(row=4, column=6, sticky=W, columnspan=6)
-        Label(master, text='${} million'.format(parameters['npv'])).grid(row=5, column=6, sticky=W, columnspan=6)
-        Label(master, text='{}%'.format(parameters['irr'])).grid(row=6, column=6, sticky=W, columnspan=6)
-        Label(master, text='{} years'.format(parameters['payback'])).grid(row=7, column=6, sticky=W, columnspan=6)
-        Label(master, text='${} million'.format(parameters['exit_value'])).grid(row=8, column=6, sticky=W, columnspan=6)
-        Label(master, text='{}x'.format(parameters['moic'])).grid(row=9, column=6, sticky=W, columnspan=6)
+        Label(master, text='{}'.format(drug_id)).grid(row=4, column=6,
+                                                      sticky=W,
+                                                      columnspan=6)
+        Label(master, text='${} million'.format(parameters['npv'])).grid(row=5, column=6,
+                                                                         sticky=W,
+                                                                         columnspan=6)
+        Label(master, text='{}%'.format(parameters['irr'])).grid(row=6, column=6,
+                                                                 sticky=W,
+                                                                 columnspan=6)
+        Label(master, text='{} years'.format(parameters['payback'])).grid(row=7, column=6,
+                                                                          sticky=W,
+                                                                          columnspan=6)
+        Label(master, text='${} million'.format(parameters['exit_value'])).grid(row=8, column=6,
+                                                                                sticky=W,
+                                                                                columnspan=6)
+        Label(master, text='{}x'.format(parameters['moic'])).grid(row=9, column=6,
+                                                                  sticky=W,
+                                                                  columnspan=6)
 
         Label(master, text='').grid(row=10, columnspan=12)
 
@@ -569,7 +604,8 @@ class ShowDetailedResults():
         ##############################################################
         # adding the results to the results table
         ##############################################################
-        df = round(df_gfm[['Net Sales', 'COGS', 'EBIT', 'FCF']].loc[parameters['present_year']:].transpose(), 2)
+        df = round(df_gfm[['Net Sales', 'COGS', 'EBIT',
+                           'FCF']].loc[parameters['present_year']:].transpose(), 2)
 
         r = 12
         for x in ['Net Sales', 'COGS', 'EBIT', 'FCF']:

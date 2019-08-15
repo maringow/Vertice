@@ -1,6 +1,5 @@
 import openpyxl as xl
 import pandas as pd
-import numpy as np
 
 
 def read_model_inputs(parameters):
@@ -71,10 +70,10 @@ def read_model_inputs(parameters):
     # add excel yearly data
     ##############################################################
     def pull_yearly_data(row_number):  # row you want data from
-        x = [0] * (parameters['present_year'] - 2016)  # zeros for years not in 'model input' excel sheet
+        x = [0] * (parameters['present_year'] - 2016)  # 0s for years not in model input excel file
         for i in range(2, 14):
             x.append(sheet.cell(row=row_number, column=i).value)
-        return (x)
+        return x
 
     df_gfm['Gx Penetration'] = pull_yearly_data(56)
     df_gfm['Number of Gx Players'] = pull_yearly_data(57)
@@ -93,7 +92,7 @@ def read_model_inputs(parameters):
     df_gfm['Additional Non-cash Effects'] = pull_yearly_data(88)
     df_gfm['Other Net Current Assets'] = pull_yearly_data(89)
     df_gfm['Capital Avoidance'] = pull_yearly_data(90)
-    df_gfm = df_gfm.fillna(0)  # if there is no data entered in the excel file, it gives NaNs, this converts them to 0s
+    df_gfm = df_gfm.fillna(0)  # if no data entered, it gives NaNs, this converts them to 0s
 
     ##############################################################
     # adding analog data
@@ -104,7 +103,7 @@ def read_model_inputs(parameters):
         x = []
         for i in range(2, 23):
             x.append(sheet.cell(row=row_number, column=i).value)
-        return (x)
+        return x
 
     df_analog = pd.DataFrame(index=range(0, 21))
     df_analog['Retail Net Price Pct BWAC'] = pull_analog_data(2)
