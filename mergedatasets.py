@@ -2,13 +2,22 @@ import math
 import pandas as pd
 import numpy as np
 
-# find all IMS records that match the Combined Molecule and Prod Form2
+
 def get_equiv(IMS, parameters):
+    """
+    Find all IMS records that match the Combined Molecule and Prod Form2.
+
+    """
     return IMS.loc[(IMS['Combined Molecule'].isin(parameters['combined_molecules'])) & (
         IMS['Prod Form2'].isin(parameters['dosage_forms']))]
 
 
 def get_dosage_forms(parameters, IMS):
+    """
+    Get the combined molecule name, based on selected molecule or brand.
+    Get the unique Prod Form2 for that combined molecule.
+
+    """
     try:
         if parameters['search_type'] == 'brand':
             parameters['combined_molecules'] = IMS.loc[IMS['Product Sum'] == parameters['brand_name']][
@@ -26,24 +35,34 @@ def get_dosage_forms(parameters, IMS):
     return parameters
 
 
-# join IMS and prospecto data
 def merge_ims_prospecto(df_equivalents, prospectoRx):
+    """
+    Join IMS and prospecto data.
+    Creates molecule- and year-level dataframe.
+
+    """
     def strip_non_numeric(df_column):
         df_column = df_column.str.replace('[^0-9]', '')
         df_column = pd.to_numeric(df_column)
         return df_column
 
+    ##############################################################
     # parse NDC columns from IMS and ProspectoRx
+    ##############################################################
     df_equivalents['NDC'] = strip_non_numeric(df_equivalents['NDC'].str.split('\s', expand=True)[0])
     df_equivalents['NDC'].fillna(999, inplace=True)  # if NDC is "NDC NOT AVAILABLE" or other invalid value, fill with 999
     df_equivalents['NDC'] = df_equivalents['NDC'].astype(np.int64)
     prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
     prospectoRx['NDC'] = strip_non_numeric(prospectoRx['NDC'])
 
+    ##############################################################
     # join price and therapeutic equivalents on NDC
+    ##############################################################
     df_merged_data = df_equivalents.merge(prospectoRx[['NDC', 'WACPrice']], how='left', on='NDC')
 
+    ##############################################################
     # fill blank prices with lowest WAC price, try by matching pack first, then strength&quantity, otherwise overall min
+    ##############################################################
     for i in df_merged_data.index:
         if math.isnan(df_merged_data['WACPrice'].iloc[i]):
             try:
@@ -67,21 +86,29 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
                     except:
                         df_merged_data['WACPrice'].iloc[i] = 0
 
+    ##############################################################
     # build hierarchical index on Year and NDC
+    ##############################################################
     year_range = [int(i) for i in np.array(range(2016, 2035))]
     NDCs = [int(i) for i in df_equivalents['NDC'].unique()]
     index_arrays = [year_range, NDCs]
     multiIndex = pd.MultiIndex.from_product(index_arrays, names=['year_index', 'ndc_index'])
 
+    ##############################################################
     # create df with multiindex
+    ##############################################################
     df_detail = pd.DataFrame(index=multiIndex, columns=['NDC', 'Units', 'Price', 'Sales'])
     df_detail['NDC'] = df_detail.index.get_level_values('ndc_index')
 
+    ##############################################################
     # create list of Units columns from IMS data
+    ##############################################################
     columns = [[2016, '2016_Units'], [2017, '2017_Units'], [2018, '2018_Units'], [2019, '2019_Units'],
                [2020, '2020_Units'], [2021, '2021_Units'], [2022, '2022_Units']]
 
+    ##############################################################
     # map units and price into df_detail
+    ##############################################################
     for year in columns:
         if year[1] in df_merged_data.columns:
             df_merged_data_agg = df_merged_data[
@@ -94,4 +121,5 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
             break
     df_detail['Units'] = df_detail['Units'].fillna(0)
     df_detail['Sales'] = df_detail['Units'] * df_detail['Price']
+
     return (df_merged_data, df_detail)

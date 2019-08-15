@@ -5,9 +5,12 @@ from tkinter import filedialog
 import pandas as pd
 import numpy as np
 
-##----------------------------------------------------------------------
-## WINDOW: SELECT BRAND NAME
+
 class BrandSelection:
+    """
+    GUI to select product based on brand name or molecule name.
+
+    """
     w1_parameters = {}
 
     def __init__(self, master, brands, molecules):
@@ -15,11 +18,15 @@ class BrandSelection:
         master.title("Generics Forecasting Model")
         master.geometry("600x400")
 
+        ##############################################################
         # create window header
+        ##############################################################
         self.title = Label(master, text='Generics Forecasting Model: Brand Selection', font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
+        ##############################################################
         # add label and combobox for brand selection
+        ##############################################################
         self.brand_label = Label(master, text='Select a brand name drug: ')
         self.brand_label.pack()
         self.brand_combo = ttk.Combobox(master, values=brands, width=30, height=15)  # 15 rows to display
@@ -29,7 +36,9 @@ class BrandSelection:
         self.or_label = Label(master, text='OR', font='Helvetica 10 bold')
         self.or_label.pack(pady=10)
 
+        ##############################################################
         # add label and combobox for molecule selection
+        ##############################################################
         self.molecule_label = Label(master, text='Select a molecule: ')
         self.molecule_label.pack()
         self.molecule_combo = ttk.Combobox(master, values=molecules, width=30, height=15)
@@ -49,16 +58,21 @@ class BrandSelection:
         self.w1_parameters['molecule_name'] = self.molecule_combo.get()
         print(self.w1_parameters['molecule_name'])
 
-##----------------------------------------------------------------------
-## WINDOW: SELECT DOSAGE FORMS
-class DosageForms:
 
+class DosageForms:
+    """
+    GUI to select dosage forms based on selected product.
+    Only appears if there is more than one dosage form.
+
+    """
     def __init__(self, master, dosage_forms):
         self.master = master
         master.title("Generics Forecasting Model")
         master.geometry("600x400")
 
+        ##############################################################
         # create window header
+        ##############################################################
         self.title = Label(master, text='Generics Forecasting Model: Select Dosage Forms', font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
@@ -66,7 +80,9 @@ class DosageForms:
         self.selected_dosage_forms = []
         self.var = []
 
+        ##############################################################
         # add dosage form checkboxes
+        ##############################################################
         for d in range(len(self.dosage_forms)):
             v = IntVar()
             box = Checkbutton(self.master, text=self.dosage_forms[d], variable=v)
@@ -76,27 +92,35 @@ class DosageForms:
         self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
         self.continue_button.pack(pady=10)
 
+    ##############################################################
+    # for each checked box, save the dosage form into selected_dosage_forms
+    ##############################################################
     def save_and_continue(self):
-        # for each checked box, save the dosage form into selected_dosage_forms
         self.selected_dosage_forms = [self.dosage_forms[i] for i in range(len(self.dosage_forms))
                                       if self.var[i].get() == 1]
         self.master.destroy()
 
-##----------------------------------------------------------------------
-## WINDOW: CONFIRM BRAND
-class ConfirmBrand:
 
+class ConfirmBrand:
+    """
+    GUI that shows summary information of selected product.
+
+    """
     def __init__(self, master, parameters, df_detail):
         self.master = master
         master.title("Generics Forecasting Model")
         master.geometry("600x400")
 
+        ##############################################################
         # create window header
+        ##############################################################
         self.title = Label(master, text='Generics Forecasting Model: Review Therapeutic Equivalents',
                            font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
+        ##############################################################
         # create label for brand selection and number of equivalents found
+        ##############################################################
         if parameters['search_type'] == 'brand':
             self.selection_label = Label(master, text='{} therapeutically equivalent NDCs found in IMS for brand {}'
                                          .format(parameters['count_eqs'], parameters['brand_name']))
@@ -106,7 +130,9 @@ class ConfirmBrand:
                                          .format(parameters['count_eqs'], parameters['molecule_name']))
             self.selection_label.pack(pady=20)
 
+        ##############################################################
         # create labels for molecule and dosage form used
+        ##############################################################
         self.combined_molecules = parameters['combined_molecules']
         self.molecules_label = Label(master, text='Molecules searched: {}'.format(self.combined_molecules))
         self.molecules_label.pack()
@@ -133,23 +159,27 @@ class ConfirmBrand:
         #                         int(df_detail['Units'].sum(level='year_index').loc[2019])))
         # self.volumes_label.pack()
 
-        # add Continue button
         self.continue_button = Button(master, text='Continue', command=master.destroy)
         self.continue_button.pack(pady=10)
 
-##----------------------------------------------------------------------
-## WINDOW: SELECT NDCS V2
-class SelectNDCs():
 
+class SelectNDCs():
+    """
+    GUI that allows selection of NDCs to include in model.
+    Shows information for each NDC in a table format to assist selection.
+
+    """
     def __init__(self, master, df_merged_data):
 
         self.master = master
         master.title("Generics Forecasting Model")
-        # master.geometry("600x400")
 
         self.title = Label(master, text='Generics Forecasting Model: Select NDCs', font='Helvetica 9 bold')
         self.title.grid(row=0, columnspan=2, pady=20, padx=20)
 
+        ##############################################################
+        # set up to enable the scrollbar
+        ##############################################################
         self.outer_frame = Frame(master)
         self.outer_frame.grid(row=1, column=0, columnspan=2)
         self.outer_frame.rowconfigure(0, weight=1)
@@ -161,7 +191,9 @@ class SelectNDCs():
         self.inner_frame = Frame(self.canvas)
         self.canvas.create_window(0, 0, window=self.inner_frame, anchor='nw')
 
+        ##############################################################
         # set up variables to store user selections
+        ##############################################################
         self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])[
             ['NDC', 'Manufacturer', 'Prod Form3', '2018_Units', '2019_Units', 'WACPrice', 'Pack']].reset_index(
             drop=True)
@@ -171,17 +203,20 @@ class SelectNDCs():
         self.selected_ndcs = pd.DataFrame()
         self.var = []
 
+        ##############################################################
+        # set up columns to show
+        ##############################################################
         m = 0
-
         header = ['NDC', 'Manufacturer', 'Dosage Form', '2018 Volume', '2019 Volume', 'WAC Price ($)', 'Pack']
         for h in header:
             label = Label(self.inner_frame, text=h, font='Helvetica 8 bold')
             label.grid(row=0, column=m, padx=8)
             m += 1
 
-        n = 1
-
+        ##############################################################
         # ndc checkboxes
+        ##############################################################
+        n = 1
         for index, row in self.ndcs.iterrows():
             v = IntVar()
             if row['2019_Units'] != row['2019_Units']:  # if nan
@@ -205,12 +240,14 @@ class SelectNDCs():
             self.addt_spacing.grid(row=n, column=6, sticky='w', padx=8)
             n += 1
 
+        ##############################################################
+        # scrollbar
+        ##############################################################
         self.scroll = Scrollbar(self.outer_frame, orient=VERTICAL)
         self.scroll.config(command=self.canvas.yview)
         self.canvas.config(yscrollcommand=self.scroll.set)
         self.scroll.grid(row=0, sticky="nse")
-
-        self.inner_frame.bind("<Configure>", self.update_scrollregion)
+        self.inner_frame.bind("<Configure>", self.update_scrollregion) #make the length of the scrollbar the full height
 
         self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
         self.continue_button.grid(row=1000, column=1, pady=20, padx=20, sticky='e')
@@ -225,9 +262,14 @@ class SelectNDCs():
     def update_scrollregion(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-##----------------------------------------------------------------------
-## WINDOW: ENTER EXCEL FILEPATH
+
 class EnterFilepath:
+    """
+    GUI to get file path to Model Input Excel file.
+    Finder window automatically pops up to select file (currently cannot reopen it if closed).
+    Ability to add a run name.
+
+    """
     parameters = {}
 
     def __init__(self, master):
@@ -235,12 +277,16 @@ class EnterFilepath:
         master.title("Generics Forecasting Model")
         master.geometry("600x400")
 
+        ##############################################################
         # create window header
+        ##############################################################
         self.title = Label(master, text='Generics Forecasting Model: Set File Path and Run Tag',
                            font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
+        ##############################################################
         # add entry for filepath and populate
+        ##############################################################
         self.filename = filedialog.askopenfilename(initialdir="C:\\Documents\\Demo Vertice 8.1",  # TODO update this
                                                    title="Select Model Input file",
                                                    filetypes=(("excel files", "*.xlsx"), ("all files", "*.*")))
@@ -250,14 +296,15 @@ class EnterFilepath:
         self.filepath_entry.insert(END, self.filename)
         self.filepath_entry.pack()
 
+        ##############################################################
         # add entry for run name
+        ##############################################################
         self.run_name_label = Label(master, text='Enter a run tag (optional):')
         self.run_name_label.pack(pady=10)
         self.run_name_entry = Entry(master, width=50)
         self.run_name_entry.pack()
         master.after(1000, lambda: self.run_name_entry.focus_force())
 
-        # add Save and Continue button
         self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
         self.continue_button.pack(pady=10)
 
@@ -267,9 +314,15 @@ class EnterFilepath:
 
         self.master.destroy()
 
-##----------------------------------------------------------------------
-## WINDOW: ENTER API COGS
+
 class EnterCOGS:
+    """
+    GUI to enter drug costs with three options.
+    (1) Margin
+    (2) Standard cost applied to each NDC
+    (3) Cost per each NDC
+
+    """
     COGS = {}
 
     def __init__(self, master, df_equivalents):
@@ -279,12 +332,17 @@ class EnterCOGS:
         self.title = Label(master, text='Enter Gross Margin', font='Helvetica 9 bold')  # margin before Distribution, Write-offs, Profit Share, and Milestone Payments
         self.title.grid(row=0, columnspan=2, pady=10)
 
-        # if user uses straight gross margin approach, instead of API approach
+        ##############################################################
+        # if user uses straight gross margin approach
+        ##############################################################
         self.gross_margin_label = Label(master, text='Gross margin assumption (as decimal): ')
         self.gross_margin_label.grid(row=1, column=0, sticky='e')
         self.gross_margin_entry = Entry(master)
         self.gross_margin_entry.grid(row=1, column=1, sticky='w')
 
+        ##############################################################
+        # if user uses standard API approach
+        ##############################################################
         self.sep1 = ttk.Separator(master, orient="horizontal")
         self.sep1.grid(column=0, row=2, columnspan=2, sticky="ew")
         self.sty = ttk.Style(master)
@@ -295,12 +353,14 @@ class EnterCOGS:
         self.subtitle = Label(master, text="Enter Standard API Cost", font='Helvetica 9 bold')
         self.subtitle.grid(row=3, columnspan=2, pady=10, padx=10)
 
-        # add entry boxes for desired units and API cost per unit
         self.standard_cogs_label = Label(master, text='Standard API Cost ($): ')
         self.standard_cogs_label.grid(row=4, column=0, sticky='e')
         self.standard_cogs_entry = Entry(master)
         self.standard_cogs_entry.grid(row=4, column=1, sticky='w')
 
+        ##############################################################
+        # if user uses API cost per unit approach
+        ##############################################################
         self.sep2 = ttk.Separator(master, orient="horizontal")
         self.sep2.grid(column=0, row=5, columnspan=2, sticky="ew")
 
@@ -320,13 +380,18 @@ class EnterCOGS:
         self.cost_per_unit_entry = Entry(master)
         self.cost_per_unit_entry.grid(row=8, column=1, sticky='w')
 
+        ##############################################################
         # add entry boxes for API units for each pack type found in therapeutic equivalents
+        ##############################################################
         self.API_costs_label = Label(master, text='Enter number of units for each pack type found: ')
         self.API_costs_label.grid(row=9, columnspan=2, pady=10)
 
         self.entries = []  # save entries created in list so that they can be accessed to store values
         i = 0  # start placing labels below the already assigned rows
 
+        ##############################################################
+        # setup for scroll bar
+        ##############################################################
         self.outer_frame = Frame(master)
         self.outer_frame.grid(row=10, column=0, columnspan=2)
         self.outer_frame.rowconfigure(0, weight=1)
@@ -338,6 +403,9 @@ class EnterCOGS:
         self.inner_frame = Frame(self.canvas)
         self.canvas.create_window(0, 0, window=self.inner_frame, anchor='nw')
 
+        ##############################################################
+        # fill scroll bar area with pack and number of units in each pack
+        ##############################################################
         self.packs = df_equivalents[['Pack', 'Units']].drop_duplicates()['Pack'].values
         for p in range(len(df_equivalents[['Pack', 'Units']].drop_duplicates())):
             pack_label = Label(self.inner_frame, text=df_equivalents['Pack'].iloc[p])
@@ -348,12 +416,15 @@ class EnterCOGS:
             self.entries.append(pack_entry)
             i += 1
 
+        ##############################################################
+        # scrollbar
+        ##############################################################
         self.scroll = Scrollbar(self.outer_frame, orient=VERTICAL)
         self.scroll.config(command=self.canvas.yview)
         self.canvas.config(yscrollcommand=self.scroll.set)
         self.scroll.grid(row=0, sticky="nse")
 
-        self.inner_frame.bind("<Configure>", self.update_scrollregion)
+        self.inner_frame.bind("<Configure>", self.update_scrollregion) #make the length of the scrollbar the full height
 
         run_model_button = Button(master, text='Run Model', command=self.save_and_run)
         run_model_button.grid(row=11, column=1, pady=10)
@@ -373,10 +444,12 @@ class EnterCOGS:
     def update_scrollregion(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
-##----------------------------------------------------------------------
-## WINDOW: PRINT RESULTS
-class ShowResults:
 
+class ShowResults:
+    """
+    GUI that shows results and allows user to kick off parameter scan or cancel it.
+
+    """
     def __init__(self, master, parameters):
         self.master = master
         master.title('Generics Forecasting Model')
@@ -385,6 +458,9 @@ class ShowResults:
         self.title = Label(master, text='Generics Forecasting Model: Results Summary', font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
+        ##############################################################
+        # printing the 5 calculated valuation metrics
+        ##############################################################
         self.unit_label = Label(master, text='NPV: ${} million'.format(parameters['npv']))
         self.unit_label.pack()
         self.unit_label = Label(master, text='IRR: {}%'.format(parameters['irr']))
@@ -406,10 +482,12 @@ class ShowResults:
         stop_model_button = Button(master, text='Cancel Parameter Scan', command=stop_model)
         stop_model_button.pack()
 
-##----------------------------------------------------------------------
-## WINDOW: PRINT RESULTS
-class SuccessfulRun:
 
+class SuccessfulRun:
+    """
+    GUI that shows that the parameter scan and writing of the results to the database was successful.
+
+    """
     def __init__(self, master):
         self.master = master
         master.title('')
@@ -425,14 +503,15 @@ class SuccessfulRun:
         run_model_button = Button(master, text='Finish', command=master.destroy)
         run_model_button.pack(pady=20)
 
-##----------------------------------------------------------------------
-## WINDOW: PRINT DETAILED RESULTS
-class ShowDetailedResults():
 
+class ShowDetailedResults():
+    """
+    GUI that shows detailed results when user choose not to run parameter in Excel file.
+
+    """
     def __init__(self, master, parameters, df_gfm):
         self.master = master
         master.title('Generics Forecasting Model')
-        # master.geometry("600x400")
 
         Label(master, text='Generics Forecasting Model: Results Summary',
               font='Helvetica 9 bold').grid(row=0, column=0, sticky=N, columnspan=12)
@@ -441,6 +520,9 @@ class ShowDetailedResults():
 
         Label(master, text='').grid(row=2, rowspan=2)
 
+        ##############################################################
+        # select what brand/molecule the user picked in the first screen
+        ##############################################################
         if parameters['search_type'] == 'brand':
             search_type = 'Brand Name'
             drug_id = parameters['brand_name']
@@ -448,6 +530,9 @@ class ShowDetailedResults():
             search_type = 'Molecule'
             drug_id = parameters['molecule_name']
 
+        ##############################################################
+        # printing the 5 calculated valuation metrics
+        ##############################################################
         Label(master, text='{}:  '.format(search_type), font='Helvetica 9 bold').grid(row=4, column=0, sticky=E,columnspan=6)
         Label(master, text='NPV:  ', font='Helvetica 9 bold').grid(row=5, column=0, sticky=E, columnspan=6)
         Label(master, text='IRR:  ', font='Helvetica 9 bold').grid(row=6, column=0, sticky=E, columnspan=6)
@@ -464,17 +549,26 @@ class ShowDetailedResults():
 
         Label(master, text='').grid(row=10, columnspan=12)
 
+        ##############################################################
+        # set up annual financial results table
+        ##############################################################
         Label(master, text="($m)", font='Helvetica 9').grid(row=11, column=0)
         Label(master, text="Net Sales", font='Helvetica 9 bold').grid(row=12, column=0)
         Label(master, text="COGS", font='Helvetica 9 bold').grid(row=13, column=0)
         Label(master, text="EBIT", font='Helvetica 9 bold').grid(row=14, column=0)
         Label(master, text="FCF", font='Helvetica 9 bold').grid(row=15, column=0)
 
+        ##############################################################
+        # years as headers
+        ##############################################################
         c = 1
         for i in range(parameters['present_year'], parameters['present_year'] + 11):
             Label(master, text=i, font='Helvetica 9 bold').grid(row=11, column=c)
             c = c + 1
 
+        ##############################################################
+        # adding the results to the results table
+        ##############################################################
         df = round(df_gfm[['Net Sales', 'COGS', 'EBIT', 'FCF']].loc[parameters['present_year']:].transpose(), 2)
 
         r = 12

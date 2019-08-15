@@ -1,13 +1,28 @@
-# Read user input Excel file
 import openpyxl as xl
 import pandas as pd
 import numpy as np
 
+
 def read_model_inputs(parameters):
-    wb = xl.load_workbook(filename=parameters['excel_filepath'], read_only=True, data_only=True) #data_only so it doesn't return the formulas
+    """
+    Reads in data from Model Inputs Excel file, which the user updates for each product.
+    Creates aggregated year-level dataframe and analog table dataframe.
+
+    Args:
+        parameters: Single-value variables.
+
+    Returns:
+        parameters: Single-value variables.
+        df_gfm: Aggregated year-level data.
+        df_analog: Market share and net price % of BWAC lookup table used in financial calculations.
+
+    """
+    wb = xl.load_workbook(filename=parameters['excel_filepath'], read_only=True, data_only=True)
     sheet = wb['Input']
 
+    ##############################################################
     # assign single-value variables from Excel cells into parameters dictionary
+    ##############################################################
     parameters.update({'brand_status': sheet['B6'].value,
                        'channel': sheet['B7'].value,
                        'channel_detail': sheet['B8'].value,
@@ -45,12 +60,16 @@ def read_model_inputs(parameters):
                        'last_forecasted_year': sheet['M55'].value
                        })
 
-    # Set up df_gfm data frame
+    ##############################################################
+    # set up df_gfm data frame
+    ##############################################################
     df_gfm = pd.DataFrame()
     df_gfm['Year'] = list(range(2016, parameters['last_forecasted_year'] + 1, 1))
     df_gfm = df_gfm.set_index('Year')
 
-    # Add excel yearly data
+    ##############################################################
+    # add excel yearly data
+    ##############################################################
     def pull_yearly_data(row_number):  # row you want data from
         x = [0] * (parameters['present_year'] - 2016)  # zeros for years not in 'model input' excel sheet
         for i in range(2, 14):
@@ -76,7 +95,9 @@ def read_model_inputs(parameters):
     df_gfm['Capital Avoidance'] = pull_yearly_data(90)
     df_gfm = df_gfm.fillna(0)  # if there is no data entered in the excel file, it gives NaNs, this converts them to 0s
 
-    # Adding analog data
+    ##############################################################
+    # adding analog data
+    ##############################################################
     sheet = wb['Analog']
 
     def pull_analog_data(row_number):  # row you want data from

@@ -4,6 +4,11 @@ import re
 
 
 def get_base_units(df):
+    """
+    Parse IMS data to get base units and quantity of base units for each NDC.
+    Parsed data is to be used to calculate API costs per NDC.
+
+    """
     ##############################################################
     # reformating numerical data to be numerical (yearly units used to find most common Base Unit)
     ##############################################################
@@ -106,4 +111,5 @@ def get_base_units(df):
             df['Units'].iloc[i] = df['Units'].iloc[i] * df['Pack Quantity'].iloc[i] * df['Pack Size'].iloc[i]
         except:
             df['Units'].iloc[i] = df['Units'].iloc[i]
+
     return (df)
