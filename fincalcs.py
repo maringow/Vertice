@@ -11,7 +11,7 @@ def get_growth_rate(df):
         df: The dataframe with molecule- and year-level data (i.e. df_detail).
 
     Returns:
-        growth_rate: The resulting rate.
+        growth_rate: A float, the resulting growth rate.
 
     """
     units_by_year = df['Units'].sum(level='year_index') # TODO update year with new annual data
@@ -32,7 +32,7 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
     Reverse-engineer the Excel-based GFM formulas for annual line items.
 
     Args:
-        parameters: Single-value variables.
+        parameters: Dictionary of single-value variables.
         df_gfm: Aggregated year-level data.
         df_detail: Molecule- and year-level data.
         df_analog: Market share and net price % of BWAC lookup table.
@@ -163,7 +163,7 @@ def valuation_calculations(parameters, df_gfm):
     Calculate the 5 key valuation numbers: IRR, NPV, payback period, exit value, MOIC.
 
     Args:
-        parameters: Single-value variables.
+        parameters: Dictionary of single-value variables.
         df_gfm: Aggregated year-level data from the financial_calculations function.
 
     Returns:
@@ -278,7 +278,7 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
     removes formulas with results that will not change during parameter scan.
 
     Args:
-        parameters: Single-value variables.
+        parameters: Dictionary of single-value variables.
         df_gfm: Aggregated year-level data.
         df_detail: Molecule- and year-level data.
         df_analog: Market share and net price % of BWAC lookup table.

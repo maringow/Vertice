@@ -8,6 +8,15 @@ class BrandSelection:
     """
     GUI to select product based on brand name or molecule name.
 
+    |    Brand Selection   |
+    |:--------------------:|
+    |   **Select brand:**  |
+    |         -----        |
+    |          OR          |
+    | **Select molecule:** |
+    |         -----        |
+    |       Continue       |
+
     """
     w1_parameters = {}
 
@@ -63,6 +72,12 @@ class DosageForms:
     GUI to select dosage forms based on selected product.
     Only appears if there is more than one dosage form.
 
+    |  Select Dosage Forms |
+    |:--------------------:|
+    |       ❑ form 1       |
+    |       ❑ form n       |
+    |       Continue       |
+
     """
     def __init__(self, master, dosage_forms):
         self.master = master
@@ -104,6 +119,14 @@ class DosageForms:
 class ConfirmBrand:
     """
     GUI that shows summary information of selected product.
+
+    | Review Therapeutic EquivalentS |
+    |:------------------------------:|
+    |   n equivalents found for xyz  |
+    |                                |
+    |     Molecules searched: xyz    |
+    | Dosage forms searched: form 1  |
+    |            Continue            |
 
     """
     def __init__(self, master, parameters, df_detail):
@@ -173,6 +196,15 @@ class SelectNDCs():
     """
     GUI that allows selection of NDCs to include in model.
     Shows information for each NDC in a table format to assist selection.
+
+    | NDC | Mfgr | Form | 2018 Volume | 2019 Volume | Price |   Pack   |
+    |-----|------|------|-------------|-------------|-------|----------|
+    | ❑ x |   x  | x    | x           | x           | x     | x        |
+    | ❑ x |   x  | x    | x           | x           | x     | x        |
+    | ❑ x | x    | x    | x           | x           | x     | x        |
+    | ❑ x |   x  | x    | x           | x           | x     | x        |
+    | ❑ x | x    | x    | x           | x           | x     | x        |
+    |     |      |      |             |             |       | Continue |
 
     """
     def __init__(self, master, df_merged_data):
@@ -277,6 +309,15 @@ class EnterFilepath:
     Finder window automatically pops up to select file (currently cannot reopen it if closed).
     Ability to add a run name.
 
+    |    File Path and Run Tag   |
+    |:--------------------------:|
+    |     **Enter filepath:**    |
+    |            -----           |
+    |             OR             |
+    |     **Enter run tag:**     |
+    |            -----           |
+    |          Continue          |
+
     """
     parameters = {}
 
@@ -330,6 +371,22 @@ class EnterCOGS:
     1. Margin
     2. Standard cost applied to each NDC
     3. Cost per each NDC
+
+    |      Enter Gross Margin     |           |
+    |:---------------------------:|:---------:|
+    |                     margin: |    000    |
+    |            - OR -           |           |
+    | **Enter Standard API Cost** |           |
+    |          standard api cost: |    000    |
+    |            - OR -           |           |
+    | **Enter API Cost Per Unit** |           |
+    |                  Base unit: |     MG    |
+    |          api cost per unit: |    000    |
+    |    Enter number of units:   |           |
+    |                      pack 1 |    000    |
+    |                      pack 2 |    000    |
+    |                      pack n |    000    |
+    |                             | Run Model |
 
     """
     COGS = {}
@@ -459,6 +516,21 @@ class ShowResults:
     """
     GUI that shows results and allows user to kick off parameter scan or cancel it.
 
+    |               |          |          |     Results Summary    |          |          |          |
+    |---------------|----------|----------|:----------------------:|----------|----------|----------|
+    |               |          |          |     **NPV**: 0.00m     |          |          |          |
+    |               |          |          |      **IRR**: 0.0%     |          |          |          |
+    |               |          |          | **Payback**: 0.0 years |          |          |          |
+    |               |          |          |  **Exit value**: 0.00m |          |          |          |
+    |               |          |          |     **MOIC**: 0.0x     |          |          |          |
+    |               |          |          |                        |          |          |          |
+    |               | **2019** | **2020** |           ...          | **2028** | **2029** | **2030** |
+    | **Net Sales** |     0    |     0    |           ...          |     0    |     0    |     0    |
+    | **COGS**      |     0    |     0    |           ...          |     0    |     0    |     0    |
+    | **EBIT**      |     0    |     0    |           ...          |     0    |     0    |     0    |
+    | **FCF**       |     0    |     0    |           ...          |     0    |     0    |     0    |
+    |               |          |          |         Finish         |          |          |          |
+
     """
     def __init__(self, master, parameters):
         self.master = master
@@ -498,6 +570,12 @@ class ShowResults:
 class SuccessfulRun:
     """
     GUI that shows that the parameter scan and writing of results to the database was successful.
+
+    | Successful Model Run |
+    |:--------------------:|
+    |    scan complete     |
+    |    results saved     |
+
 
     """
     def __init__(self, master):

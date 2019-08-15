@@ -6,7 +6,7 @@ import numpy as np
 def get_base_units(df):
     """
     Parse IMS data to get base units and quantity of base units for each NDC.
-    Parsed data is to be used to calculate API costs per NDC.
+    Parsed data is used to calculate API costs per NDC, which is auto-populated in the gui entry boxes.
 
     """
     ##############################################################

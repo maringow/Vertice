@@ -8,10 +8,10 @@ def read_model_inputs(parameters):
     Creates aggregated year-level dataframe and analog table dataframe.
 
     Args:
-        parameters: Single-value variables.
+        parameters: Dictionary of single-value variables.
 
     Returns:
-        parameters: Single-value variables.
+        parameters: Dictionary of single-value variables.
         df_gfm: Aggregated year-level data.
         df_analog: Market share and net price % of BWAC lookup table used in financial calculations.
 
