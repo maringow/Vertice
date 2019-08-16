@@ -30,24 +30,12 @@ def get_base_units(df):
     # getting the Base Unit
     ##############################################################
     # getting most common unit sold, make Base Unit
-    df['unitssum'] = df['2013_Units'] + df['2014_Units'] + df['2015_Units'] + df['2016_Units'] + \
-                     df['2017_Units'] + df['2018_Units'] + df['2019_Units']
-    x = df.groupby(['Combined Molecule', 'Strength'])['2019_Units', 'unitssum'].sum()\
-        .sort_values(['Combined Molecule', 'unitssum'], ascending=[True, False]).reset_index()
-    x = x.groupby('Combined Molecule').nth(0).drop(['2019_Units', 'unitssum'], axis=1)
-    df = df.merge(x, on='Combined Molecule', how='left',
-                  suffixes=['', 'Base Unit']).drop('unitssum', axis=1)
-    df = df.rename(columns={"StrengthBase Unit": "Base Unit1"})
-    # if no sales, the most freq in the db
-    x = df[df['Base Unit1'] != df['Base Unit1']]
-    x = x.groupby(['Combined Molecule', 'Strength'])['Strength'].count().reset_index(name='count')
-    x = x.sort_values(['Combined Molecule', 'count'], ascending=[True, False])
-    x = x.groupby('Combined Molecule').first().drop('count', axis=1)
-    df = df.merge(x, on='Combined Molecule', how='left', suffixes=['', 'Base Unit'])
-    df = df.rename(columns={"StrengthBase Unit": "Base Unit2"})
-    # combining columns
-    df['Base Unit'] = (df['Base Unit1'].fillna('') + df['Base Unit2'].fillna(''))
-    df = df.drop(['Base Unit1', 'Base Unit2'], axis=1)
+    df['unitssum'] = df['2013_Units'] + df['2014_Units'] + df['2015_Units'] + df['2016_Units'] + df['2017_Units'] + df['2018_Units'] + df['2019_Units']
+    x = df.groupby(['Combined Molecule','Strength'])['2019_Units','unitssum'].sum().sort_values(['Combined Molecule','unitssum'],ascending=[True,False]).reset_index()
+    x = x.groupby('Combined Molecule').first().drop(['2019_Units','unitssum'], axis=1)
+    df = df.merge(x, on='Combined Molecule', how ='left',suffixes=['','Base Unit']).drop('unitssum',axis=1)
+    df = df.rename(columns={"StrengthBase Unit": "Base Unit"})
+    df['Base Unit'] = df['Base Unit'].fillna('')
 
     ##############################################################
     # parsing the number of Base Units in the Strength string
@@ -105,7 +93,7 @@ def get_base_units(df):
                 df.Units.iloc[i] = ''
         # if not parsed, it goes blank
         else:
-            df.Units = ''
+            df.Units.iloc[i] = ''
     ##############################################################
     # multiplying parsed # if possible to get total Base Units
     ##############################################################
