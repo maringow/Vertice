@@ -30,10 +30,13 @@ def get_base_units(df):
     # getting the Base Unit
     ##############################################################
     # getting most common unit sold, make Base Unit
-    df['unitssum'] = df['2013_Units'] + df['2014_Units'] + df['2015_Units'] + df['2016_Units'] + df['2017_Units'] + df['2018_Units'] + df['2019_Units']
-    x = df.groupby(['Combined Molecule','Strength'])['2019_Units','unitssum'].sum().sort_values(['Combined Molecule','unitssum'],ascending=[True,False]).reset_index()
-    x = x.groupby('Combined Molecule').first().drop(['2019_Units','unitssum'], axis=1)
-    df = df.merge(x, on='Combined Molecule', how ='left',suffixes=['','Base Unit']).drop('unitssum',axis=1)
+    df['unitssum'] = df['2013_Units'] + df['2014_Units'] + df['2015_Units'] + df['2016_Units'] + \
+                     df['2017_Units'] + df['2018_Units'] + df['2019_Units']
+    x = df.groupby(['Combined Molecule', 'Strength'])['2019_Units', 'unitssum']\
+        .sum().sort_values(['Combined Molecule', 'unitssum'], ascending=[True, False]).reset_index()
+    x = x.groupby('Combined Molecule').first().drop(['2019_Units', 'unitssum'], axis=1)
+    df = df.merge(x, on='Combined Molecule', how='left',
+                  suffixes=['', 'Base Unit']).drop('unitssum', axis=1)
     df = df.rename(columns={"StrengthBase Unit": "Base Unit"})
     df['Base Unit'] = df['Base Unit'].fillna('')
 
@@ -94,6 +97,7 @@ def get_base_units(df):
         # if not parsed, it goes blank
         else:
             df.Units.iloc[i] = ''
+
     ##############################################################
     # multiplying parsed # if possible to get total Base Units
     ##############################################################
