@@ -34,7 +34,7 @@ def get_base_units(df):
                      df['2017_Units'] + df['2018_Units'] + df['2019_Units']
     x = df.groupby(['Combined Molecule', 'Strength'])['2019_Units', 'unitssum'].sum()\
         .sort_values(['Combined Molecule', 'unitssum'], ascending=[True, False]).reset_index()
-    x = x.groupby('Combined Molecule').nth(1).drop(['2019_Units', 'unitssum'], axis=1)
+    x = x.groupby('Combined Molecule').nth(0).drop(['2019_Units', 'unitssum'], axis=1)
     df = df.merge(x, on='Combined Molecule', how='left',
                   suffixes=['', 'Base Unit']).drop('unitssum', axis=1)
     df = df.rename(columns={"StrengthBase Unit": "Base Unit1"})

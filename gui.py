@@ -237,8 +237,6 @@ class SelectNDCs():
             ['NDC', 'Manufacturer', 'Prod Form3', '2018_Units', '2019_Units', 'WACPrice', 'Pack']]\
             .reset_index(drop=True)
         self.ndcs = self.ndcs.drop_duplicates().reset_index()
-        print('df_merged_data', df_merged_data)
-        print('self.ndcs', self.ndcs)
         self.selected_ndcs = pd.DataFrame()
         self.var = []
 
