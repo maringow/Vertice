@@ -137,7 +137,6 @@ parameters['gx_players_adj'] = 0
 
 df_gfm, df_detail = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
 results, annual_forecast = fincalcs.valuation_calculations(parameters, df_gfm)
-# print(annual_forecast[['Net Sales', 'COGS', 'EBIT', 'FCF']])
 
 ##----------------------------------------------------------------------
 ## PRINT RESULTS TO WINDOW
