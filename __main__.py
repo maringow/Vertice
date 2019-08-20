@@ -8,6 +8,7 @@ from sqlite3 import Error
 from sklearn.model_selection import ParameterGrid
 import pandas as pd
 import numpy as np
+# importing internal modules
 import gui
 import fincalcs
 import readinputs
