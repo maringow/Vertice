@@ -574,7 +574,6 @@ class SuccessfulRun:
     |    scan complete     |
     |    results saved     |
 
-
     """
     def __init__(self, master):
         self.master = master
@@ -623,40 +622,31 @@ class ShowDetailedResults():
         ##############################################################
         # printing the 5 calculated valuation metrics
         ##############################################################
-        Label(master, text='{}:  '.format(search_type), font='Helvetica 9 bold').grid(row=4,
-                                                                                      column=0,
-                                                                                      sticky=E,
-                                                                                      columnspan=6)
-        Label(master, text='NPV:  ', font='Helvetica 9 bold').grid(row=5, column=0, sticky=E,
-                                                                   columnspan=6)
-        Label(master, text='IRR:  ', font='Helvetica 9 bold').grid(row=6, column=0, sticky=E,
-                                                                   columnspan=6)
-        Label(master, text='Payback:  ', font='Helvetica 9 bold').grid(row=7, column=0, sticky=E,
-                                                                       columnspan=6)
-        Label(master, text='Exit value in 2021:  ', font='Helvetica 9 bold').grid(row=8, column=0,
-                                                                                  sticky=E,
-                                                                                  columnspan=6)
-        Label(master, text='MOIC in 2021:  ', font='Helvetica 9 bold').grid(row=9, column=0,
-                                                                            sticky=E, columnspan=6)
+        Label(master, text='{}:  '.format(search_type),
+              font='Helvetica 9 bold').grid(row=4, column=0, sticky=E, columnspan=6)
+        Label(master, text='NPV:  ',
+              font='Helvetica 9 bold').grid(row=5, column=0, sticky=E, columnspan=6)
+        Label(master, text='IRR:  ',
+              font='Helvetica 9 bold').grid(row=6, column=0, sticky=E,columnspan=6)
+        Label(master, text='Payback:  ',
+              font='Helvetica 9 bold').grid(row=7, column=0, sticky=E, columnspan=6)
+        Label(master, text='Exit value in 2021:  ',
+              font='Helvetica 9 bold').grid(row=8, column=0, sticky=E, columnspan=6)
+        Label(master, text='MOIC in 2021:  ',
+              font='Helvetica 9 bold').grid(row=9, column=0, sticky=E, columnspan=6)
 
-        Label(master, text='{}'.format(drug_id)).grid(row=4, column=6,
-                                                      sticky=W,
-                                                      columnspan=6)
-        Label(master, text='${} million'.format(parameters['npv'])).grid(row=5, column=6,
-                                                                         sticky=W,
-                                                                         columnspan=6)
-        Label(master, text='{}%'.format(parameters['irr'])).grid(row=6, column=6,
-                                                                 sticky=W,
-                                                                 columnspan=6)
-        Label(master, text='{} years'.format(parameters['payback'])).grid(row=7, column=6,
-                                                                          sticky=W,
-                                                                          columnspan=6)
-        Label(master, text='${} million'.format(parameters['exit_value'])).grid(row=8, column=6,
-                                                                                sticky=W,
-                                                                                columnspan=6)
-        Label(master, text='{}x'.format(parameters['moic'])).grid(row=9, column=6,
-                                                                  sticky=W,
-                                                                  columnspan=6)
+        Label(master, text='{}'.format(drug_id))\
+            .grid(row=4, column=6, sticky=W, columnspan=6)
+        Label(master, text='${} million'.format(parameters['npv']))\
+            .grid(row=5, column=6, sticky=W, columnspan=6)
+        Label(master, text='{}%'.format(parameters['irr']))\
+            .grid(row=6, column=6, sticky=W, columnspan=6)
+        Label(master, text='{} years'.format(parameters['payback']))\
+            .grid(row=7, column=6, sticky=W, columnspan=6)
+        Label(master, text='${} million'.format(parameters['exit_value']))\
+            .grid(row=8, column=6, sticky=W, columnspan=6)
+        Label(master, text='{}x'.format(parameters['moic']))\
+            .grid(row=9, column=6, sticky=W, columnspan=6)
 
         Label(master, text='').grid(row=10, columnspan=12)
 
