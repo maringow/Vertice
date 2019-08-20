@@ -109,6 +109,7 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
                                   (1 - pd.to_numeric(parameters['profit_margin_override']))
     else:
         # calculating std_cost_per_unit in future
+        # API_cost is the API cost per NDC from the 2nd or 3rd approach in GUI window
         df_detail['std_cost_per_unit'] = df_detail['API_cost'].add(
             (parameters['cogs']['excipients'] + parameters['cogs']['direct_labor'] +
              parameters['cogs']['variable_overhead'] + parameters['cogs']['fixed_overhead'] +
