@@ -38,10 +38,6 @@ def get_base_units(df):
         df = pd.to_numeric(df)
         return df
 
-    df['2013_Units'] = make_numeric(df['2013_Units'])
-    df['2014_Units'] = make_numeric(df['2014_Units'])
-    df['2015_Units'] = make_numeric(df['2015_Units'])
-    df['2016_Units'] = make_numeric(df['2016_Units'])
     df['2017_Units'] = make_numeric(df['2017_Units'])
     df['2018_Units'] = make_numeric(df['2018_Units'])
     df['2019_Units'] = make_numeric(df['2019_Units'])
@@ -50,8 +46,7 @@ def get_base_units(df):
     # getting the Base Unit
     ##############################################################
     # getting most common unit sold, make Base Unit
-    df['unitssum'] = df['2013_Units'] + df['2014_Units'] + df['2015_Units'] + df['2016_Units'] + \
-                     df['2017_Units'] + df['2018_Units'] + df['2019_Units']
+    df['unitssum'] = df['2017_Units'] + df['2018_Units'] + df['2019_Units']
     x = df.groupby(['Combined Molecule', 'Strength'])['2019_Units', 'unitssum']\
         .sum().sort_values(['Combined Molecule', 'unitssum'], ascending=[True, False]).reset_index()
     x = x.groupby('Combined Molecule').first().drop(['2019_Units', 'unitssum'], axis=1)
