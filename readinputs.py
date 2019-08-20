@@ -38,7 +38,6 @@ def read_model_inputs(parameters):
                        'competition_detail': sheet['B17'].value,
                        'pos': sheet['B18'].value,
                        'comments': sheet['B19'].value,
-                       'scan_and_save': sheet['B20'].value,
                        'volume_growth_rate': sheet['B23'].value,
                        'wac_increase': sheet['B24'].value,
                        'gtn_%': sheet['B27'].value,

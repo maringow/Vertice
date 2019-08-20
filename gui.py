@@ -510,9 +510,59 @@ class EnterCOGS:
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
 
 
-class ShowResults:
+# class ShowResults:
+#     """
+#     GUI that shows results and allows user to kick off parameter scan or cancel it.
+#
+#     |     Results Summary    |
+#     |:----------------------:|
+#     |     **NPV**: 0.00m     |
+#     |      **IRR**: 0.0%     |
+#     | **Payback**: 0.0 years |
+#     |  **Exit value**: 0.00m |
+#     |     **MOIC**: 0.0x     |
+#     |        Run Scan        |
+#     |       Cancel Scan      |
+#
+#     """
+#     def __init__(self, master, parameters):
+#         self.master = master
+#         master.title('Generics Forecasting Model')
+#         master.geometry("500x300")
+#
+#         self.title = Label(master, text='Generics Forecasting Model: Results Summary',
+#                            font='Helvetica 9 bold')
+#         self.title.pack(pady=10)
+#
+#         ##############################################################
+#         # printing the 5 calculated valuation metrics
+#         ##############################################################
+#         self.unit_label = Label(master, text='NPV: ${} million'.format(parameters['npv']))
+#         self.unit_label.pack()
+#         self.unit_label = Label(master, text='IRR: {}%'.format(parameters['irr']))
+#         self.unit_label.pack()
+#         self.unit_label = Label(master, text='Payback: {} years'.format(parameters['payback']))
+#         self.unit_label.pack()
+#         self.unit_label = Label(master, text='Exit value in 2021: ${} million'
+#                                 .format(parameters['exit_value']))
+#         self.unit_label.pack()
+#         self.unit_label = Label(master, text='MOIC in 2021: {}x'.format(parameters['moic']))
+#         self.unit_label.pack()
+#
+#         run_model_button = Button(master, text='Run Parameter Scan', command=master.destroy)
+#         run_model_button.pack(pady=20)
+#
+#         def stop_model():
+#             import sys
+#             sys.exit()
+#
+#         stop_model_button = Button(master, text='Cancel Parameter Scan', command=stop_model)
+#         stop_model_button.pack()
+
+
+class ShowDetailedResults():
     """
-    GUI that shows results and allows user to kick off parameter scan or cancel it.
+    GUI that shows detailed results when user choose not to run parameter in Excel file.
 
     |               |          |          |     Results Summary    |          |          |          |
     |---------------|----------|----------|:----------------------:|----------|----------|----------|
@@ -530,73 +580,6 @@ class ShowResults:
     |               |          |          |         Finish         |          |          |          |
 
     """
-    def __init__(self, master, parameters):
-        self.master = master
-        master.title('Generics Forecasting Model')
-        master.geometry("500x300")
-
-        self.title = Label(master, text='Generics Forecasting Model: Results Summary',
-                           font='Helvetica 9 bold')
-        self.title.pack(pady=10)
-
-        ##############################################################
-        # printing the 5 calculated valuation metrics
-        ##############################################################
-        self.unit_label = Label(master, text='NPV: ${} million'.format(parameters['npv']))
-        self.unit_label.pack()
-        self.unit_label = Label(master, text='IRR: {}%'.format(parameters['irr']))
-        self.unit_label.pack()
-        self.unit_label = Label(master, text='Payback: {} years'.format(parameters['payback']))
-        self.unit_label.pack()
-        self.unit_label = Label(master, text='Exit value in 2021: ${} million'
-                                .format(parameters['exit_value']))
-        self.unit_label.pack()
-        self.unit_label = Label(master, text='MOIC in 2021: {}x'.format(parameters['moic']))
-        self.unit_label.pack()
-
-        run_model_button = Button(master, text='Run Parameter Scan', command=master.destroy)
-        run_model_button.pack(pady=20)
-
-        def stop_model():
-            import sys
-            sys.exit()
-
-        stop_model_button = Button(master, text='Cancel Parameter Scan', command=stop_model)
-        stop_model_button.pack()
-
-
-class SuccessfulRun:
-    """
-    GUI that shows that the parameter scan and writing of results to the database was successful.
-
-    | Successful Model Run |
-    |:--------------------:|
-    |    scan complete     |
-    |    results saved     |
-
-    """
-    def __init__(self, master):
-        self.master = master
-        master.title('')
-        master.geometry("300x150")
-
-        self.title = Label(master, text='Generics Forecasting Model: Successful Model Run',
-                           font='Helvetica 9 bold')
-        self.title.pack(pady=10)
-        self.title = Label(master, text='Parameter scan complete.', font='Helvetica 9')
-        self.title.pack(pady=10)
-        self.title = Label(master, text='Results saved to the database.', font='Helvetica 9')
-        self.title.pack(pady=10)
-
-        run_model_button = Button(master, text='Finish', command=master.destroy)
-        run_model_button.pack(pady=20)
-
-
-class ShowDetailedResults():
-    """
-    GUI that shows detailed results when user choose not to run parameter in Excel file.
-
-    """
     def __init__(self, master, parameters, df_gfm):
         self.master = master
         master.title('Generics Forecasting Model')
@@ -604,7 +587,7 @@ class ShowDetailedResults():
         Label(master, text='Generics Forecasting Model: Results Summary',
               font='Helvetica 9 bold').grid(row=0, column=0, sticky=N, columnspan=12)
         Label(master,
-              text='Did not opt to do the parameter scan. No results saved to the database.',
+              text='Chose whether to run the parameter scan and save results to the database.',
               font='Helvetica 9').grid(row=1, column=0, sticky=N, columnspan=12)
 
         Label(master, text='').grid(row=2, rowspan=2)
@@ -681,5 +664,39 @@ class ShowDetailedResults():
                 c = c + 1
             r = r + 1
 
-        Label(master, text='').grid(row=16, rowspan=2)
-        Button(master, text='Finish', command=master.destroy).grid(row=16, columnspan=12, pady=10)
+        run_model_button = Button(master, text='Run Parameter Scan', command=master.destroy)
+        run_model_button.grid(row=16, columnspan=12, pady=10)
+
+        def stop_model():
+            import sys
+            sys.exit()
+
+        stop_model_button = Button(master, text='Cancel Parameter Scan', command=stop_model)
+        stop_model_button.grid(row=17, columnspan=12, pady=10)
+
+
+class SuccessfulRun:
+    """
+    GUI that shows that the parameter scan and writing of results to the database was successful.
+
+    | Successful Model Run |
+    |:--------------------:|
+    |    scan complete     |
+    |    results saved     |
+
+    """
+    def __init__(self, master):
+        self.master = master
+        master.title('')
+        master.geometry("300x150")
+
+        self.title = Label(master, text='Generics Forecasting Model: Successful Model Run',
+                           font='Helvetica 9 bold')
+        self.title.pack(pady=10)
+        self.title = Label(master, text='Parameter scan complete.', font='Helvetica 9')
+        self.title.pack(pady=10)
+        self.title = Label(master, text='Results saved to the database.', font='Helvetica 9')
+        self.title.pack(pady=10)
+
+        run_model_button = Button(master, text='Finish', command=master.destroy)
+        run_model_button.pack(pady=20)
