@@ -30,6 +30,7 @@ def get_growth_rate(df):
 def financial_calculations(parameters, df_gfm, df_detail, df_analog):
     """
     Reverse-engineer the Excel-based GFM formulas for annual line items.
+    Uses dataframes that have been created by reading in Excel data and the user's GUI inputs.
 
     Args:
         parameters: Dictionary of single-value variables.
@@ -274,7 +275,7 @@ def valuation_calculations(parameters, df_gfm):
 
 def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
     """
-    Altered financial_calculations that handles the parameter scan and
+    Altered financial_calculations function that handles the parameter scan and
     removes formulas with results that will not change during parameter scan.
 
     Args:

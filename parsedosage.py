@@ -6,7 +6,27 @@ import numpy as np
 def get_base_units(df):
     """
     Parse IMS data to get base units and quantity of base units for each NDC.
-    Parsed data is used to calculate API costs per NDC, which is auto-populated in the gui entry boxes.
+    Parsed data is used to calculate API costs per NDC, which auto-populates in the gui entry boxes.
+    Base Unit is based on most units sold of the NDCs selected in GUI windows.
+
+    Example:
+    **Before**
+    | Pack Size | Pack Quantity | Strength |        Pack          |
+    |:---------:|:-------------:|:--------:|:--------------------:|
+    | 1         | 1             |100MG/ML  | SYR 100MG/ML 1.0ML   |
+    | 1         | 90            | 8MG      | CAP 8MG 90           |
+    | 4         | 25            | 0.4MG    | TAB SL .4MG 25X4     |
+    | 1         | 4000          | 100%     | LIQ BULK 100% 4000ML |
+    | 1         | 100           | 15MG     | TAB 15MG 15          |
+
+    **After**
+    | Pack Size | Pack Quantity | Strength |        Pack          | Base Unit | Units |
+    |:---------:|:-------------:|:--------:|:--------------------:|:---------:|:-----:|
+    | 1         | 1             |100MG/ML  | SYR 100MG/ML 1.0ML   | 40MG/.4ML | 1     |
+    | 1         | 90            | 8MG      | CAP 8MG 90           | 1MG       | 720   |
+    | 4         | 25            | 0.4MG    | TAB SL .4MG 25X4     | 0.4MG     | 100   |
+    | 1         | 4000          | 100%     | LIQ BULK 100% 4000ML | 100%      | 4000  |
+    | 1         | 100           | 15MG     | TAB 15MG 15          | 5MG       | 300   |
 
     """
     ##############################################################

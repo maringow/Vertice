@@ -6,6 +6,8 @@ def read_model_inputs(parameters):
     """
     Reads in data from Model Inputs Excel file, which the user updates for each product.
     Creates aggregated year-level dataframe and analog table dataframe.
+    Uses absolute cell reference.
+    With openpyxl, a for loop is needed to pull a row of data (see functions below).
 
     Args:
         parameters: Dictionary of single-value variables.
