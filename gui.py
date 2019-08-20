@@ -472,11 +472,12 @@ class EnterCOGS:
         # fill scroll bar area with pack and number of units in each pack
         ##############################################################
         self.packs = df_equivalents[['Pack', 'Units']].drop_duplicates()['Pack'].values
+        self.units = df_equivalents[['Pack', 'Units']].drop_duplicates()['Units'].values
         for p in range(len(df_equivalents[['Pack', 'Units']].drop_duplicates())):
-            pack_label = Label(self.inner_frame, text=df_equivalents['Pack'].iloc[p])
+            pack_label = Label(self.inner_frame, text=self.packs[p])
             pack_label.grid(row=i, column=1, padx=5, sticky='e')
             pack_entry = Entry(self.inner_frame)
-            pack_entry.insert(END, df_equivalents['Units'].iloc[p])
+            pack_entry.insert(END, self.units[p])
             pack_entry.grid(row=i, column=2, padx=5, sticky='e')
             self.entries.append(pack_entry)
             i += 1
