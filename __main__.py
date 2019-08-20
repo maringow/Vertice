@@ -17,8 +17,9 @@ import output
 import parsedosage
 
 
-##----------------------------------------------------------------------
-## INGEST DATA (IMS, ProspectoRx)
+##############################################################
+# INGEST DATA (IMS, ProspectoRx)
+##############################################################
 
 # turn off warnings for SettingWithCopy and Future
 pd.set_option('mode.chained_assignment', None)
@@ -36,8 +37,9 @@ brands = sorted(IMS.loc[IMS['Brand/Generic'] == 'BRAND']['Product Sum'].dropna()
 molecules = IMS['Combined Molecule'].dropna().unique().tolist()
 parameters = {}
 
-##----------------------------------------------------------------------
-## OPEN BRAND SELECTION AND SAVE PARAMETERS
+##############################################################
+# OPEN BRAND SELECTION AND SAVE PARAMETERS
+##############################################################
 window = Tk()
 window1 = gui.BrandSelection(window, brands, molecules)
 window.mainloop()
@@ -45,8 +47,9 @@ window.mainloop()
 parameters.update(window1.w1_parameters)
 print(parameters)
 
-##----------------------------------------------------------------------
-## OPEN DOSAGE FORM SELECTION IF MORE THAN ONE DOSAGE FORM IS FOUND
+##############################################################
+# OPEN DOSAGE FORM SELECTION IF MORE THAN ONE DOSAGE FORM IS FOUND
+##############################################################
 parameters = mergedatasets.get_dosage_forms(parameters, IMS)
 
 if len(parameters['dosage_forms']) > 1:
@@ -57,9 +60,9 @@ if len(parameters['dosage_forms']) > 1:
 
 print(parameters['dosage_forms'])
 
-##----------------------------------------------------------------------
-## FIND THERAPEUTIC EQUIVALENTS AND JOIN IMS AND PROSPECTO DATASETS
-
+##############################################################
+# FIND THERAPEUTIC EQUIVALENTS AND JOIN IMS AND PROSPECTO DATASETS
+##############################################################
 # find all IMS records that match the Combined Molecule and Prod Form2
 df_equivalents = mergedatasets.get_equiv(IMS, parameters)
 parameters['count_eqs'] = len(df_equivalents)
@@ -70,8 +73,9 @@ df_merged_data, df_detail = mergedatasets.merge_ims_prospecto(df_equivalents, pr
 parameters['combined_molecules'] = '; '.join(parameters['combined_molecules'])
 parameters['dosage_forms'] = '; '.join(parameters['dosage_forms'])
 
-##----------------------------------------------------------------------
-## OPEN ConfirmBrand WINDOW AND SAVE
+##############################################################
+# OPEN ConfirmBrand WINDOW AND SAVE
+##############################################################
 # set parameters to display in confirmation window
 parameters['count_competitors'] = len(df_equivalents.loc[pd.isnull(
     df_equivalents['2018_Units']) == False]['Manufacturer'].unique()) # TODO update year w/ new data
@@ -81,8 +85,9 @@ window = Tk()
 window3 = gui.ConfirmBrand(window, parameters, df_detail)
 window.mainloop()
 
-##----------------------------------------------------------------------
-## OPEN SelectNDCs WINDOW AND SAVE
+##############################################################
+# OPEN SelectNDCs WINDOW AND SAVE
+##############################################################
 window = Tk()
 window4 = gui.SelectNDCs(window, df_merged_data)
 window.mainloop()
@@ -96,16 +101,18 @@ print('After drop: {}'.format(df_equivalents['NDC']))
 parameters['selected_NDCs'] = str(parameters['selected_NDCs'])
 df_equivalents = parsedosage.get_base_units(df_equivalents)
 
-##----------------------------------------------------------------------
-## OPEN EnterFilepath WINDOW AND SAVE VALUES
+##############################################################
+# OPEN EnterFilepath WINDOW AND SAVE VALUES
+##############################################################
 window = Tk()
 window5 = gui.EnterFilepath(window)
 window.mainloop()
 
 parameters.update(window5.parameters)
 
-##----------------------------------------------------------------------
-## OPEN EnterCOGS WINDOW AND SAVE VALUES
+##############################################################
+# OPEN EnterCOGS WINDOW AND SAVE VALUES
+##############################################################
 window = Tk()
 window6 = gui.EnterCOGS(window, df_equivalents)
 window.mainloop()
@@ -126,8 +133,9 @@ else:
 df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC', 'API_cost']],
                      on='NDC', how='left').set_index(['year_index', 'ndc_index'])
 
-##----------------------------------------------------------------------
-## READ EXCEL
+##############################################################
+# READ EXCEL
+##############################################################
 parameters, df_gfm, df_analog = readinputs.read_model_inputs(parameters)
 
 # parameters for base case
@@ -139,8 +147,9 @@ parameters['gx_players_adj'] = 0
 df_gfm, df_detail = fincalcs.financial_calculations(parameters, df_gfm, df_detail, df_analog)
 results, annual_forecast = fincalcs.valuation_calculations(parameters, df_gfm)
 
-##----------------------------------------------------------------------
-## PRINT RESULTS TO WINDOW
+##############################################################
+# PRINT RESULTS TO WINDOW
+##############################################################
 parameters['npv'] = round(results['npv'], 2)
 if results['irr'] == 'N/A':
     parameters['irr'] = 'N/A'
@@ -157,8 +166,9 @@ window = Tk()
 window7 = gui.ShowDetailedResults(window, parameters, df_gfm)
 window.mainloop()
 
-##----------------------------------------------------------------------
-## PARAMETER SCAN
+##############################################################
+# PARAMETER SCAN
+##############################################################
 scenario_id = 0
 results['scenario_id'] = scenario_id
 annual_forecast['scenario_id'] = scenario_id
@@ -183,7 +193,6 @@ param_grid = {'years_to_discount': [5, 10],
               'gx_players_adj': [-2, -1, 0, 1, 2]}
 
 param_mat = pd.DataFrame(ParameterGrid(param_grid))
-
 
 def parameterscan(years_to_discount, probability_of_success, launch_delay_years,
                   overall_cogs_increase, volume_growth, gx_players_adj, parameters,
@@ -217,8 +226,9 @@ for i in x[1]:
     i['scenario_id'] = scenario_id
     df_annual_forecast = df_annual_forecast.append(i)
 
-##----------------------------------------------------------------------
-## FORMATTING THE RESULTS TO PUT INTO DB
+##############################################################
+# FORMATTING THE RESULTS TO PUT INTO DB
+##############################################################
 run_id = 0
 df_result['run_id'] = run_id
 df_annual_forecast['run_id'] = run_id
