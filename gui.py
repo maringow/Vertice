@@ -4,6 +4,65 @@ from tkinter import filedialog
 import pandas as pd
 
 
+class AutocompleteCombobox(ttk.Combobox):
+    """
+    Ability to autocomplete a Tkinter ComboBox. Used to select Brand or Molecule.
+    Idea from: [stackoverflow link](https://stackoverflow.com/questions/12298159/tkinter-how-to-create-a-combo-box-with-autocompletion)
+
+    """
+    def set_completion_list(self, completion_list):
+        """Use our completion list as our drop down selection menu, arrows move through menu."""
+        self._completion_list = completion_list
+        self._hits = []
+        self._hit_index = 0
+        self.position = 0
+        self.bind('<KeyRelease>', self.handle_keyrelease)
+        self['values'] = self._completion_list  # Setup our popup menu
+
+    def autocomplete(self):
+        """
+        Autocomplete the Combobox.
+
+        """
+        self.position = len(self.get())
+        _hits = []
+        for element in self._completion_list:
+            if element.lower().startswith(self.get().lower()):  # Match case insensitively
+                _hits.append(element)
+        # if we have a new hit list, keep this in mind
+        if _hits != self._hits:
+            self._hit_index = 0
+            self._hits = _hits
+        # only allow cycling if we are in a known hit list
+        if _hits == self._hits and self._hits:
+            self._hit_index = self._hit_index % len(self._hits)
+        # now finally perform the auto completion
+        if self._hits:
+            self.delete(0, END)
+            self.insert(0, self._hits[self._hit_index])
+            self.select_range(self.position, END)
+
+    def handle_keyrelease(self, event):
+        """
+        Event handler for the keyrelease event on this widget.
+        e.g. pressing an arrow or deleting text.
+
+        """
+        if event.keysym == "BackSpace":
+            self.delete(self.index(INSERT), END)
+            self.position = self.index(END)
+        if event.keysym == "Left":
+            if self.position < self.index(END):  # delete the selection
+                self.delete(self.position, END)
+            else:
+                self.position = self.position - 1  # delete one character
+                self.delete(self.position, END)
+        if event.keysym == "Right":
+            self.position = self.index(END)  # go to end (no selection)
+        if len(event.keysym) == 1:
+            self.autocomplete()
+
+
 class BrandSelection:
     """
     GUI to select product based on brand name or molecule name.
@@ -12,6 +71,7 @@ class BrandSelection:
     |:--------------------:|
     |   **Select brand:**  |
     |         -----        |
+    |       Continue       |
     |          OR          |
     | **Select molecule:** |
     |         -----        |
@@ -37,34 +97,41 @@ class BrandSelection:
         ##############################################################
         self.brand_label = Label(master, text='Select a brand name drug: ')
         self.brand_label.pack()
-        self.brand_combo = ttk.Combobox(master, values=brands, width=30, height=15)  # show 15 rows
+        self.brand_combo = AutocompleteCombobox(master) # using combobox with autocomplete ability
+        self.brand_combo.set_completion_list(brands)
+        self.brand_combo.configure(width=30, height=15)  # show 15 rows
         self.brand_combo.pack()
-        self.brand_combo.bind("<<ComboboxSelected>>", self.get_brand)
 
-        self.or_label = Label(master, text='OR', font='Helvetica 10 bold')
-        self.or_label.pack(pady=10)
+        self.continue_button = Button(master, text='Continue with Brand', command=self.get_brand)
+        self.continue_button.pack(pady=10)
+
+        self.or_label = Label(master, text='OR', font='Helvetica 9 bold')
+        self.or_label.pack(pady=20)
 
         ##############################################################
         # add label and combobox for molecule selection
         ##############################################################
         self.molecule_label = Label(master, text='Select a molecule: ')
         self.molecule_label.pack()
-        self.molecule_combo = ttk.Combobox(master, values=molecules, width=30, height=15)
+        self.molecule_combo = AutocompleteCombobox(master) # combobox with autocomplete ability
+        self.molecule_combo.set_completion_list(molecules)
+        self.molecule_combo.configure(width=30, height=15)
         self.molecule_combo.pack()
-        self.molecule_combo.bind("<<ComboboxSelected>>", self.get_molecule)
 
-        self.continue_button = Button(master, text='Continue', command=master.destroy)
+        self.continue_button = Button(master, text='Continue with Molecule', command=self.get_molecule)
         self.continue_button.pack(pady=10)
 
-    def get_brand(self, event):
+    def get_brand(self):
         self.w1_parameters['search_type'] = 'brand'
         self.w1_parameters['brand_name'] = self.brand_combo.get()
         print(self.w1_parameters['brand_name'])
+        self.master.destroy()
 
-    def get_molecule(self, event):
+    def get_molecule(self):
         self.w1_parameters['search_type'] = 'molecule'
         self.w1_parameters['molecule_name'] = self.molecule_combo.get()
         print(self.w1_parameters['molecule_name'])
+        self.master.destroy()
 
 
 class DosageForms:
