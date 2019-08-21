@@ -103,8 +103,12 @@ def get_base_units(df):
         elif re.sub('[. 0-9]', '', str(df.Strength.iloc[i])) == \
                 re.sub('[.0-9]', '', str(df['Base Unit'].iloc[i])):
             x = re.sub('[. 0-9]', '', str(df.Strength.iloc[i]))
-            a = list(filter(None, str(df.Strength.iloc[i]).split(x)))[0]
-            b = list(filter(None, str(df['Base Unit'].iloc[i]).split(x)))[0]
+            if x != '':  # in case the there is only numbers in the strength field
+                a = list(filter(None, str(df.Strength.iloc[i]).split(x)))[0]
+                b = list(filter(None, str(df['Base Unit'].iloc[i]).split(x)))[0]
+            else:
+                a = df.Strength.iloc[i]
+                b = df['Base Unit'].iloc[i]
             try:
                 df.Units.iloc[i] = (float(a) / float(b))
             except:
