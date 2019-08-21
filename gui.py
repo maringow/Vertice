@@ -259,7 +259,7 @@ class ConfirmBrand:
         self.continue_button.pack(pady=10)
 
 
-class SelectNDCs():
+class SelectNDCs:
     """
     GUI that allows selection of NDCs to include in model.
     Shows information for each NDC in a table format to assist selection.
@@ -352,7 +352,7 @@ class SelectNDCs():
         self.scroll.config(command=self.canvas.yview)
         self.canvas.config(yscrollcommand=self.scroll.set)
         self.scroll.grid(row=0, sticky="nse")
-        self.inner_frame.bind("<Configure>", self.update_scrollregion) #update height of scrollbar
+        self.inner_frame.bind("<Configure>", self.update_scrollregion)  # update height of scrollbar
 
         self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
         self.continue_button.grid(row=1000, column=1, pady=20, padx=20, sticky='e')
@@ -401,7 +401,7 @@ class EnterFilepath:
         ##############################################################
         # add entry for filepath and populate
         ##############################################################
-        self.filename = filedialog.askopenfilename(initialdir="C:\\Documents\\Demo Vertice 8.1",  # TODO update this
+        self.filename = filedialog.askopenfilename(initialdir="C:\\Documents",  # TODO update
                                                    title="Select Model Input file",
                                                    filetypes=(("excel files", "*.xlsx"),
                                                               ("all files", "*.*")))
@@ -557,7 +557,7 @@ class EnterCOGS:
         self.canvas.config(yscrollcommand=self.scroll.set)
         self.scroll.grid(row=0, sticky="nse")
 
-        self.inner_frame.bind("<Configure>", self.update_scrollregion) #update height of scrollbar
+        self.inner_frame.bind("<Configure>", self.update_scrollregion)  # update height of scrollbar
 
         run_model_button = Button(master, text='Run Model', command=self.save_and_run)
         run_model_button.grid(row=11, column=1, pady=10)
@@ -678,7 +678,7 @@ class ShowDetailedResults():
         Label(master, text='NPV:  ',
               font='Helvetica 9 bold').grid(row=5, column=0, sticky=E, columnspan=6)
         Label(master, text='IRR:  ',
-              font='Helvetica 9 bold').grid(row=6, column=0, sticky=E,columnspan=6)
+              font='Helvetica 9 bold').grid(row=6, column=0, sticky=E, columnspan=6)
         Label(master, text='Payback:  ',
               font='Helvetica 9 bold').grid(row=7, column=0, sticky=E, columnspan=6)
         Label(master, text='Exit value in 2021:  ',
