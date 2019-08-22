@@ -3,7 +3,10 @@ from sqlite3 import Error
 
 
 def create_connection(db_file):
-    # create a database connection to a SQLite database
+    """
+    Create a database connection to a SQLite database.
+
+    """
     try:
         conn = sqlite3.connect(db_file)
         return conn
@@ -50,6 +53,11 @@ def select_all_forecasts(conn):
 
 
 def select_max_ids(conn):
+    """
+    Finds the last run_id. Used to label the current model results run_id.
+    e.g. last run_id is 11 so current model run_id will be 12.
+
+    """
     cur = conn.cursor()
     cur.execute("SELECT MAX(scenario_id), MAX(run_id) FROM annual_forecast")
     row = cur.fetchall()
@@ -58,6 +66,10 @@ def select_max_ids(conn):
 
 
 def insert_result(conn, results):
+    """
+    Writes the single-value model results to the SQLite database.
+
+    """
     print(results)
     sql = """INSERT INTO model_results(scenario_id, run_id, run_name, brand_name, molecule, 
     dosage_form, selected_NDCs, channel, indication, presentation, internal_external, brand_status,
@@ -73,6 +85,10 @@ def insert_result(conn, results):
 
 
 def insert_forecast(conn, annual_forecast):
+    """
+    Writes the annual model results to the SQLite database.
+
+    """
     sql = """INSERT INTO annual_forecast(scenario_id, run_id, forecast_year, number_gx_competitors,
      profit_share, milestone_payments, research_development_cost, price_pct_of_mkt, net_sales, 
      cogs, ebit, fcf, exit_value, moic)

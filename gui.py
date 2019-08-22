@@ -6,7 +6,7 @@ import pandas as pd
 
 class AutocompleteCombobox(ttk.Combobox):
     """
-    Ability to autocomplete a Tkinter ComboBox. Used to select Brand or Molecule.
+    Modifying Tkinter Combobox to have ability to autocomplete. Used to select Brand or Molecule.
     Idea from: [stackoverflow link](https://stackoverflow.com/questions/12298159/tkinter-how-to-create-a-combo-box-with-autocompletion)
 
     """
@@ -27,7 +27,7 @@ class AutocompleteCombobox(ttk.Combobox):
         self.position = len(self.get())
         _hits = []
         for element in self._completion_list:
-            if element.lower().startswith(self.get().lower()):  # Match case insensitively
+            if element.lower().startswith(self.get().lower()):  # match case insensitively
                 _hits.append(element)
         # if we have a new hit list, keep this in mind
         if _hits != self._hits:
