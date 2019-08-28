@@ -82,7 +82,7 @@ class BrandSelection:
     def __init__(self, master, brands, molecules):
         self.master = master
         master.title("Generics Forecasting Model")
-        master.geometry("600x400")
+        master.geometry("400x350")
 
         ##############################################################
         # create window header
@@ -142,7 +142,7 @@ class DosageForms:
     def __init__(self, master, dosage_forms):
         self.master = master
         master.title("Generics Forecasting Model")
-        master.geometry("600x400")
+        master.geometry("400x350")
 
         ##############################################################
         # create window header
@@ -257,15 +257,16 @@ class SelectNDCs:
 
         self.master = master
         master.title("Generics Forecasting Model")
+        master.resizable(width=False, height=False)  # disable ability to resize window
 
         tk.Label(master, text='Generics Forecasting Model: Select NDCs',
-                 font='Helvetica 9 bold').grid(row=0, columnspan=2, pady=20, padx=20)
+                 font='Helvetica 9 bold').grid(row=0, columnspan=4, pady=20, padx=20)
 
         ##############################################################
         # set up to enable the scrollbar
         ##############################################################
         self.outer_frame = tk.Frame(master)
-        self.outer_frame.grid(row=1, column=0, columnspan=2)
+        self.outer_frame.grid(row=1, column=0, columnspan=4)
         self.outer_frame.rowconfigure(0, weight=1)
         self.outer_frame.columnconfigure(0, weight=1)
 
@@ -306,7 +307,7 @@ class SelectNDCs:
                 v.set(0)
             else:
                 v.set(1)
-            box = tk.Checkbutton(self.inner_frame, text=row['NDC'], variable=v)
+            box = tk.Checkbutton(self.inner_frame, text=row['NDC'], variable=v, command= self.callback)
             box.grid(row=n, column=0, sticky='w', padx=2)
             self.var.append(v)
             tk.Label(self.inner_frame, text=row['Manufacturer'])\
@@ -332,18 +333,47 @@ class SelectNDCs:
         self.scroll.grid(row=0, sticky="nse")
         self.inner_frame.bind("<Configure>", self.update_scrollregion)  # update height of scrollbar
 
+        ##############################################################
+        # count of ndcs selected at bottom
+        ##############################################################
+        self.count_of_ndcs = tk.StringVar()
+        x = str(sum([1 for i in range(len(self.ndcs)) if self.var[i].get() == 1])) + ' Selected'
+        self.count_of_ndcs.set(x)
+        tk.Label(master, textvariable=self.count_of_ndcs,
+                 font='Helvetica 9 bold').grid(row=1000, column=0, sticky='ew')
+
+        tk.Button(master, text='Select all', command=self.select_all).grid(row=1000, column=1)
+        tk.Button(master, text='Unselect all', command=self.unselect_all).grid(row=1000, column=2)
+
         tk.Button(master, text='Continue', command=self.save_and_continue)\
-            .grid(row=1000, column=1, pady=20, padx=20, sticky='e')
+            .grid(row=1000, column=3, pady=20, padx=20)
+
+    def callback(self):
+        '''Update count of NDCs selected when box is checked/unchecked.'''
+        x = sum([1 for i in range(len(self.ndcs)) if self.var[i].get() == 1])
+        self.count_of_ndcs.set(str(x) + ' Selected')
 
     def save_and_continue(self):
-        # print(self.var)
-        # print(self.ndcs['NDC'])
         self.selected_ndcs = [self.ndcs['NDC'][i] for i in range(len(self.ndcs))
                               if self.var[i].get() == 1]
         self.master.destroy()
 
     def update_scrollregion(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    def select_all(self):
+        '''Select all boxes and update count of NDCs selected.'''
+        for i in self.var:
+            i.set(1)
+        x = sum([1 for i in range(len(self.ndcs)) if self.var[i].get() == 1])
+        self.count_of_ndcs.set(str(x) + ' Selected')
+
+    def unselect_all(self):
+        '''Unselect all boxes and update count of NDCs selected to 0.'''
+        for i in self.var:
+            i.set(0)
+        x = sum([1 for i in range(len(self.ndcs)) if self.var[i].get() == 1])
+        self.count_of_ndcs.set(str(x) + ' Selected')
 
 
 class EnterFilepath:
@@ -414,10 +444,10 @@ class EnterCOGS:
     |      Enter Gross Margin     |           |
     |:---------------------------:|:---------:|
     |                     margin: |    000    |
-    |            - OR -           |           |
+    |          --- OR --          |           |
     | **Enter Standard API Cost** |           |
     |          standard api cost: |    000    |
-    |            - OR -           |           |
+    |          --- OR ---         |           |
     | **Enter API Cost Per Unit** |           |
     |                  Base unit: |     MG    |
     |          api cost per unit: |    000    |
@@ -433,6 +463,7 @@ class EnterCOGS:
     def __init__(self, master, df_equivalents):
         self.master = master
         master.title('Generics Forecasting Model')
+        master.resizable(width=False, height=False)  # disable ability to resize window
 
         tk.Label(master, text='Enter Gross Margin',
                  font='Helvetica 9 bold').grid(row=0, columnspan=2, pady=10)
@@ -486,7 +517,7 @@ class EnterCOGS:
         # add entry boxes for API units for each pack type found in therapeutic equivalents
         ##############################################################
         tk.Label(master, text='Enter number of units for each pack type found: \n'
-                              'Double check numbers if auto-populated.')\
+                              'Double check auto-populated numbers.')\
             .grid(row=9, rowspan=2, columnspan=2, pady=10)
 
         self.entries = []  # save entries created in list
@@ -515,7 +546,7 @@ class EnterCOGS:
             tk.Label(self.inner_frame, text=self.packs[p]).grid(row=i, column=1, padx=5, sticky='e')
             pack_entry = tk.Entry(self.inner_frame)
             pack_entry.insert(tk.END, self.units[p])
-            pack_entry.grid(row=i, column=2, padx=5, sticky='e')
+            pack_entry.grid(row=i, column=2, padx=5)
             self.entries.append(pack_entry)
             i += 1
 
