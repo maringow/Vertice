@@ -1,4 +1,4 @@
-from tkinter import *
+import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 import pandas as pd
@@ -38,9 +38,9 @@ class AutocompleteCombobox(ttk.Combobox):
             self._hit_index = self._hit_index % len(self._hits)
         # now finally perform the auto completion
         if self._hits:
-            self.delete(0, END)
+            self.delete(0, tk.END)
             self.insert(0, self._hits[self._hit_index])
-            self.select_range(self.position, END)
+            self.select_range(self.position, tk.END)
 
     def handle_keyrelease(self, event):
         """
@@ -49,16 +49,16 @@ class AutocompleteCombobox(ttk.Combobox):
 
         """
         if event.keysym == "BackSpace":
-            self.delete(self.index(INSERT), END)
-            self.position = self.index(END)
+            self.delete(self.index(tk.INSERT), tk.END)
+            self.position = self.index(tk.END)
         if event.keysym == "Left":
-            if self.position < self.index(END):  # delete the selection
-                self.delete(self.position, END)
+            if self.position < self.index(tk.END):  # delete the selection
+                self.delete(self.position, tk.END)
             else:
                 self.position = self.position - 1  # delete one character
-                self.delete(self.position, END)
+                self.delete(self.position, tk.END)
         if event.keysym == "Right":
-            self.position = self.index(END)  # go to end (no selection)
+            self.position = self.index(tk.END)  # go to end (no selection)
         if len(event.keysym) == 1:
             self.autocomplete()
 
@@ -88,37 +88,38 @@ class BrandSelection:
         ##############################################################
         # create window header
         ##############################################################
-        self.title = Label(master, text='Generics Forecasting Model: Brand Selection',
+        self.title = tk.Label(master, text='Generics Forecasting Model: Brand Selection',
                            font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
         ##############################################################
         # add label and combobox for brand selection
         ##############################################################
-        self.brand_label = Label(master, text='Select a brand name drug: ')
+        self.brand_label = tk.Label(master, text='Select a brand name drug: ')
         self.brand_label.pack()
         self.brand_combo = AutocompleteCombobox(master) # using combobox with autocomplete ability
         self.brand_combo.set_completion_list(brands)
         self.brand_combo.configure(width=30, height=15)  # show 15 rows
         self.brand_combo.pack()
 
-        self.continue_button = Button(master, text='Continue with Brand', command=self.get_brand)
+        self.continue_button = tk.Button(master, text='Continue with Brand', command=self.get_brand)
         self.continue_button.pack(pady=10)
 
-        self.or_label = Label(master, text='OR', font='Helvetica 9 bold')
+        self.or_label = tk.Label(master, text='OR', font='Helvetica 9 bold')
         self.or_label.pack(pady=20)
 
         ##############################################################
         # add label and combobox for molecule selection
         ##############################################################
-        self.molecule_label = Label(master, text='Select a molecule: ')
+        self.molecule_label = tk.Label(master, text='Select a molecule: ')
         self.molecule_label.pack()
         self.molecule_combo = AutocompleteCombobox(master) # combobox with autocomplete ability
         self.molecule_combo.set_completion_list(molecules)
         self.molecule_combo.configure(width=30, height=15)
         self.molecule_combo.pack()
 
-        self.continue_button = Button(master, text='Continue with Molecule', command=self.get_molecule)
+        self.continue_button = tk.Button(master, text='Continue with Molecule',
+                                         command=self.get_molecule)
         self.continue_button.pack(pady=10)
 
     def get_brand(self):
@@ -154,8 +155,8 @@ class DosageForms:
         ##############################################################
         # create window header
         ##############################################################
-        self.title = Label(master, text='Generics Forecasting Model: Select Dosage Forms',
-                           font='Helvetica 9 bold')
+        self.title = tk.Label(master, text='Generics Forecasting Model: Select Dosage Forms',
+                              font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
         self.dosage_forms = dosage_forms
@@ -166,12 +167,12 @@ class DosageForms:
         # add dosage form checkboxes
         ##############################################################
         for d in range(len(self.dosage_forms)):
-            v = IntVar()
-            box = Checkbutton(self.master, text=self.dosage_forms[d], variable=v)
+            v = tk.IntVar()
+            box = tk.Checkbutton(self.master, text=self.dosage_forms[d], variable=v)
             box.pack()
             self.var.append(v)
 
-        self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
+        self.continue_button = tk.Button(master, text='Continue', command=self.save_and_continue)
         self.continue_button.pack(pady=10)
 
     ##############################################################
@@ -204,37 +205,37 @@ class ConfirmBrand:
         ##############################################################
         # create window header
         ##############################################################
-        self.title = Label(master,
-                           text='Generics Forecasting Model: Review Therapeutic Equivalents',
-                           font='Helvetica 9 bold')
+        self.title = tk.Label(master,
+                              text='Generics Forecasting Model: Review Therapeutic Equivalents',
+                              font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
         ##############################################################
         # create label for brand selection and number of equivalents found
         ##############################################################
         if parameters['search_type'] == 'brand':
-            self.selection_label = Label(master,
-                                         text='{} therapeutically equivalent NDCs found in IMS for brand {}'
-                                         .format(parameters['count_eqs'], parameters['brand_name']))
+            self.selection_label = tk.Label(master,
+                                            text='{} therapeutically equivalent NDCs found in IMS for brand {}'
+                                            .format(parameters['count_eqs'], parameters['brand_name']))
             self.selection_label.pack(pady=20)
         elif parameters['search_type'] == 'molecule':
-            self.selection_label = Label(master,
-                                         text='{} therapeutically equivalent NDCs found in IMS for molecule {}'
-                                         .format(parameters['count_eqs'],
-                                                 parameters['molecule_name']))
+            self.selection_label = tk.Label(master,
+                                            text='{} therapeutically equivalent NDCs found in IMS for molecule {}'
+                                            .format(parameters['count_eqs'],
+                                                    parameters['molecule_name']))
             self.selection_label.pack(pady=20)
 
         ##############################################################
         # create labels for molecule and dosage form used
         ##############################################################
         self.combined_molecules = parameters['combined_molecules']
-        self.molecules_label = Label(master, text='Molecules searched: {}'
-                                     .format(self.combined_molecules))
+        self.molecules_label = tk.Label(master, text='Molecules searched: {}'
+                                        .format(self.combined_molecules))
         self.molecules_label.pack()
 
         self.dosage_forms = parameters['dosage_forms']
-        self.dosage_forms_label = Label(master, text='Dosage forms searched: {}'
-                                        .format(self.dosage_forms))
+        self.dosage_forms_label = tk.Label(master, text='Dosage forms searched: {}'
+                                           .format(self.dosage_forms))
         self.dosage_forms_label.pack()
 
         # create label for number of competitors found
@@ -255,7 +256,7 @@ class ConfirmBrand:
         #                         int(df_detail['Units'].sum(level='year_index').loc[2019])))
         # self.volumes_label.pack()
 
-        self.continue_button = Button(master, text='Continue', command=master.destroy)
+        self.continue_button = tk.Button(master, text='Continue', command=master.destroy)
         self.continue_button.pack(pady=10)
 
 
@@ -279,22 +280,22 @@ class SelectNDCs:
         self.master = master
         master.title("Generics Forecasting Model")
 
-        self.title = Label(master, text='Generics Forecasting Model: Select NDCs',
-                           font='Helvetica 9 bold')
+        self.title = tk.Label(master, text='Generics Forecasting Model: Select NDCs',
+                              font='Helvetica 9 bold')
         self.title.grid(row=0, columnspan=2, pady=20, padx=20)
 
         ##############################################################
         # set up to enable the scrollbar
         ##############################################################
-        self.outer_frame = Frame(master)
+        self.outer_frame = tk.Frame(master)
         self.outer_frame.grid(row=1, column=0, columnspan=2)
         self.outer_frame.rowconfigure(0, weight=1)
         self.outer_frame.columnconfigure(0, weight=1)
 
-        self.canvas = Canvas(self.outer_frame, width=900)
+        self.canvas = tk.Canvas(self.outer_frame, width=900)
         self.canvas.grid(sticky="nsew", padx=40)
 
-        self.inner_frame = Frame(self.canvas)
+        self.inner_frame = tk.Frame(self.canvas)
         self.canvas.create_window(0, 0, window=self.inner_frame, anchor='nw')
 
         ##############################################################
@@ -314,7 +315,7 @@ class SelectNDCs:
         header = ['NDC', 'Manufacturer', 'Dosage Form', '2018 Volume', '2019 Volume',
                   'WAC Price ($)', 'Pack']
         for h in header:
-            label = Label(self.inner_frame, text=h, font='Helvetica 8 bold')
+            label = tk.Label(self.inner_frame, text=h, font='Helvetica 8 bold')
             label.grid(row=0, column=m, padx=8)
             m += 1
 
@@ -323,38 +324,38 @@ class SelectNDCs:
         ##############################################################
         n = 1
         for index, row in self.ndcs.iterrows():
-            v = IntVar()
+            v = tk.IntVar()
             if row['2019_Units'] != row['2019_Units']:  # if nan
                 v.set(0)
             else:
                 v.set(1)
-            box = Checkbutton(self.inner_frame, text=row['NDC'], variable=v)
+            box = tk.Checkbutton(self.inner_frame, text=row['NDC'], variable=v)
             box.grid(row=n, column=0, sticky='w', padx=2)
             self.var.append(v)
-            self.manufacturer_label = Label(self.inner_frame, text=row['Manufacturer'])
+            self.manufacturer_label = tk.Label(self.inner_frame, text=row['Manufacturer'])
             self.manufacturer_label.grid(row=n, column=1, sticky='w', padx=8)
-            self.form_label = Label(self.inner_frame, text=row['Prod Form3'])
+            self.form_label = tk.Label(self.inner_frame, text=row['Prod Form3'])
             self.form_label.grid(row=n, column=2, sticky='w', padx=8)
-            self.units_2018 = Label(self.inner_frame, text=row['2018_Units'])
+            self.units_2018 = tk.Label(self.inner_frame, text=row['2018_Units'])
             self.units_2018.grid(row=n, column=3, sticky='w', padx=8)
-            self.units_2019 = Label(self.inner_frame, text=row['2019_Units'])
+            self.units_2019 = tk.Label(self.inner_frame, text=row['2019_Units'])
             self.units_2019.grid(row=n, column=4, sticky='w', padx=8)
-            self.wacprice = Label(self.inner_frame, text=row['WACPrice'])
+            self.wacprice = tk.Label(self.inner_frame, text=row['WACPrice'])
             self.wacprice.grid(row=n, column=5, sticky='w', padx=8)
-            self.addt_spacing = Label(self.inner_frame, text=row['Pack'])
+            self.addt_spacing = tk.Label(self.inner_frame, text=row['Pack'])
             self.addt_spacing.grid(row=n, column=6, sticky='w', padx=8)
             n += 1
 
         ##############################################################
         # scrollbar
         ##############################################################
-        self.scroll = Scrollbar(self.outer_frame, orient=VERTICAL)
+        self.scroll = tk.Scrollbar(self.outer_frame, orient='vertical')
         self.scroll.config(command=self.canvas.yview)
         self.canvas.config(yscrollcommand=self.scroll.set)
         self.scroll.grid(row=0, sticky="nse")
         self.inner_frame.bind("<Configure>", self.update_scrollregion)  # update height of scrollbar
 
-        self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
+        self.continue_button = tk.Button(master, text='Continue', command=self.save_and_continue)
         self.continue_button.grid(row=1000, column=1, pady=20, padx=20, sticky='e')
 
     def save_and_continue(self):
@@ -394,8 +395,8 @@ class EnterFilepath:
         ##############################################################
         # create window header
         ##############################################################
-        self.title = Label(master, text='Generics Forecasting Model: Set File Path and Run Tag',
-                           font='Helvetica 9 bold')
+        self.title = tk.Label(master, text='Generics Forecasting Model: Set File Path and Run Tag',
+                              font='Helvetica 9 bold')
         self.title.pack(pady=10)
 
         ##############################################################
@@ -405,22 +406,22 @@ class EnterFilepath:
                                                    title="Select Model Input file",
                                                    filetypes=(("excel files", "*.xlsx"),
                                                               ("all files", "*.*")))
-        self.filepath_label = Label(master, text='Enter filepath for Excel parameters:')
+        self.filepath_label = tk.Label(master, text='Enter filepath for Excel parameters:')
         self.filepath_label.pack(pady=10)
-        self.filepath_entry = Entry(master, width=75)
-        self.filepath_entry.insert(END, self.filename)
+        self.filepath_entry = tk.Entry(master, width=75)
+        self.filepath_entry.insert(tk.END, self.filename)
         self.filepath_entry.pack()
 
         ##############################################################
         # add entry for run name
         ##############################################################
-        self.run_name_label = Label(master, text='Enter a run tag (optional):')
+        self.run_name_label = tk.Label(master, text='Enter a run tag (optional):')
         self.run_name_label.pack(pady=10)
-        self.run_name_entry = Entry(master, width=50)
+        self.run_name_entry = tk.Entry(master, width=50)
         self.run_name_entry.pack()
         master.after(1000, lambda: self.run_name_entry.focus_force())
 
-        self.continue_button = Button(master, text='Continue', command=self.save_and_continue)
+        self.continue_button = tk.Button(master, text='Continue', command=self.save_and_continue)
         self.continue_button.pack(pady=10)
 
     def save_and_continue(self):
@@ -460,15 +461,15 @@ class EnterCOGS:
         self.master = master
         master.title('Generics Forecasting Model')
 
-        self.title = Label(master, text='Enter Gross Margin', font='Helvetica 9 bold')
+        self.title = tk.Label(master, text='Enter Gross Margin', font='Helvetica 9 bold')
         self.title.grid(row=0, columnspan=2, pady=10)
 
         ##############################################################
         # if user uses straight gross margin approach
         ##############################################################
-        self.gross_margin_label = Label(master, text='Gross margin assumption (as decimal): ')
+        self.gross_margin_label = tk.Label(master, text='Gross margin assumption (as decimal): ')
         self.gross_margin_label.grid(row=1, column=0, sticky='e')
-        self.gross_margin_entry = Entry(master)
+        self.gross_margin_entry = tk.Entry(master)
         self.gross_margin_entry.grid(row=1, column=1, sticky='w')
 
         ##############################################################
@@ -479,14 +480,14 @@ class EnterCOGS:
         self.sty = ttk.Style(master)
         self.sty.configure("TSeparator", background="blue")
 
-        self.or_label = Label(master, text='OR', font='Helvetica 9 bold')
+        self.or_label = tk.Label(master, text='OR', font='Helvetica 9 bold')
         self.or_label.grid(row=2, columnspan=2, pady=10, padx=10)
-        self.subtitle = Label(master, text="Enter Standard API Cost", font='Helvetica 9 bold')
+        self.subtitle = tk.Label(master, text="Enter Standard API Cost", font='Helvetica 9 bold')
         self.subtitle.grid(row=3, columnspan=2, pady=10, padx=10)
 
-        self.standard_cogs_label = Label(master, text='Standard API Cost ($): ')
+        self.standard_cogs_label = tk.Label(master, text='Standard API Cost ($): ')
         self.standard_cogs_label.grid(row=4, column=0, sticky='e')
-        self.standard_cogs_entry = Entry(master)
+        self.standard_cogs_entry = tk.Entry(master)
         self.standard_cogs_entry.grid(row=4, column=1, sticky='w')
 
         ##############################################################
@@ -495,27 +496,27 @@ class EnterCOGS:
         self.sep2 = ttk.Separator(master, orient="horizontal")
         self.sep2.grid(column=0, row=5, columnspan=2, sticky="ew")
 
-        self.or_label = Label(master, text='OR', font='Helvetica 9 bold')
+        self.or_label = tk.Label(master, text='OR', font='Helvetica 9 bold')
         self.or_label.grid(row=5, columnspan=2, pady=10, padx=10)
-        self.subtitle = Label(master, text='Enter API Cost Per Unit', font='Helvetica 9 bold')
+        self.subtitle = tk.Label(master, text='Enter API Cost Per Unit', font='Helvetica 9 bold')
         self.subtitle.grid(row=6, columnspan=2, pady=10, padx=10)
 
-        self.unit_label = Label(master, text='Base unit: ')
+        self.unit_label = tk.Label(master, text='Base unit: ')
         self.unit_label.grid(row=7, column=0, sticky='e')
-        self.unit_entry = Entry(master)
-        self.unit_entry.insert(END, df_equivalents['Base Unit'].iloc[0])
+        self.unit_entry = tk.Entry(master)
+        self.unit_entry.insert(tk.END, df_equivalents['Base Unit'].iloc[0])
         self.unit_entry.grid(row=7, column=1, sticky='w')
 
-        self.cost_per_unit_label = Label(master, text='API cost per unit ($): ')
+        self.cost_per_unit_label = tk.Label(master, text='API cost per unit ($): ')
         self.cost_per_unit_label.grid(row=8, column=0, sticky='e')
-        self.cost_per_unit_entry = Entry(master)
+        self.cost_per_unit_entry = tk.Entry(master)
         self.cost_per_unit_entry.grid(row=8, column=1, sticky='w')
 
         ##############################################################
         # add entry boxes for API units for each pack type found in therapeutic equivalents
         ##############################################################
-        self.API_costs_label = Label(master,
-                                     text='Enter number of units for each pack type found: ')
+        self.API_costs_label = tk.Label(master,
+                                        text='Enter number of units for each pack type found: ')
         self.API_costs_label.grid(row=9, columnspan=2, pady=10)
 
         self.entries = []  # save entries created in list
@@ -524,15 +525,15 @@ class EnterCOGS:
         ##############################################################
         # setup for scroll bar
         ##############################################################
-        self.outer_frame = Frame(master)
+        self.outer_frame = tk.Frame(master)
         self.outer_frame.grid(row=10, column=0, columnspan=2)
         self.outer_frame.rowconfigure(0, weight=1)
         self.outer_frame.columnconfigure(0, weight=1)
 
-        self.canvas = Canvas(self.outer_frame, height=100)
+        self.canvas = tk.Canvas(self.outer_frame, height=100)
         self.canvas.grid(sticky="nsew")
 
-        self.inner_frame = Frame(self.canvas)
+        self.inner_frame = tk.Frame(self.canvas)
         self.canvas.create_window(0, 0, window=self.inner_frame, anchor='nw')
 
         ##############################################################
@@ -541,10 +542,10 @@ class EnterCOGS:
         self.packs = df_equivalents[['Pack', 'Units']].drop_duplicates()['Pack'].values
         self.units = df_equivalents[['Pack', 'Units']].drop_duplicates()['Units'].values
         for p in range(len(df_equivalents[['Pack', 'Units']].drop_duplicates())):
-            pack_label = Label(self.inner_frame, text=self.packs[p])
+            pack_label = tk.Label(self.inner_frame, text=self.packs[p])
             pack_label.grid(row=i, column=1, padx=5, sticky='e')
-            pack_entry = Entry(self.inner_frame)
-            pack_entry.insert(END, self.units[p])
+            pack_entry = tk.Entry(self.inner_frame)
+            pack_entry.insert(tk.END, self.units[p])
             pack_entry.grid(row=i, column=2, padx=5, sticky='e')
             self.entries.append(pack_entry)
             i += 1
@@ -552,14 +553,14 @@ class EnterCOGS:
         ##############################################################
         # scrollbar
         ##############################################################
-        self.scroll = Scrollbar(self.outer_frame, orient=VERTICAL)
+        self.scroll = tk.Scrollbar(self.outer_frame, orient='vertical')
         self.scroll.config(command=self.canvas.yview)
         self.canvas.config(yscrollcommand=self.scroll.set)
         self.scroll.grid(row=0, sticky="nse")
 
         self.inner_frame.bind("<Configure>", self.update_scrollregion)  # update height of scrollbar
 
-        run_model_button = Button(master, text='Run Model', command=self.save_and_run)
+        run_model_button = tk.Button(master, text='Run Model', command=self.save_and_run)
         run_model_button.grid(row=11, column=1, pady=10)
 
     def save_and_run(self):
@@ -652,13 +653,13 @@ class ShowDetailedResults():
         self.master = master
         master.title('Generics Forecasting Model')
 
-        Label(master, text='Generics Forecasting Model: Results Summary',
-              font='Helvetica 9 bold').grid(row=0, column=0, sticky=N, columnspan=12)
-        Label(master,
-              text='Chose whether to run the parameter scan and save results to the database.',
-              font='Helvetica 9').grid(row=1, column=0, sticky=N, columnspan=12)
+        tk.Label(master, text='Generics Forecasting Model: Results Summary',
+                 font='Helvetica 9 bold').grid(row=0, column=0, sticky='n', columnspan=12)
+        tk.Label(master,
+                 text='Chose whether to run the parameter scan and save results to the database.',
+                 font='Helvetica 9').grid(row=1, column=0, sticky='n', columnspan=12)
 
-        Label(master, text='').grid(row=2, rowspan=2)
+        tk.Label(master, text='').grid(row=2, rowspan=2)
 
         ##############################################################
         # select what brand/molecule the user picked in the first screen
@@ -673,49 +674,49 @@ class ShowDetailedResults():
         ##############################################################
         # printing the 5 calculated valuation metrics
         ##############################################################
-        Label(master, text='{}:  '.format(search_type),
-              font='Helvetica 9 bold').grid(row=4, column=0, sticky=E, columnspan=6)
-        Label(master, text='NPV:  ',
-              font='Helvetica 9 bold').grid(row=5, column=0, sticky=E, columnspan=6)
-        Label(master, text='IRR:  ',
-              font='Helvetica 9 bold').grid(row=6, column=0, sticky=E, columnspan=6)
-        Label(master, text='Payback:  ',
-              font='Helvetica 9 bold').grid(row=7, column=0, sticky=E, columnspan=6)
-        Label(master, text='Exit value in 2021:  ',
-              font='Helvetica 9 bold').grid(row=8, column=0, sticky=E, columnspan=6)
-        Label(master, text='MOIC in 2021:  ',
-              font='Helvetica 9 bold').grid(row=9, column=0, sticky=E, columnspan=6)
+        tk.Label(master, text='{}:  '.format(search_type),
+                 font='Helvetica 9 bold').grid(row=4, column=0, sticky='e', columnspan=6)
+        tk.Label(master, text='NPV:  ',
+                 font='Helvetica 9 bold').grid(row=5, column=0, sticky='e', columnspan=6)
+        tk.Label(master, text='IRR:  ',
+                 font='Helvetica 9 bold').grid(row=6, column=0, sticky='e', columnspan=6)
+        tk.Label(master, text='Payback:  ',
+                 font='Helvetica 9 bold').grid(row=7, column=0, sticky='e', columnspan=6)
+        tk.Label(master, text='Exit value in 2021:  ',
+                 font='Helvetica 9 bold').grid(row=8, column=0, sticky='e', columnspan=6)
+        tk.Label(master, text='MOIC in 2021:  ',
+                 font='Helvetica 9 bold').grid(row=9, column=0, sticky='e', columnspan=6)
 
-        Label(master, text='{}'.format(drug_id))\
-            .grid(row=4, column=6, sticky=W, columnspan=6)
-        Label(master, text='${} million'.format(parameters['npv']))\
-            .grid(row=5, column=6, sticky=W, columnspan=6)
-        Label(master, text='{}%'.format(parameters['irr']))\
-            .grid(row=6, column=6, sticky=W, columnspan=6)
-        Label(master, text='{} years'.format(parameters['payback']))\
-            .grid(row=7, column=6, sticky=W, columnspan=6)
-        Label(master, text='${} million'.format(parameters['exit_value']))\
-            .grid(row=8, column=6, sticky=W, columnspan=6)
-        Label(master, text='{}x'.format(parameters['moic']))\
-            .grid(row=9, column=6, sticky=W, columnspan=6)
+        tk.Label(master, text='{}'.format(drug_id))\
+            .grid(row=4, column=6, sticky='w', columnspan=6)
+        tk.Label(master, text='${} million'.format(parameters['npv']))\
+            .grid(row=5, column=6, sticky='w', columnspan=6)
+        tk.Label(master, text='{}%'.format(parameters['irr']))\
+            .grid(row=6, column=6, sticky='w', columnspan=6)
+        tk.Label(master, text='{} years'.format(parameters['payback']))\
+            .grid(row=7, column=6, sticky='w', columnspan=6)
+        tk.Label(master, text='${} million'.format(parameters['exit_value']))\
+            .grid(row=8, column=6, sticky='w', columnspan=6)
+        tk.Label(master, text='{}x'.format(parameters['moic']))\
+            .grid(row=9, column=6, sticky='w', columnspan=6)
 
-        Label(master, text='').grid(row=10, columnspan=12)
+        tk.Label(master, text='').grid(row=10, columnspan=12)
 
         ##############################################################
         # set up annual financial results table
         ##############################################################
-        Label(master, text="($m)", font='Helvetica 9').grid(row=11, column=0)
-        Label(master, text="Net Sales", font='Helvetica 9 bold').grid(row=12, column=0)
-        Label(master, text="COGS", font='Helvetica 9 bold').grid(row=13, column=0)
-        Label(master, text="EBIT", font='Helvetica 9 bold').grid(row=14, column=0)
-        Label(master, text="FCF", font='Helvetica 9 bold').grid(row=15, column=0)
+        tk.Label(master, text="($m)", font='Helvetica 9').grid(row=11, column=0)
+        tk.Label(master, text="Net Sales", font='Helvetica 9 bold').grid(row=12, column=0)
+        tk.Label(master, text="COGS", font='Helvetica 9 bold').grid(row=13, column=0)
+        tk.Label(master, text="EBIT", font='Helvetica 9 bold').grid(row=14, column=0)
+        tk.Label(master, text="FCF", font='Helvetica 9 bold').grid(row=15, column=0)
 
         ##############################################################
         # years as headers
         ##############################################################
         c = 1
         for i in range(parameters['present_year'], parameters['present_year'] + 11):
-            Label(master, text=i, font='Helvetica 9 bold').grid(row=11, column=c)
+            tk.Label(master, text=i, font='Helvetica 9 bold').grid(row=11, column=c)
             c = c + 1
 
         ##############################################################
@@ -728,18 +729,18 @@ class ShowDetailedResults():
         for x in ['Net Sales', 'COGS', 'EBIT', 'FCF']:
             c = 1
             for y in range(parameters['present_year'], parameters['present_year'] + 11):
-                Label(master, text=df[y].loc[x], font='Helvetica 9').grid(row=r, column=c)
+                tk.Label(master, text=df[y].loc[x], font='Helvetica 9').grid(row=r, column=c)
                 c = c + 1
             r = r + 1
 
-        run_model_button = Button(master, text='Run Parameter Scan', command=master.destroy)
+        run_model_button = tk.Button(master, text='Run Parameter Scan', command=master.destroy)
         run_model_button.grid(row=16, columnspan=12, pady=10)
 
         def stop_model():
             import sys
             sys.exit()
 
-        stop_model_button = Button(master, text='Cancel Parameter Scan', command=stop_model)
+        stop_model_button = tk.Button(master, text='Cancel Parameter Scan', command=stop_model)
         stop_model_button.grid(row=17, columnspan=12, pady=10)
 
 
@@ -758,13 +759,13 @@ class SuccessfulRun:
         master.title('')
         master.geometry("300x150")
 
-        self.title = Label(master, text='Generics Forecasting Model: Successful Model Run',
+        self.title = tk.Label(master, text='Generics Forecasting Model: Successful Model Run',
                            font='Helvetica 9 bold')
         self.title.pack(pady=10)
-        self.title = Label(master, text='Parameter scan complete.', font='Helvetica 9')
+        self.title = tk.Label(master, text='Parameter scan complete.', font='Helvetica 9')
         self.title.pack(pady=10)
-        self.title = Label(master, text='Results saved to the database.', font='Helvetica 9')
+        self.title = tk.Label(master, text='Results saved to the database.', font='Helvetica 9')
         self.title.pack(pady=10)
 
-        run_model_button = Button(master, text='Finish', command=master.destroy)
+        run_model_button = tk.Button(master, text='Finish', command=master.destroy)
         run_model_button.pack(pady=20)

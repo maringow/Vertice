@@ -1,7 +1,6 @@
 import re
 import warnings
-import tkinter
-from tkinter import *
+import tkinter as tk
 from tkinter import ttk
 import sqlite3
 from sqlite3 import Error
@@ -40,7 +39,7 @@ parameters = {}
 ##############################################################
 # OPEN BRAND SELECTION AND SAVE PARAMETERS
 ##############################################################
-window = Tk()
+window = tk.Tk()
 window1 = gui.BrandSelection(window, brands, molecules)
 window.mainloop()
 
@@ -53,7 +52,7 @@ print(parameters)
 parameters = mergedatasets.get_dosage_forms(parameters, IMS)
 
 if len(parameters['dosage_forms']) > 1:
-    window = Tk()
+    window = tk.Tk()
     window2 = gui.DosageForms(window, parameters['dosage_forms'])
     window.mainloop()
     parameters['dosage_forms'] = window2.selected_dosage_forms
@@ -81,14 +80,14 @@ parameters['count_competitors'] = len(df_equivalents.loc[pd.isnull(
     df_equivalents['2018_Units']) == False]['Manufacturer'].unique()) # TODO update year w/ new data
 parameters['historical_growth_rate'] = fincalcs.get_growth_rate(df_detail)
 
-window = Tk()
+window = tk.Tk()
 window3 = gui.ConfirmBrand(window, parameters, df_detail)
 window.mainloop()
 
 ##############################################################
 # OPEN SelectNDCs WINDOW AND SAVE
 ##############################################################
-window = Tk()
+window = tk.Tk()
 window4 = gui.SelectNDCs(window, df_merged_data)
 window.mainloop()
 
@@ -104,7 +103,7 @@ df_equivalents = parsedosage.get_base_units(df_equivalents)
 ##############################################################
 # OPEN EnterFilepath WINDOW AND SAVE VALUES
 ##############################################################
-window = Tk()
+window = tk.Tk()
 window5 = gui.EnterFilepath(window)
 window.mainloop()
 
@@ -113,7 +112,7 @@ parameters.update(window5.parameters)
 ##############################################################
 # OPEN EnterCOGS WINDOW AND SAVE VALUES
 ##############################################################
-window = Tk()
+window = tk.Tk()
 window6 = gui.EnterCOGS(window, df_equivalents)
 window.mainloop()
 
@@ -162,7 +161,7 @@ else:
 parameters['exit_value'] = round(annual_forecast.loc[2021]['Exit Values'], 2)
 parameters['moic'] = round(annual_forecast.loc[2021]['MOIC'], 1)
 
-window = Tk()
+window = tk.Tk()
 window7 = gui.ShowDetailedResults(window, parameters, df_gfm)
 window.mainloop()
 
@@ -295,6 +294,6 @@ conn.commit()
 # output.select_all_results(conn)
 conn.close()
 
-window = Tk()
+window = tk.Tk()
 window8 = gui.SuccessfulRun(window)
 window.mainloop()
