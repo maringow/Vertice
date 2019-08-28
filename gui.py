@@ -100,8 +100,7 @@ class BrandSelection:
         self.brand_combo.configure(width=30, height=15)  # show 15 rows
         self.brand_combo.pack()
 
-        self.continue_button = tk.Button(master, text='Continue with Brand', command=self.get_brand)
-        self.continue_button.pack(pady=10)
+        tk.Button(master, text='Continue with Brand', command=self.get_brand).pack(pady=10)
 
         tk.Label(master, text='OR', font='Helvetica 9 bold').pack(pady=20)
 
@@ -114,9 +113,7 @@ class BrandSelection:
         self.molecule_combo.configure(width=30, height=15)
         self.molecule_combo.pack()
 
-        self.continue_button = tk.Button(master, text='Continue with Molecule',
-                                         command=self.get_molecule)
-        self.continue_button.pack(pady=10)
+        tk.Button(master, text='Continue with Molecule', command=self.get_molecule).pack(pady=10)
 
     def get_brand(self):
         self.w1_parameters['search_type'] = 'brand'
@@ -167,8 +164,7 @@ class DosageForms:
             box.pack()
             self.var.append(v)
 
-        self.continue_button = tk.Button(master, text='Continue', command=self.save_and_continue)
-        self.continue_button.pack(pady=10)
+        tk.Button(master, text='Continue', command=self.save_and_continue).pack(pady=10)
 
     ##############################################################
     # for each checked box, save the dosage form into selected_dosage_forms
@@ -240,8 +236,7 @@ class ConfirmBrand:
         #                         int(df_detail['Units'].sum(level='year_index').loc[2019])))
         # self.volumes_label.pack()
 
-        self.continue_button = tk.Button(master, text='Continue', command=master.destroy)
-        self.continue_button.pack(pady=10)
+        tk.Button(master, text='Continue', command=master.destroy).pack(pady=10)
 
 
 class SelectNDCs:
@@ -338,8 +333,8 @@ class SelectNDCs:
         self.scroll.grid(row=0, sticky="nse")
         self.inner_frame.bind("<Configure>", self.update_scrollregion)  # update height of scrollbar
 
-        self.continue_button = tk.Button(master, text='Continue', command=self.save_and_continue)
-        self.continue_button.grid(row=1000, column=1, pady=20, padx=20, sticky='e')
+        tk.Button(master, text='Continue', command=self.save_and_continue)\
+            .grid(row=1000, column=1, pady=20, padx=20, sticky='e')
 
     def save_and_continue(self):
         print(self.var)
@@ -401,8 +396,7 @@ class EnterFilepath:
         self.run_name_entry.pack()
         master.after(1000, lambda: self.run_name_entry.focus_force())
 
-        self.continue_button = tk.Button(master, text='Continue', command=self.save_and_continue)
-        self.continue_button.pack(pady=10)
+        tk.Button(master, text='Continue', command=self.save_and_continue).pack(pady=10)
 
     def save_and_continue(self):
         self.parameters['excel_filepath'] = self.filepath_entry.get()
@@ -739,5 +733,4 @@ class SuccessfulRun:
         tk.Label(master, text='Parameter scan complete.', font='Helvetica 9').pack(pady=10)
         tk.Label(master, text='Results saved to the database.', font='Helvetica 9').pack(pady=10)
 
-        run_model_button = tk.Button(master, text='Finish', command=master.destroy)
-        run_model_button.pack(pady=20)
+        tk.Button(master, text='Finish', command=master.destroy).pack(pady=20)
