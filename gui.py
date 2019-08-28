@@ -1,10 +1,9 @@
 import tkinter as tk
-from tkinter import ttk
 from tkinter import filedialog
 import pandas as pd
 
 
-class AutocompleteCombobox(ttk.Combobox):
+class AutocompleteCombobox(tk.ttk.Combobox):
     """
     Modifying Tkinter Combobox to have ability to autocomplete. Used to select Brand or Molecule.
     Idea from: [stackoverflow link](https://stackoverflow.com/questions/12298159/tkinter-how-to-create-a-combo-box-with-autocompletion)
@@ -246,10 +245,10 @@ class SelectNDCs:
 
     | NDC | Mfgr | Form | 2018 Volume | 2019 Volume | Price |   Pack   |
     |-----|------|------|-------------|-------------|-------|----------|
-    | ❑ x |   x  | x    | x           | x           | x     | x        |
-    | ❑ x |   x  | x    | x           | x           | x     | x        |
     | ❑ x | x    | x    | x           | x           | x     | x        |
-    | ❑ x |   x  | x    | x           | x           | x     | x        |
+    | ❑ x | x    | x    | x           | x           | x     | x        |
+    | ❑ x | x    | x    | x           | x           | x     | x        |
+    | ❑ x | x    | x    | x           | x           | x     | x        |
     | ❑ x | x    | x    | x           | x           | x     | x        |
     |     |      |      |             |             |       | Continue |
 
@@ -441,16 +440,17 @@ class EnterCOGS:
         ##############################################################
         # if user uses straight gross margin approach
         ##############################################################
-        tk.Label(master, text='Gross margin assumption (as decimal): ').grid(row=1, column=0, sticky='e')
+        tk.Label(master,
+                 text='Gross margin assumption (as decimal): ').grid(row=1, column=0, sticky='e')
         self.gross_margin_entry = tk.Entry(master)
         self.gross_margin_entry.grid(row=1, column=1, sticky='w')
 
         ##############################################################
         # if user uses standard API approach
         ##############################################################
-        self.sep1 = ttk.Separator(master, orient="horizontal")
+        self.sep1 = tk.ttk.Separator(master, orient="horizontal")
         self.sep1.grid(column=0, row=2, columnspan=2, sticky="ew")
-        self.sty = ttk.Style(master)
+        self.sty = tk.ttk.Style(master)
         self.sty.configure("TSeparator", background="blue")
 
         tk.Label(master, text='OR', font='Helvetica 9 bold')\
@@ -465,7 +465,7 @@ class EnterCOGS:
         ##############################################################
         # if user uses API cost per unit approach
         ##############################################################
-        self.sep2 = ttk.Separator(master, orient="horizontal")
+        self.sep2 = tk.ttk.Separator(master, orient="horizontal")
         self.sep2.grid(column=0, row=5, columnspan=2, sticky="ew")
 
         tk.Label(master, text='OR', font='Helvetica 9 bold')\

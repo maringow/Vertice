@@ -92,11 +92,11 @@ window4 = gui.SelectNDCs(window, df_merged_data)
 window.mainloop()
 
 parameters['selected_NDCs'] = window4.selected_ndcs
-print('Before drop: {}'.format(df_equivalents['NDC']))
+print('Before drop: \n{}'.format(df_equivalents['NDC']))
 df_detail = df_detail[df_detail['NDC'].isin(parameters['selected_NDCs'])]
 df_merged_data = df_merged_data[df_merged_data['NDC'].isin(parameters['selected_NDCs'])]
 df_equivalents = df_equivalents[df_equivalents['NDC'].isin(parameters['selected_NDCs'])]
-print('After drop: {}'.format(df_equivalents['NDC']))
+print('After drop: \n{}'.format(df_equivalents['NDC']))
 parameters['selected_NDCs'] = str(parameters['selected_NDCs'])
 df_equivalents = parsedosage.get_base_units(df_equivalents)
 
@@ -203,7 +203,7 @@ def parameterscan(years_to_discount, probability_of_success, launch_delay_years,
     parameters['volume_growth_rate'] = volume_growth
     parameters['gx_players_adj'] = gx_players_adj
     df_gfm['Number of Gx Players'] = base_gx_players + gx_players_adj
-    x, y = fincalcs.forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog)
+    x = fincalcs.forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog)
     return fincalcs.valuation_calculations(parameters, x)
 
 x = param_mat.apply(lambda row: parameterscan(row['years_to_discount'],

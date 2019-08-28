@@ -278,6 +278,7 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
     """
     Altered financial_calculations function that handles the parameter scan and
     removes formulas with results that will not change during parameter scan.
+    Additionally, it only returns df_gfm, not df_details.
 
     Args:
         parameters: Dictionary of single-value variables.
@@ -287,7 +288,6 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
 
     Returns:
         df_gfm: Aggregated year-level data.
-        df_detail: Molecule- and year-level data.
 
     """
     ##############################################################
@@ -401,4 +401,4 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
                     df_gfm['Change in Net Current Assets'] + df_gfm['Capital Avoidance'] + \
                     df_gfm['Total Capitalized'] - df_gfm['Write-off of Residual Tax Value']
 
-    return(df_gfm, df_detail)
+    return df_gfm
