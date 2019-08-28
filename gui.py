@@ -337,8 +337,8 @@ class SelectNDCs:
             .grid(row=1000, column=1, pady=20, padx=20, sticky='e')
 
     def save_and_continue(self):
-        print(self.var)
-        print(self.ndcs['NDC'])
+        # print(self.var)
+        # print(self.ndcs['NDC'])
         self.selected_ndcs = [self.ndcs['NDC'][i] for i in range(len(self.ndcs))
                               if self.var[i].get() == 1]
         self.master.destroy()
@@ -394,7 +394,7 @@ class EnterFilepath:
         tk.Label(master, text='Enter a run tag (optional):').pack(pady=10)
         self.run_name_entry = tk.Entry(master, width=50)
         self.run_name_entry.pack()
-        master.after(1000, lambda: self.run_name_entry.focus_force())
+        master.after(10, self.run_name_entry.focus_force())
 
         tk.Button(master, text='Continue', command=self.save_and_continue).pack(pady=10)
 
