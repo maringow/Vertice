@@ -84,7 +84,7 @@ count_df = [count_df[0], count_df[1], len(prospectoRx)]
 ##############################################################
 # save the updated master file, replacing the previous master file
 ##############################################################
-prospectoRx.to_excel('WAC_082719.xlsx') #TODO have new name for this
+prospectoRx.to_excel('WAC_082719.xlsx', index=False) #TODO have better name for this
 
 ##############################################################
 # gui window to show changes are successful
