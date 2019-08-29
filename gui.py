@@ -257,7 +257,7 @@ class SelectNDCs:
 
         self.master = master
         master.title("Generics Forecasting Model")
-        master.resizable(width=False, height=False)  # disable ability to resize window
+        # master.resizable(width=False, height=False)  # disable ability to resize window
 
         tk.Label(master, text='Generics Forecasting Model: Select NDCs',
                  font='Helvetica 9 bold').grid(row=0, columnspan=4, pady=20, padx=20)
@@ -332,6 +332,15 @@ class SelectNDCs:
         self.canvas.config(yscrollcommand=self.scroll.set)
         self.scroll.grid(row=0, sticky="nse")
         self.inner_frame.bind("<Configure>", self.update_scrollregion)  # update height of scrollbar
+
+        ##############################################################
+        # adjusting spacing when window expands
+        ##############################################################
+        for i in [0,1000,1001]:
+            master.grid_rowconfigure(i, weight=1)
+        master.grid_columnconfigure(0, weight=2)
+        for i in range(1,5):
+            master.grid_columnconfigure(i, weight=1)
 
         ##############################################################
         # count of ndcs selected at bottom
@@ -732,6 +741,14 @@ class ShowDetailedResults():
                 tk.Label(master, text=df[y].loc[x], font='Helvetica 9').grid(row=r, column=c)
                 c = c + 1
             r = r + 1
+
+        ##############################################################
+        # adjusting spacing when window expands
+        ##############################################################
+        for i in [0,10,18]:
+            master.grid_rowconfigure(i, weight=1)
+        for i in range(1,12):
+            master.grid_columnconfigure(i, weight=1)
 
         run_model_button = tk.Button(master, text='Run Parameter Scan', command=master.destroy)
         run_model_button.grid(row=16, columnspan=12, pady=10)
