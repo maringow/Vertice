@@ -25,8 +25,8 @@ pd.set_option('mode.chained_assignment', None)
 warnings.filterwarnings("ignore", category=FutureWarning)
 
 # read in files
-IMS = pd.read_csv('full_extract_6.26.csv')
-prospectoRx = pd.read_excel('WAC_082719.xlsx')
+IMS = pd.read_csv('full_extract_6.26.csv') #TODO have new name for this
+prospectoRx = pd.read_excel('WAC_082719.xlsx') #TODO have new name for this
 
 # get valid brands from IMS file
 brands = sorted(IMS.loc[IMS['Brand/Generic'] == 'BRAND']['Product Sum'].dropna().unique())

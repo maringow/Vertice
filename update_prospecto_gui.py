@@ -30,7 +30,7 @@ class EnterFilepath:
         ##############################################################
         self.filename = filedialog.askopenfilename(initialdir="C:\\Documents",  # TODO update
                                                    title="Select ProspectoRx price change file",
-                                                   filetypes=(("excel files", "*.xlsx"),
+                                                   filetypes=(("csv files", "*.csv"),
                                                               ("all files", "*.*")))
         tk.Label(master, text='Enter filepath:').pack(pady=10)
         self.filepath_entry = tk.Entry(master, width=75)
@@ -42,3 +42,24 @@ class EnterFilepath:
     def save_and_continue(self):
         self.parameters['excel_filepath'] = self.filepath_entry.get()
         self.master.destroy()
+
+
+class SuccessfulRun:
+    """
+    GUI that shows that the price update was successful.
+
+    | Successful Model Run |
+    |:--------------------:|
+    |   update complete    |
+
+    """
+    def __init__(self, master, count_df):
+        self.master = master
+        master.title('Generics Forecasting Model')
+
+        tk.Label(master, text='Successful ProspectoRX Price Update',
+                 font='Helvetica 9 bold').pack(pady=10)
+        tk.Label(master, text='{} NDC prices updated.'.format(count_df[1]), font='Helvetica 9').pack(pady=10)
+        tk.Label(master, text='{} new NDCs added to master file.'.format(count_df[2]-count_df[0]), font='Helvetica 9').pack(pady=10)
+
+        tk.Button(master, text='Okay', command=master.destroy).pack(pady=20)
