@@ -55,11 +55,14 @@ class SuccessfulRun:
     """
     def __init__(self, master, count_df):
         self.master = master
+        master.geometry("400x350")
         master.title('Generics Forecasting Model')
 
         tk.Label(master, text='Successful ProspectoRX Price Update',
                  font='Helvetica 9 bold').pack(pady=10)
-        tk.Label(master, text='{} NDC prices updated.'.format(count_df[1]), font='Helvetica 9').pack(pady=10)
-        tk.Label(master, text='{} new NDCs added to master file.'.format(count_df[2]-count_df[0]), font='Helvetica 9').pack(pady=10)
+        tk.Label(master, text='{} NDC prices updated.'.format(count_df[1]),
+                 font='Helvetica 9').pack(pady=10)
+        tk.Label(master, text='{} new NDCs added to master file.'.format(count_df[2]-count_df[0]),
+                 font='Helvetica 9').pack(pady=10)
 
         tk.Button(master, text='Okay', command=master.destroy).pack(pady=20)

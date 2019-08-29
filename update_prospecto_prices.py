@@ -25,7 +25,6 @@ if 'PriceUpdateDate' not in prospectoRx.columns:  # add these columns only if th
     prospectoRx['WACPrice'] = round(prospectoRx['Package Size'] * prospectoRx['WAC (Unit)'], 2)
     prospectoRx['PriceUpdateDate'] = np.repeat('From 2019-08-28 data pull', len(prospectoRx))
 count_df = [len(prospectoRx)]
-print(count_df)
 
 ##############################################################
 # read in new pricing data
@@ -37,7 +36,7 @@ def strip_non_numeric(df_column):
     return df_column
 newdata['PackageIdentifier'] = strip_non_numeric(newdata['PackageIdentifier'])
 count_df = [count_df[0], len(newdata)]
-print(count_df)
+
 ##############################################################
 # if the NDC is not in the db, we make a new row to add the NDC to the master file
 # otherwise, we update the price in the master file
