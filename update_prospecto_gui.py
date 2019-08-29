@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import filedialog
 
-class InfoWindow:
 
+class InfoWindow:
     """
     GUI that shows that the most recent WACBeginDate saved to the master price file.
 
@@ -14,7 +14,6 @@ class InfoWindow:
     |               Okay              |
 
     """
-
     def __init__(self, master, x):
         self.master = master
         master.geometry("500x300")
@@ -47,7 +46,7 @@ class EnterFilepath:
 
     def __init__(self, master):
         self.master = master
-        master.title("Update ProspectoRx Prices")
+        master.title("Generics Forecasting Model")
         master.geometry("600x400")
 
         ##############################################################

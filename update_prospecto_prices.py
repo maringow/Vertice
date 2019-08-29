@@ -12,7 +12,7 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 ##############################################################
 # finding the most recent price change date in the master file
 ##############################################################
-prospectoRx = pd.read_excel('WAC_082719.xlsx') #TODO have new name for this, something like Master Prcing File
+prospectoRx = pd.read_excel('WAC_082719.xlsx')  # TODO have new name for this, Master Prcing File?
 try:
     dates_of_changes = prospectoRx[prospectoRx.PriceUpdateDate != 'From 2019-08-27 data pull'].PriceUpdateDate
     dates_of_changes = dates_of_changes.unique()
@@ -21,7 +21,7 @@ try:
         x.append(datetime.strptime(i, '%Y-%m-%d'))
     x = max(x)
 except:
-    x = date(2019,8,27)
+    x = date(2019, 8, 27)
 
 ##############################################################
 # gui window to show last price change date
@@ -50,11 +50,11 @@ count_df = [len(prospectoRx)]
 ##############################################################
 # read in new pricing data
 ##############################################################
-newdata = pd.read_csv(window1.parameters['excel_filepath'])
 def strip_non_numeric(df_column):
     df_column = df_column.str.replace('[^0-9]', '')
     df_column = pd.to_numeric(df_column)
     return df_column
+newdata = pd.read_csv(window1.parameters['excel_filepath'])
 newdata['PackageIdentifier'] = strip_non_numeric(newdata['PackageIdentifier'])
 count_df = [count_df[0], len(newdata)]
 
@@ -84,7 +84,7 @@ count_df = [count_df[0], count_df[1], len(prospectoRx)]
 ##############################################################
 # save the updated master file, replacing the previous master file
 ##############################################################
-prospectoRx.to_excel('WAC_082719.xlsx', index=False) #TODO have better name for this
+prospectoRx.to_excel('WAC_082719.xlsx', index=False)  # TODO have better name for this
 
 ##############################################################
 # gui window to show changes are successful
