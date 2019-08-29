@@ -1,6 +1,37 @@
 import tkinter as tk
 from tkinter import filedialog
 
+class InfoWindow:
+
+    """
+    GUI that shows that the most recent WACBeginDate saved to the master price file.
+
+    |     Prospecto Price Update      |
+    |:-------------------------------:|
+    |    Most recent price update:    |
+    |             **date**            |
+    | Include this date in data pull. |
+    |               Okay              |
+
+    """
+
+    def __init__(self, master, x):
+        self.master = master
+        master.geometry("500x300")
+        master.title('Generics Forecasting Model')
+
+        tk.Label(master, text='ProspectoRx Price Update',
+                 font='Helvetica 9 bold').pack(pady=10)
+        x = x.strftime("%B") + " " + str(x.day) + ', ' + str(x.year)
+        tk.Label(master, text='Most recent price update:', font='Helvetica 9').pack()
+        tk.Label(master, text=x, bg='gray85', font='Helvetica 9 bold').pack(pady=10)
+        tk.Label(master,
+                 text='Make sure to pull data from ProspectoRx that at least includes this date.',
+                 font='Helvetica 9').pack(pady=10)
+
+        tk.Button(master, text='Okay', command=master.destroy).pack(pady=20)
+
+
 class EnterFilepath:
     """
     GUI to get file path to ProspectoRx price change file.
@@ -51,6 +82,8 @@ class SuccessfulRun:
     | Successful Model Run |
     |:--------------------:|
     |   update complete    |
+    | x NDC prices updated |
+    | x NDC added to file  |
 
     """
     def __init__(self, master, count_df):

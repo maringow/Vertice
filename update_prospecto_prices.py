@@ -1,5 +1,6 @@
 import warnings
 import tkinter as tk
+from datetime import datetime, date
 import pandas as pd
 import numpy as np
 # importing internal modules
@@ -7,6 +8,27 @@ import update_prospecto_gui
 # turn off warnings for SettingWithCopy and Future
 pd.set_option('mode.chained_assignment', None)
 warnings.filterwarnings("ignore", category=FutureWarning)
+
+##############################################################
+# finding the most recent price change date in the master file
+##############################################################
+prospectoRx = pd.read_excel('WAC_082719.xlsx') #TODO have new name for this, something like Master Prcing File
+try:
+    dates_of_changes = prospectoRx[prospectoRx.PriceUpdateDate != 'From 2019-08-27 data pull'].PriceUpdateDate
+    dates_of_changes = dates_of_changes.unique()
+    x = []
+    for i in dates_of_changes:
+        x.append(datetime.strptime(i, '%Y-%m-%d'))
+    x = max(x)
+except:
+    x = date(2019,8,27)
+
+##############################################################
+# gui window to show last price change date
+##############################################################
+window = tk.Tk()
+window0 = update_prospecto_gui.InfoWindow(window, x)
+window.mainloop()
 
 
 ##############################################################
@@ -19,7 +41,6 @@ window.mainloop()
 ##############################################################
 # read in master file of prices
 ##############################################################
-prospectoRx = pd.read_excel('WAC_082719.xlsx') #TODO have new name for this
 prospectoRx.rename(index=str, columns={'Drug Identifier': 'NDC'}, inplace=True)
 if 'PriceUpdateDate' not in prospectoRx.columns:  # add these columns only if they doesn't exist
     prospectoRx['WACPrice'] = round(prospectoRx['Package Size'] * prospectoRx['WAC (Unit)'], 2)
@@ -63,7 +84,7 @@ count_df = [count_df[0], count_df[1], len(prospectoRx)]
 ##############################################################
 # save the updated master file, replacing the previous master file
 ##############################################################
-# prospectoRx.to_excel('WAC_082719.xlsx')
+prospectoRx.to_excel('WAC_082719.xlsx') #TODO have new name for this
 
 ##############################################################
 # gui window to show changes are successful
