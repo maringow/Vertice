@@ -53,8 +53,9 @@ def merge_ims_prospecto(df_equivalents, prospectoRx):
     df_equivalents['NDC'] = strip_non_numeric(df_equivalents['NDC'].str.split('\s', expand=True)[0])
     df_equivalents['NDC'].fillna(999, inplace=True)  # e.g. if NDC is "NDC NOT AVAILABLE"
     df_equivalents['NDC'] = df_equivalents['NDC'].astype(np.int64)
-    prospectoRx.rename(index=str, columns={'PackageIdentifier': 'NDC'}, inplace=True)
-    prospectoRx['NDC'] = strip_non_numeric(prospectoRx['NDC'])
+    prospectoRx['WACPrice'] = round(prospectoRx['Package Size'] * prospectoRx['WAC (Unit)'], 2)
+    prospectoRx.rename(index=str, columns={'Drug Identifier': 'NDC'}, inplace=True)
+    # prospectoRx['NDC'] = strip_non_numeric(prospectoRx['NDC'])
 
     ##############################################################
     # join price and therapeutic equivalents on NDC

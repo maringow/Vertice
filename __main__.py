@@ -26,7 +26,7 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 
 # read in files
 IMS = pd.read_csv('full_extract_6.26.csv')
-prospectoRx = pd.read_csv('prospecto_all_one_year_20190708.csv')
+prospectoRx = pd.read_excel('WAC_082719.xlsx')
 
 # get valid brands from IMS file
 brands = sorted(IMS.loc[IMS['Brand/Generic'] == 'BRAND']['Product Sum'].dropna().unique())
