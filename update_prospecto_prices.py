@@ -12,13 +12,13 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 ##############################################################
 # finding the most recent price change date in the master file
 ##############################################################
-prospectoRx = pd.read_excel('WAC_082719.xlsx')  # TODO have new name for this, Master Prcing File?
+prospectoRx = pd.read_excel('WAC_082719.xlsx')  # TODO have new name for this, Master Pricing File?
 try:
     dates_of_changes = prospectoRx[prospectoRx.PriceUpdateDate != 'From 2019-08-27 data pull'].PriceUpdateDate
     dates_of_changes = dates_of_changes.unique()
     x = []
     for i in dates_of_changes:
-        x.append(datetime.strptime(i, '%Y-%m-%d'))
+        x.append(datetime.strptime(i, '%Y-%m-%d')) # TODO make sure it pulls in the most recent date, NEEDS TO BE FIX PLZ
     x = max(x)
 except:
     x = date(2019, 8, 27)
@@ -41,10 +41,10 @@ window.mainloop()
 ##############################################################
 # read in master file of prices
 ##############################################################
-prospectoRx.rename(index=str, columns={'Drug Identifier': 'NDC'}, inplace=True)
+# prospectoRx.rename(index=str, columns={'Drug Identifier': 'NDC'}, inplace=True)
 if 'PriceUpdateDate' not in prospectoRx.columns:  # add these columns only if they doesn't exist
     prospectoRx['WACPrice'] = round(prospectoRx['Package Size'] * prospectoRx['WAC (Unit)'], 2)
-    prospectoRx['PriceUpdateDate'] = np.repeat('From 2019-08-28 data pull', len(prospectoRx))
+    prospectoRx['PriceUpdateDate'] = np.repeat('From 2019-08-27 data pull', len(prospectoRx))
 count_df = [len(prospectoRx)]
 
 ##############################################################
