@@ -67,7 +67,7 @@ for i in newdata.PackageIdentifier:
         x = pd.DataFrame(newdata[newdata.PackageIdentifier == i])
         if x.TypeName.values == 'NDC':
             x.TypeName = 'NDC11'
-        x = pd.DataFrame([x.PackageIdentifier.values[0], x.TypeName.values[0],
+        x = pd.DataFrame([x.PackageIdentifier.values[0], x.TypeName.values[0],  # TODO case when there is a blank (maybe do a try/except)
                           x.SpecificDrugProductID.values[0], x.BrandGenericStatus.values[0],
                           x.CompanyName.str.replace(',', '').values[0], '', '', '',
                           x.PackageSize.values[0], x.WACUnitPrice.values[0],  x.WACPrice.values[0],
