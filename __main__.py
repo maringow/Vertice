@@ -34,9 +34,9 @@ IMS = IMS.merge(dosage_mapping, how='left', left_on='Form (TLC3)', right_on='IMS
 print(IMS.head())
 
 # get valid brands from IMS file
-# brands = sorted(IMS.loc[IMS['Brand/Generic'] == 'BRAND']['Product Sum'].dropna().unique())   # brand only
-brands = sorted(IMS.loc[(IMS['Brand/Generic'] == 'BRAND') |    # includes branded generics
-                (IMS['Brand/Generic'] == 'BRANDED GENERIC')]['Product Sum'].dropna().unique())
+brands = sorted(IMS.loc[IMS['Brand/Generic'] == 'BRAND']['Product Sum'].dropna().unique())   # brand only
+# brands = sorted(IMS.loc[(IMS['Brand/Generic'] == 'BRAND') |    # includes branded generics
+#                 (IMS['Brand/Generic'] == 'BRANDED GENERIC')]['Product Sum'].dropna().unique())
 molecules = IMS['Combined Molecule'].dropna().unique().tolist()
 parameters = {}
 

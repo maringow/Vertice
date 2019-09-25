@@ -160,10 +160,10 @@ class DosageForms:
         for d in range(len(self.dosage_forms)):
             v = tk.IntVar()
             box = tk.Checkbutton(self.master, text=self.dosage_forms[d], variable=v)
-            box.pack()
+            box.pack(anchor='w', padx=20)
             self.var.append(v)
 
-        tk.Button(master, text='Continue', command=self.save_and_continue).pack(pady=10)
+        tk.Button(master, text='Continue', command=self.save_and_continue).pack(pady=10, padx=20, anchor='e')
 
     ##############################################################
     # for each checked box, save the dosage form into selected_dosage_forms
