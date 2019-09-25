@@ -243,8 +243,8 @@ class SelectNDCs:
     GUI that allows selection of NDCs to include in model.
     Shows information for each NDC in a table format to assist selection.
 
-    | NDC | Mfgr | Form | 2018 Volume | 2019 Volume | Price |   Pack   |
-    |-----|------|------|-------------|-------------|-------|----------|
+    | NDC | Manuf | Form | 2018 Volume | 2019 Volume | Price |   Pack   |
+    |-----|-------|------|-------------|-------------|-------|----------|
     | ❑ x | x    | x    | x           | x           | x     | x        |
     | ❑ x | x    | x    | x           | x           | x     | x        |
     | ❑ x | x    | x    | x           | x           | x     | x        |
@@ -280,7 +280,7 @@ class SelectNDCs:
         # set up variables to store user selections
         ##############################################################
         self.ndcs = df_merged_data.sort_values(by=['Manufacturer', 'NDC'])[
-            ['NDC', 'Manufacturer', 'Prod Form3', '2018_Units', '2019_Units', 'WACPrice', 'Pack']]\
+            ['NDC', 'Manufacturer', 'Vertice Dosage Form', '2018_Units', '2019_Units', 'WACPrice', 'Pack']]\
             .reset_index(drop=True)
         self.ndcs = self.ndcs.drop_duplicates().reset_index()
         self.selected_ndcs = pd.DataFrame()
@@ -312,7 +312,7 @@ class SelectNDCs:
             self.var.append(v)
             tk.Label(self.inner_frame, text=row['Manufacturer'])\
                 .grid(row=n, column=1, sticky='w', padx=8)
-            tk.Label(self.inner_frame, text=row['Prod Form3'])\
+            tk.Label(self.inner_frame, text=row['Vertice Dosage Form'])\
                 .grid(row=n, column=2, sticky='w', padx=8)
             tk.Label(self.inner_frame, text=row['2018_Units'])\
                 .grid(row=n, column=3, sticky='w', padx=8)

@@ -3,37 +3,36 @@ import pandas as pd
 import numpy as np
 
 
-def get_equiv(IMS, parameters):
-    """
-    Find all IMS records that match the Combined Molecule and Prod Form2.
-
-    """
-    return IMS.loc[(IMS['Combined Molecule'].isin(parameters['combined_molecules'])) &
-                   (IMS['Prod Form2'].isin(parameters['dosage_forms']))]
-
-
-def get_dosage_forms(parameters, IMS):
+def get_dosage_forms(IMS, parameters):
     """
     Get the combined molecule name, based on selected molecule or brand.
-    Get the unique Prod Form2 for that combined molecule.
-
+    Get the list of dosage forms for that combined molecule.
+    Return parameter dictionary with dosage form appended.
     """
     try:
         if parameters['search_type'] == 'brand':
             parameters['combined_molecules'] = IMS.loc[IMS['Product Sum'] ==
                                                        parameters['brand_name']]['Combined Molecule'].unique()
             parameters['dosage_forms'] = IMS.loc[IMS['Product Sum'] ==
-                                                 parameters['brand_name']]['Prod Form2'].unique()
+                                                 parameters['brand_name']]['Vertice Dosage Form'].unique()
             parameters['molecule_name'] = 'Not specified'
         elif parameters['search_type'] == 'molecule':
             parameters['combined_molecules'] = [parameters['molecule_name']]
             parameters['dosage_forms'] = IMS.loc[IMS['Combined Molecule'] ==
-                                                 parameters['molecule_name']]['Prod Form2'].unique()
+                                                 parameters['molecule_name']]['Vertice Dosage Form'].unique()
             parameters['brand_name'] = 'Not specified'
     except KeyError:
         print('Please select a brand or molecule to run the model.')
 
     return parameters
+
+
+def get_equiv(IMS, parameters):
+    """
+    Find all IMS records that match the Combined Molecule and Vertice dosage form.
+    """
+    return IMS.loc[(IMS['Combined Molecule'].isin(parameters['combined_molecules'])) &
+                   (IMS['Vertice Dosage Form'].isin(parameters['dosage_forms']))]
 
 
 def merge_ims_prospecto(df_equivalents, prospectoRx):

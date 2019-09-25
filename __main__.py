@@ -27,12 +27,16 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 # read in files
 IMS = pd.read_csv('full_extract_6.26.csv') #TODO have new name for this
 prospectoRx = pd.read_excel('WAC_082719.xlsx') #TODO have new name for this
+dosage_mapping = pd.read_csv('Dosage form mapping.csv')
+
+# merge IMS with dosage form mapping
+IMS = IMS.merge(dosage_mapping, how='left', left_on='Form (TLC3)', right_on='IMS Dosage Form')
+print(IMS.head())
 
 # get valid brands from IMS file
-brands = sorted(IMS.loc[IMS['Brand/Generic'] == 'BRAND']['Product Sum'].dropna().unique())
-# brands = sorted(IMS.loc[(IMS['Brand/Generic'] == 'BRAND') |
-#   (IMS['Brand/Generic'] == 'BRANDED GENERIC')]['Product Sum'].dropna().unique())
-# ^ if we want to included BRANDED GENERICS too
+# brands = sorted(IMS.loc[IMS['Brand/Generic'] == 'BRAND']['Product Sum'].dropna().unique())   # brand only
+brands = sorted(IMS.loc[(IMS['Brand/Generic'] == 'BRAND') |    # includes branded generics
+                (IMS['Brand/Generic'] == 'BRANDED GENERIC')]['Product Sum'].dropna().unique())
 molecules = IMS['Combined Molecule'].dropna().unique().tolist()
 parameters = {}
 
@@ -49,7 +53,7 @@ print(parameters)
 ##############################################################
 # OPEN DOSAGE FORM SELECTION IF MORE THAN ONE DOSAGE FORM IS FOUND
 ##############################################################
-parameters = mergedatasets.get_dosage_forms(parameters, IMS)
+parameters = mergedatasets.get_dosage_forms(IMS, parameters)
 
 if len(parameters['dosage_forms']) > 1:
     window = tk.Tk()
