@@ -14,7 +14,7 @@ def get_growth_rate(df):
         growth_rate: A float, the resulting growth rate.
 
     """
-    units_by_year = df['Units'].sum(level='year_index') # TODO update year with new annual data
+    units_by_year = df['Units'].sum(level='year_index')
     growth_rate1 = ((units_by_year.loc[2018] / units_by_year.loc[2016]) ** (1 / 2) - 1)
     growth_rate2 = ((units_by_year.loc[2018] / units_by_year.loc[2017]) - 1)
     if abs(growth_rate1) != np.inf:
@@ -25,6 +25,25 @@ def get_growth_rate(df):
         growth_rate = 0
 
     return growth_rate
+
+
+def set_vertice_price_discount(df_gfm, parameters, df_analog):
+    '''
+    Check brand status of model run and set Vertice price as % of BWAC/GWAC accordingly
+    :param df_gfm: Dataframe that holds annual financial calculations
+    :param parameters: Dictionary that holds model parameters
+    :param df_analog: Lookup table of model assumptions based on historical data
+    :return: df_gfm, updated with model price assumptions for Vertice
+    '''
+    if parameters['brand_status'] == 'Brand':
+        col_name = [parameters['channel'] + ' Net Price Pct BWAC']
+        df_gfm['Vertice Price as % of WAC'] = df_analog.loc[df_gfm['Number of Gx Players'],
+                                                            col_name].values
+    else:
+        df_gfm['Vertice Price as % of WAC'] = (1 - parameters['gtn_%']) * \
+                                              (1 - df_gfm['Price Discount of Current Gx Net Price'])
+
+    return df_gfm
 
 
 def get_future_volume(df_detail, parameters):
@@ -45,6 +64,31 @@ def get_future_volume(df_detail, parameters):
                                     (1 + parameters['volume_growth_rate'])
 
     return df_detail
+
+
+def store_api_cost(df_detail, df_merged_data, parameters):
+    """
+    Calculates API cost per unit and merges into df_detail based on user inputs in the API COGS screen (window6).
+    If standard margin % option is used, does nothing.
+    :param df_detail: Molecule- and year-level data used to calculate financial forecast
+    :param df_merged_data: Merged volume and price data for set of "equivalent" NDCs
+    :param parameters: Dictionary of variables used in model
+    :return:
+        df_merged_data: Updated with API cost
+        df_detail: Updated with API cost to feed into COGS
+    """
+    if parameters['standard_cogs_entry'] != '':
+        print("Storing standard API COGS for all NDCs")
+        df_merged_data['API_cost'] = pd.to_numeric(parameters['standard_cogs_entry'])
+    else:
+        print("Storing NDC-specific API COGS based on provided API volumes and unit cost")
+        for key, value in parameters['api_units_per_pack'].items():
+            df_merged_data['API_units'].loc[df_merged_data['Pack'] == key] = pd.to_numeric(value)
+        df_merged_data['API_cost'] = df_merged_data['API_units'] * parameters['api_cost_per_unit']
+    df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC', 'API_cost']],
+                         on='NDC', how='left').set_index(['year_index', 'ndc_index'])
+
+    return df_merged_data, df_detail
 
 
 def get_vertice_volume_forecast(df_detail, df_gfm, parameters):
@@ -79,14 +123,15 @@ def get_vertice_volume_forecast(df_detail, df_gfm, parameters):
     return df_vertice_ndc_volumes
 
 
+
 def get_vertice_ndc_prices(df_detail, df_gfm, parameters):
     """
     Calculates forecasted Vertice prices by year and NDC based on predicted price growth (wac_increase)
     and Vertice price discount to market (Vertice Price as % of WAC)
 
     Args:
-        df_detail: Molecule- and year-level data used to calculate and store financial forecast.
-        df_gfm: Aggregated year-level data used to calculate financial forecast.
+        df_detail: Molecule- and year-level data used to calculate financial forecast.
+        df_gfm: Aggregated year-level data used to calculate and store financial forecast.
         parameters: Dictionary of variables used in model, including predicted growth rate
 
     :return: df_vertice_ndc_prices: Dataframe of forecasted Vertice prices by NDC and year
@@ -99,6 +144,44 @@ def get_vertice_ndc_prices(df_detail, df_gfm, parameters):
                                                    level=0, fill_value=0)
 
     return df_vertice_ndc_prices
+
+
+
+def calculate_cogs(df_detail, df_gfm, df_vertice_ndc_volumes, parameters):
+    """
+    Calculates COGS based on user input to COGS window. User has 3 options and the first one that has an input is used
+    1. Use a gross margin % across all NDCs
+    2. Use a standard API cost across all NDCs (essentially weighted approach)
+    3. Use an NDC-specific API cost for each NDC
+    :param df_detail: Dataframe that contains year and NDC level data used in model
+    :param df_gfm: Dataframe that holds annual financial calculations
+    :param df_vertice_ndc_volumes: Dataframe of forecasted Vertice prices by NDC and year
+    :param parameters: Dictionary that holds model parameters
+    :return:
+        df_detail: Updated with fixed COGS factors (excipients, labor, etc.)
+        df_gfm: Updated with Standard COGS column
+    """
+    if parameters['profit_margin_override'] != '':
+        print("Calculating COGS using profit margin %")
+        df_gfm['Standard COGS'] = -df_gfm['Net Sales'] * \
+                                  (1 - pd.to_numeric(parameters['profit_margin_override']))
+    else:
+        print("Calculating COGS using dollar API cost")
+        # calculating std_cost_per_unit in future
+        # API_cost is the API cost per NDC from the 2nd or 3rd approach in GUI window
+        df_detail['std_cost_per_unit'] = df_detail['API_cost'].add(
+            (parameters['cogs']['excipients'] + parameters['cogs']['direct_labor'] +
+             parameters['cogs']['variable_overhead'] + parameters['cogs']['fixed_overhead'] +
+             parameters['cogs']['depreciation'] + parameters['cogs']['cmo_markup']),
+            level=0, fill_value=0)
+        for i in range(parameters['present_year'] + 1, parameters['last_forecasted_year'] + 1):
+            df_detail.loc[i]['std_cost_per_unit'] = df_detail.loc[i - 1]['std_cost_per_unit'] * \
+                                                    (1 + parameters['cogs']['cost_increase'])
+
+        df_gfm['Standard COGS'] = -(df_detail['std_cost_per_unit'] *
+                                    df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
+
+    return df_detail, df_gfm
 
 
 def financial_calculations(parameters, df_gfm, df_detail, df_analog):
@@ -117,71 +200,37 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
         df_detail: Molecule- and year-level data.
 
     """
-    ##############################################################
-    # assign Vertice price as % of either BWAC or GWAC
-    ##############################################################
-    if parameters['brand_status'] == 'Brand':
-        col_name = [parameters['channel'] + ' Net Price Pct BWAC']
-        df_gfm['Vertice Price as % of WAC'] = df_analog.loc[df_gfm['Number of Gx Players'],
-                                                            col_name].values
-    else:
-        df_gfm['Vertice Price as % of WAC'] = (1 - parameters['gtn_%']) * \
-                                              (1 - df_gfm['Price Discount of Current Gx Net Price'])
 
-    ##############################################################
-    # keep market unit sales for reference
-    ##############################################################
+    # assign Vertice price as % of either BWAC or GWAC
+    df_gfm = set_vertice_price_discount(df_gfm, parameters, df_analog)
+
+    # store historical volume and size for reference
     df_gfm['Market Volume'] = df_detail['Units'].groupby(level=[0]).sum() * 1.0
     df_gfm['Market Size'] = df_detail['Sales'].groupby(level=[0]).sum() / 1000000
 
-    ##############################################################
-    # calculate volume of market in future
-    ##############################################################
+    # calculate projected market size
     df_detail = get_future_volume(df_detail, parameters)
     #TODO unit test: volume in year [base year + 1] = base year volume X [1 + growth rate]
 
-    ##############################################################
-    # adjust volumes for launch year and if there is a partial year
-    ##############################################################
+    # calculate projected Vertice volumes
     df_vertice_ndc_volumes = get_vertice_volume_forecast(df_detail, df_gfm, parameters)
     #TODO unit test
 
-    ##############################################################
-    # calculating price (WAC) in future
-    ##############################################################
+    # project future WAC prices
     df_vertice_ndc_prices = get_vertice_ndc_prices(df_detail, df_gfm, parameters)
+    #TODO unit test
 
+    # calculate COGS and add to df_detail and df_gfm
+    df_detail, df_gfm = calculate_cogs(df_detail, df_gfm, df_vertice_ndc_volumes, parameters)
 
+    ##############################################################
+    # calculate remaining financial line items
+    ##############################################################
     df_gfm['Net Sales'] = (df_vertice_ndc_prices *
                            df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
     df_gfm['Gross Sales'] = df_gfm['Net Sales'] / (1 - parameters['gtn_%'])
     df_gfm['Distribution'] = -df_gfm['Gross Sales'] * parameters['cogs']['distribution']
     df_gfm['Write-offs'] = -df_gfm['Gross Sales'] * parameters['cogs']['writeoffs']
-
-    ##############################################################
-    # if stmt for margin approach or API approach
-    ##############################################################
-    if parameters['profit_margin_override'] != '':
-        df_gfm['Standard COGS'] = -df_gfm['Net Sales'] * \
-                                  (1 - pd.to_numeric(parameters['profit_margin_override']))
-    else:
-        # calculating std_cost_per_unit in future
-        # API_cost is the API cost per NDC from the 2nd or 3rd approach in GUI window
-        df_detail['std_cost_per_unit'] = df_detail['API_cost'].add(
-            (parameters['cogs']['excipients'] + parameters['cogs']['direct_labor'] +
-             parameters['cogs']['variable_overhead'] + parameters['cogs']['fixed_overhead'] +
-             parameters['cogs']['depreciation'] + parameters['cogs']['cmo_markup']),
-            level=0, fill_value=0)
-        for i in range(parameters['present_year'] + 1, parameters['last_forecasted_year'] + 1):
-            df_detail.loc[i]['std_cost_per_unit'] = df_detail.loc[i - 1]['std_cost_per_unit'] * \
-                                                    (1 + parameters['cogs']['cost_increase'])
-
-        df_gfm['Standard COGS'] = -(df_detail['std_cost_per_unit'] *
-                                    df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
-
-    ##############################################################
-    # calculating remaining financial line items
-    ##############################################################
     df_gfm['Profit Share'] = -(df_gfm['Net Sales'] +
                                df_gfm['Standard COGS'] +
                                df_gfm['Distribution'] +
@@ -214,33 +263,32 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
                     df_gfm['Change in Net Current Assets'] + df_gfm['Capital Avoidance'] + \
                     df_gfm['Total Capitalized'] - df_gfm['Write-off of Residual Tax Value']
 
-    return (df_gfm, df_detail)
+    return df_gfm, df_detail
 
 
-def valuation_calculations(parameters, df_gfm):
+def calculate_irr(df_gfm, parameters):
     """
-    Calculate the 5 key valuation numbers: IRR, NPV, payback period, exit value, MOIC.
-
-    Args:
-        parameters: Dictionary of single-value variables.
-        df_gfm: Aggregated year-level data from the financial_calculations function.
-
-    Returns:
-        result: Single-value variables to be saved in database.
-        df_gfm: Select columns of aggregated year-level data to be saved in database.
-
+    Calculate internal rate of return (IRR)
+    :param df_gfm: Dataframe containing forecasted annual cash flows
+    :param parameters: Dictionary of model variables, including Present Year and Years to Discount
+    :return: irr value
     """
-    ##############################################################
-    # irr
-    ##############################################################
     irr = np.irr(df_gfm.FCF.loc[parameters['present_year']:
                                 parameters['present_year'] + parameters['years_discounted']])
     if math.isnan(irr):
         irr = 'N/A'
+    return irr
 
-    ##############################################################
-    # npv
-    ##############################################################
+
+def calculate_npv(df_gfm, parameters):
+    """
+    Calculate net present value (NPV)
+    :param df_gfm: Dataframe containing forecasted annual cash flows
+    :param parameters: Dictionary of model variables, including Present Year and Years to Discount
+    :return:
+        npv: net present value
+        pv: list of present values by year
+    """
     x = 0
     pv = []
     for i in df_gfm.FCF.loc[parameters['present_year']:
@@ -248,18 +296,17 @@ def valuation_calculations(parameters, df_gfm):
         pv.append(i / (1 + parameters['discount_rate']) ** x)
         x += 1
     npv = sum(pv)
+    return npv, pv
 
-    ##############################################################
-    # discounted payback period
-    ##############################################################
-    df_gfm['FCF PV'] = 0
-    df_gfm['FCF PV'].loc[parameters['present_year']:
-                         parameters['present_year'] + parameters['years_discounted']] = pv
 
-    ##############################################################
-    # UNdiscounted payback period
-    ##############################################################
-    df_gfm['Cumulative FCF'] = np.cumsum(df_gfm["FCF"].loc[parameters['present_year']:
+def calculate_payback(df_gfm, parameters):
+    """
+    Calculate payback period by checking what year cumulative cash flows become positive
+    :param df_gfm: Dataframe containing forecasted annual cash flows
+    :param parameters: Dictionary of model variables, including Present Year and Years to Discount
+    :return: payback period
+    """
+    df_gfm['Cumulative FCF'] = np.cumsum(df_gfm['FCF'].loc[parameters['present_year']:
                                                            parameters['present_year'] +
                                                            parameters['years_discounted'] + 1])
     df_gfm['Cumulative FCF'] = df_gfm['Cumulative FCF'].fillna(0)
@@ -270,24 +317,55 @@ def valuation_calculations(parameters, df_gfm):
         payback_period = idx - parameters['present_year'] + 1 - \
                          df_gfm['Cumulative FCF'].loc[idx] / df_gfm['FCF'].loc[idx + 1]
 
-    ##############################################################
-    # exit values
-    ##############################################################
-    df_gfm['Exit Values'] = df_gfm['EBIT'] * parameters['exit_multiple']
+    return payback_period
 
-    ##############################################################
-    # moic
-    ##############################################################
+
+def calculate_moic(df_gfm):
+    """
+    Calculate annual MOIC by
+    :param df_gfm: Dataframe containing forecasted annual cash flows
+    :param parameters: Dictionary of model variables, including Present Year and Years to Discount
+    :return: df_gfm updated with MOIC column
+    """
     amt_invested = df_gfm['Total Capitalized'] + df_gfm['R&D'] + df_gfm['SG&A'] + \
                    df_gfm['Milestone Payments']
     cum_amt_invested = np.cumsum(amt_invested)
-    MOIC = []
+    moic = []
     for i in range(len(df_gfm['Exit Values'])):
         if cum_amt_invested.iloc[i] == 0:
-            MOIC.append(0)
+            moic.append(0)
         else:
-            MOIC.append(-df_gfm['Exit Values'].iloc[i] / cum_amt_invested.iloc[i])
-    df_gfm["MOIC"] = MOIC
+            moic.append(-df_gfm['Exit Values'].iloc[i] / cum_amt_invested.iloc[i])
+    df_gfm["MOIC"] = moic
+    return df_gfm
+
+
+def valuation_calculations(parameters, df_gfm):
+    """
+    Calculate the 5 key valuation numbers: IRR, NPV, payback period, exit value, MOIC. Save results to dictionary
+    to be written to SQLite database.
+
+    Args:
+        parameters: Dictionary of single-value variables.
+        df_gfm: Aggregated year-level data from the financial_calculations function.
+
+    Returns:
+        result: Single-value variables to be saved in database.
+        df_gfm: Select columns of aggregated year-level data to be saved in database.
+
+    """
+
+    irr = calculate_irr(df_gfm, parameters)
+    npv, pv = calculate_npv(df_gfm, parameters)
+
+    # calculate present value of FCFs using discount
+    df_gfm['FCF PV'] = 0
+    df_gfm['FCF PV'].loc[parameters['present_year']:
+                         parameters['present_year'] + parameters['years_discounted']] = pv
+
+    payback_period = calculate_payback(df_gfm, parameters)
+    df_gfm['Exit Values'] = df_gfm['EBIT'] * parameters['exit_multiple']
+    df_gfm = calculate_moic(df_gfm)
 
     ##############################################################
     # save results
@@ -331,36 +409,13 @@ def valuation_calculations(parameters, df_gfm):
          'Vertice Price as % of WAC', 'Net Sales', 'COGS', 'EBIT', 'FCF', 'Exit Values', 'MOIC']]
 
 
-def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
-    """
-    Altered financial_calculations function that handles the parameter scan and
-    removes formulas with results that will not change during parameter scan.
-    Additionally, it only returns df_gfm, not df_details.
+def get_scenario_volume(df_detail, parameters):
+    '''
 
-    Args:
-        parameters: Dictionary of single-value variables.
-        df_gfm: Aggregated year-level data.
-        df_detail: Molecule- and year-level data.
-        df_analog: Market share and net price % of BWAC lookup table.
-
-    Returns:
-        df_gfm: Aggregated year-level data.
-
-    """
-    ##############################################################
-    # assign Vertice price as % of either BWAC or GWAC
-    ##############################################################
-    if parameters['brand_status'] == 'Brand':
-        col_name = [parameters['channel'] + ' Net Price Pct BWAC']
-        df_gfm['Vertice Price as % of WAC'] = df_analog.loc[df_gfm['Number of Gx Players'],
-                                                            col_name].values
-    else:
-        df_gfm['Vertice Price as % of WAC'] = (1 - parameters['gtn_%']) * \
-                                              (1 - df_gfm['Price Discount of Current Gx Net Price'])
-
-    ##############################################################
-    # Calculating volume of market in future
-    ##############################################################
+    :param df_detail:
+    :param parameters:
+    :return:
+    '''
     n_years = parameters['last_forecasted_year'] + 1 - parameters['present_year']
     rate_array = np.ones(n_years) + 1 * parameters['volume_growth_rate']
     cum_years = np.arange(n_years) + 1
@@ -381,9 +436,23 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
     df_detail['Units'] = df.values
     df_detail = df_detail.drop(['Units_x', 'Units_y'], axis=1)
 
-    ##############################################################
-    # adjust volumes for launch year and if there is a partial year
-    ##############################################################
+    return df_detail
+
+
+def get_scenario_vertice_sales(df_detail, df_gfm, df_analog, parameters):
+    """
+    Calculate projected Vertice sales for a given scenario using scenario assumptions (time of launch,
+    Vertice market share) and store in df_gfm
+    :param df_detail: Dataframe containing year and NDC-level data used in model calculations
+    :param df_gfm: Dataframe that holds annual financial calculations
+    :param df_analog: Lookup table that holds model assumptions based on historical data
+    :param parameters: Dictionary that holds model parameters
+    :return:
+        df_vertice_ndc_volumes: Holds projected Vertice sales by NDC
+        df_gfm: Updated with projected Vertice net sales column
+    """
+
+    # adjust for partial year volumes
     vol_adj = []
     for i in range(2016, parameters['last_forecasted_year'] + 1):
         if i < parameters['vertice_launch_year']:
@@ -393,9 +462,7 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
         else:
             vol_adj.append(1)
 
-    ##############################################################
-    # calculating net sales
-    ##############################################################
+    # calculate Vertice price and volume
     df_gfm['Vertice Gx Market Share'] = df_analog.loc[
         df_gfm['Number of Gx Players'], [parameters['channel'] + ' Market Share']].values
 
@@ -409,6 +476,40 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
                                                    level=0, fill_value=0)
     df_gfm['Net Sales'] = (df_vertice_ndc_prices *
                            df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
+
+    return df_vertice_ndc_volumes, df_gfm
+
+
+def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
+    """
+    Altered financial_calculations function that handles the parameter scan and
+    removes formulas with results that will not change during parameter scan.
+    Additionally, it only returns df_gfm, not df_details.
+
+    Args:
+        parameters: Dictionary of single-value variables.
+        df_gfm: Aggregated year-level data.
+        df_detail: Molecule- and year-level data.
+        df_analog: Market share and net price % of BWAC lookup table.
+
+    Returns:
+        df_gfm: Aggregated year-level data.
+
+    """
+    ##############################################################
+    # assign Vertice price as % of either BWAC or GWAC
+    ##############################################################
+    df_gfm = set_vertice_price_discount(df_gfm, parameters, df_analog)
+
+    ##############################################################
+    # Calculating volume of market in future
+    ##############################################################
+    df_detail = get_scenario_volume(df_detail, parameters)
+
+    ##############################################################
+    # adjust volumes for launch year and if there is a partial year
+    ##############################################################
+    df_vertice_ndc_volumes, df_gfm = get_scenario_vertice_sales(df_detail, df_gfm, df_analog, parameters)
 
     ##############################################################
     # if stmt for margin approach or API approach

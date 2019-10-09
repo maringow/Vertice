@@ -129,8 +129,10 @@ parameters['api_units_per_pack'] = window6.COGS['units_per_pack']
 df_merged_data['API_units'] = 0
 
 # map COGS into df_merged_data and df_detail
-df_merged_data, df_detail = mergedatasets.get_api_cost(df_detail, df_merged_data, parameters)
-
+if parameters['profit_margin_override'] != '':
+    print("COGS will be calculated as % of net sales")
+else:
+    df_merged_data, df_detail = fincalcs.store_api_cost(df_detail, df_merged_data, parameters)
 
 ##############################################################
 # READ EXCEL
