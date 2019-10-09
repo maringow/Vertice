@@ -27,15 +27,89 @@ def get_growth_rate(df):
     return growth_rate
 
 
+def get_future_volume(df_detail, parameters):
+    """
+    Forecasts sales volumes by year and NDC based on base year volume and predicted growth rate.
+
+    Args:
+        df_detail: Molecule- and year-level data
+        parameters: Dictionary of variables used in model, including predicted growth rate
+
+    :return:
+        df_detail: Updated with annual volume forecasts
+    """
+
+    df_detail['Units'] = df_detail['Units'].fillna(0)
+    for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
+        df_detail.loc[i]['Units'] = df_detail.loc[i - 1]['Units'] * \
+                                    (1 + parameters['volume_growth_rate'])
+
+    return df_detail
+
+
+def get_vertice_volume_forecast(df_detail, df_gfm, parameters):
+    """
+    Calculates Vertice volume forecast based on total forecasted market volume, Vertice launch date,
+    predicted Gx penetration, predicted Vertice market share, and probability of success
+
+    Args:
+        df_detail: Molecule- and year-level data
+        df_gfm: Dataframe of annual variables used in model
+        parameters: Dictionary of variables used in model, including predicted growth rate
+
+    :return:
+        df_vertice_ndc_volumes: dataframe of forecasted Vertice sales volumes by NDC and year
+    """
+
+    vol_adj = []
+    for i in range(2016, parameters['last_forecasted_year'] + 1):
+        if i < parameters['vertice_launch_year']:
+            vol_adj.append(0)
+        elif i == parameters['vertice_launch_year']:
+            vol_adj.append((13 - parameters['vertice_launch_month']) / 12)
+        else:
+            vol_adj.append(1)
+
+    df_vertice_ndc_volumes = df_detail['Units']\
+        .mul(vol_adj * df_gfm['Gx Penetration'], level=0,
+             fill_value=0).mul(df_gfm['Vertice Gx Market Share'], level=0, fill_value=0)
+    df_vertice_ndc_volumes = df_vertice_ndc_volumes * parameters['pos']
+    df_vertice_ndc_volumes = round(df_vertice_ndc_volumes, 0)
+
+    return df_vertice_ndc_volumes
+
+
+def get_vertice_ndc_prices(df_detail, df_gfm, parameters):
+    """
+    Calculates forecasted Vertice prices by year and NDC based on predicted price growth (wac_increase)
+    and Vertice price discount to market (Vertice Price as % of WAC)
+
+    Args:
+        df_detail: Molecule- and year-level data used to calculate and store financial forecast.
+        df_gfm: Aggregated year-level data used to calculate financial forecast.
+        parameters: Dictionary of variables used in model, including predicted growth rate
+
+    :return: df_vertice_ndc_prices: Dataframe of forecasted Vertice prices by NDC and year
+    """
+
+    for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
+        df_detail.loc[i]['Price'] = df_detail.loc[i - 1]['Price'] * (1 + parameters['wac_increase'])
+
+    df_vertice_ndc_prices = df_detail['Price'].mul(df_gfm['Vertice Price as % of WAC'],
+                                                   level=0, fill_value=0)
+
+    return df_vertice_ndc_prices
+
+
 def financial_calculations(parameters, df_gfm, df_detail, df_analog):
     """
     Reverse-engineer the Excel-based GFM formulas for annual line items.
     Uses dataframes that have been created by reading in Excel data and the user's GUI inputs.
 
     Args:
-        parameters: Dictionary of single-value variables.
-        df_gfm: Aggregated year-level data.
-        df_detail: Molecule- and year-level data.
+        parameters: Dictionary of variables used in model.
+        df_gfm: Aggregated year-level data used to calculate financial forecast.
+        df_detail: Molecule- and year-level data used to calculate and store financial forecast.
         df_analog: Market share and net price % of BWAC lookup table.
 
     Returns:
@@ -61,42 +135,25 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
     df_gfm['Market Size'] = df_detail['Sales'].groupby(level=[0]).sum() / 1000000
 
     ##############################################################
-    # calculating volume of market in future
+    # calculate volume of market in future
     ##############################################################
-    df_detail['Units'] = df_detail['Units'].fillna(0)
-    for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
-        df_detail.loc[i]['Units'] = df_detail.loc[i - 1]['Units'] * \
-                                    (1 + parameters['volume_growth_rate'])
+    df_detail = get_future_volume(df_detail, parameters)
+    #TODO unit test: volume in year [base year + 1] = base year volume X [1 + growth rate]
 
     ##############################################################
     # adjust volumes for launch year and if there is a partial year
     ##############################################################
-    vol_adj = []
-    for i in range(2016, parameters['last_forecasted_year'] + 1):
-        if i < parameters['vertice_launch_year']:
-            vol_adj.append(0)
-        elif i == parameters['vertice_launch_year']:
-            vol_adj.append((13 - parameters['vertice_launch_month']) / 12)
-        else:
-            vol_adj.append(1)
-
-    df_vertice_ndc_volumes = df_detail['Units']\
-        .mul(vol_adj * df_gfm['Gx Penetration'], level=0,
-             fill_value=0).mul(df_gfm['Vertice Gx Market Share'], level=0, fill_value=0)
-    df_vertice_ndc_volumes = df_vertice_ndc_volumes * parameters['pos']
-    df_vertice_ndc_volumes = round(df_vertice_ndc_volumes, 0)
+    df_vertice_ndc_volumes = get_vertice_volume_forecast(df_detail, df_gfm, parameters)
+    #TODO unit test
 
     ##############################################################
     # calculating price (WAC) in future
     ##############################################################
-    for i in range(parameters['present_year'], parameters['last_forecasted_year'] + 1):
-        df_detail.loc[i]['Price'] = df_detail.loc[i - 1]['Price'] * (1 + parameters['wac_increase'])
+    df_vertice_ndc_prices = get_vertice_ndc_prices(df_detail, df_gfm, parameters)
 
-    df_vertice_ndc_prices = df_detail['Price'].mul(df_gfm['Vertice Price as % of WAC'],
-                                                   level=0, fill_value=0)
+
     df_gfm['Net Sales'] = (df_vertice_ndc_prices *
                            df_vertice_ndc_volumes).groupby(level=[0]).sum() / 1000000
-
     df_gfm['Gross Sales'] = df_gfm['Net Sales'] / (1 - parameters['gtn_%'])
     df_gfm['Distribution'] = -df_gfm['Gross Sales'] * parameters['cogs']['distribution']
     df_gfm['Write-offs'] = -df_gfm['Gross Sales'] * parameters['cogs']['writeoffs']

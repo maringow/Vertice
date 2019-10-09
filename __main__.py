@@ -96,11 +96,11 @@ window4 = gui.SelectNDCs(window, df_merged_data)
 window.mainloop()
 
 parameters['selected_NDCs'] = window4.selected_ndcs
-print('Before drop: \n{}'.format(df_equivalents['NDC']))
+# print('Before drop: \n{}'.format(df_equivalents['NDC']))
 df_detail = df_detail[df_detail['NDC'].isin(parameters['selected_NDCs'])]
 df_merged_data = df_merged_data[df_merged_data['NDC'].isin(parameters['selected_NDCs'])]
 df_equivalents = df_equivalents[df_equivalents['NDC'].isin(parameters['selected_NDCs'])]
-print('After drop: \n{}'.format(df_equivalents['NDC']))
+# print('After drop: \n{}'.format(df_equivalents['NDC']))
 parameters['selected_NDCs'] = str(parameters['selected_NDCs'])
 df_equivalents = parsedosage.get_base_units(df_equivalents)
 
@@ -120,21 +120,17 @@ window = tk.Tk()
 window6 = gui.EnterCOGS(window, df_equivalents)
 window.mainloop()
 
+# save inputs
 parameters['profit_margin_override'] = window6.COGS['gm_override']
 parameters['api_units'] = window6.COGS['units']
 parameters['api_cost_per_unit'] = pd.to_numeric(window6.COGS['cost_per_unit'])
 parameters['standard_cogs_entry'] = window6.COGS['standard_cogs_entry']
+parameters['api_units_per_pack'] = window6.COGS['units_per_pack']
 df_merged_data['API_units'] = 0
 
 # map COGS into df_merged_data and df_detail
-if parameters['standard_cogs_entry'] != '':
-    df_merged_data['API_cost'] = pd.to_numeric(parameters['standard_cogs_entry'])
-else:
-    for key, value in window6.COGS['units_per_pack'].items():
-        df_merged_data['API_units'].loc[df_merged_data['Pack'] == key] = pd.to_numeric(value)
-    df_merged_data['API_cost'] = df_merged_data['API_units'] * parameters['api_cost_per_unit']
-df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC', 'API_cost']],
-                     on='NDC', how='left').set_index(['year_index', 'ndc_index'])
+df_merged_data, df_detail = mergedatasets.get_api_cost(df_detail, df_merged_data, parameters)
+
 
 ##############################################################
 # READ EXCEL
@@ -230,7 +226,7 @@ for i in x[1]:
     df_annual_forecast = df_annual_forecast.append(i)
 
 ##############################################################
-# FORMATTING THE RESULTS TO PUT INTO DB
+# FORMAT RESULTS TO LOAD TO SQLITE DB
 ##############################################################
 run_id = 0
 df_result['run_id'] = run_id
@@ -240,10 +236,10 @@ df_annual_forecast.columns = ['Number of Gx Players', 'Profit Share', 'Milestone
                               'Vertice Price as % of WAC', 'Net Sales', 'COGS', 'EBIT', 'FCF',
                               'Exit Values', 'MOIC', 'scenario_id', 'run_id']
 
-# creating a forecast year column
+# create a forecast year column
 df_annual_forecast['forecast_year'] = df_annual_forecast.index.values
 
-# ordering the columns
+# order the columns
 df_result = df_result[
     ['scenario_id', 'run_id', 'run_name', 'brand_name', 'combined_molecules', 'dosage_forms',
      'selected_NDCs', 'channel', 'indication', 'presentation', 'internal_external', 'brand_status',

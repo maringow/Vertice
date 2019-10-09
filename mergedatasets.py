@@ -35,6 +35,28 @@ def get_equiv(IMS, parameters):
                    (IMS['Vertice Dosage Form'].isin(parameters['dosage_forms']))]
 
 
+def get_api_cost(df_detail, df_merged_data, parameters):
+    """
+    Calculates API cost per unit and merges into df_detail based on user inputs in the API COGS screen (window6).
+    :param df_detail: Molecule- and year-level data used to calculate and store financial forecast
+    :param df_merged_data: Merged volume and price data for set of "equivalent" NDCs
+    :param parameters: Dictionary of variables used in model
+    :return:
+        df_merged_data: Updated with API cost
+        df_detail: Updated with API cost to feed into COGS
+    """
+    if parameters['standard_cogs_entry'] != '':
+        df_merged_data['API_cost'] = pd.to_numeric(parameters['standard_cogs_entry'])
+    else:
+        for key, value in parameters['api_units_per_pack'].items():
+            df_merged_data['API_units'].loc[df_merged_data['Pack'] == key] = pd.to_numeric(value)
+        df_merged_data['API_cost'] = df_merged_data['API_units'] * parameters['api_cost_per_unit']
+    df_detail = pd.merge(df_detail.reset_index(), df_merged_data[['NDC', 'API_cost']],
+                         on='NDC', how='left').set_index(['year_index', 'ndc_index'])
+
+    return df_merged_data, df_detail
+
+
 def merge_ims_prospecto(df_equivalents, prospectoRx):
     """
     Join IMS and prospecto data.
