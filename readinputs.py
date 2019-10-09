@@ -118,4 +118,4 @@ def read_model_inputs(parameters):
     df_analog.index.name = "Number of Gx Players"
     df_analog = df_analog.fillna(0)
 
-    return (parameters, df_gfm, df_analog)
+    return parameters, df_gfm, df_analog

@@ -5,12 +5,12 @@ import pandas as pd
 
 class AutocompleteCombobox(tk.ttk.Combobox):
     """
-    Modifying Tkinter Combobox to have ability to autocomplete. Used to select Brand or Molecule.
-    Idea from: [stackoverflow link](https://stackoverflow.com/questions/12298159/tkinter-how-to-create-a-combo-box-with-autocompletion)
-
+    Ability to autocomplete Tkinter comboboxes. Used to select Brand or Molecule.
     """
     def set_completion_list(self, completion_list):
-        """Use our completion list as our drop down selection menu, arrows move through menu."""
+        """
+        Use our completion list as our drop down selection menu, arrows move through menu.
+        """
         self._completion_list = completion_list
         self._hits = []
         self._hit_index = 0
@@ -21,7 +21,6 @@ class AutocompleteCombobox(tk.ttk.Combobox):
     def autocomplete(self):
         """
         Autocomplete the Combobox.
-
         """
         self.position = len(self.get())
         _hits = []
@@ -45,7 +44,6 @@ class AutocompleteCombobox(tk.ttk.Combobox):
         """
         Event handler for the keyrelease event on this widget.
         e.g. pressing an arrow or deleting text.
-
         """
         if event.keysym == "BackSpace":
             self.delete(self.index(tk.INSERT), tk.END)

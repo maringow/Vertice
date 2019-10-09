@@ -4,8 +4,9 @@ from sqlite3 import Error
 
 def create_connection(db_file):
     """
-    Create a database connection to a SQLite database.
-
+    Creates connection to SQLite database file
+    :param db_file: Filepath of SQLite db file
+    :return: None
     """
     try:
         conn = sqlite3.connect(db_file)
@@ -56,7 +57,6 @@ def select_max_ids(conn):
     """
     Finds the last run_id. Used to label the current model results run_id.
     e.g. last run_id is 11 so current model run_id will be 12.
-
     """
     cur = conn.cursor()
     cur.execute("SELECT MAX(scenario_id), MAX(run_id) FROM annual_forecast")
@@ -68,7 +68,6 @@ def select_max_ids(conn):
 def insert_result(conn, results):
     """
     Writes the single-value model results to the SQLite database.
-
     """
     print(results)
     sql = """INSERT INTO model_results(scenario_id, run_id, run_name, brand_name, molecule, 
