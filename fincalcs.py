@@ -203,6 +203,9 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
 
     # assign Vertice price as % of either BWAC or GWAC
     df_gfm = set_vertice_price_discount(df_gfm, parameters, df_analog)
+    # check that Vertice price as % of WAC has been set and is > 0 over the forecast years
+    # print(df_gfm['Vertice Price as % of WAC'])
+    assert ((df_gfm['Vertice Price as % of WAC']).sum() > 0), "Check Vertice price as % of WAC assumptions"
 
     # store historical volume and size for reference
     df_gfm['Market Volume'] = df_detail['Units'].groupby(level=[0]).sum() * 1.0
@@ -210,15 +213,18 @@ def financial_calculations(parameters, df_gfm, df_detail, df_analog):
 
     # calculate projected market size
     df_detail = get_future_volume(df_detail, parameters)
-    #TODO unit test: volume in year [base year + 1] = base year volume X [1 + growth rate]
+    print(df_detail.loc[parameters['present_year'] + 1]['Units'])
+    print(df_detail.loc[parameters['present_year']]['Units'] * (1 + parameters['volume_growth_rate']))
+    # check that volume in year [base year + 1] = base year volume X [1 + growth rate]
+    assert (df_detail.loc[parameters['present_year'] + 1]['Units'].equals(
+            df_detail.loc[parameters['present_year']]['Units'] * (1 + parameters['volume_growth_rate']))), \
+            "Volume growth rate applied incorrectly to df_detail Units"
 
     # calculate projected Vertice volumes
     df_vertice_ndc_volumes = get_vertice_volume_forecast(df_detail, df_gfm, parameters)
-    #TODO unit test
 
     # project future WAC prices
     df_vertice_ndc_prices = get_vertice_ndc_prices(df_detail, df_gfm, parameters)
-    #TODO unit test
 
     # calculate COGS and add to df_detail and df_gfm
     df_detail, df_gfm = calculate_cogs(df_detail, df_gfm, df_vertice_ndc_volumes, parameters)
@@ -496,19 +502,15 @@ def forloop_financial_calculations(parameters, df_gfm, df_detail, df_analog):
         df_gfm: Aggregated year-level data.
 
     """
-    ##############################################################
-    # assign Vertice price as % of either BWAC or GWAC
-    ##############################################################
-    df_gfm = set_vertice_price_discount(df_gfm, parameters, df_analog)
 
-    ##############################################################
-    # Calculating volume of market in future
-    ##############################################################
+    # assign Vertice price as % of either BWAC or GWAC
+    df_gfm = set_vertice_price_discount(df_gfm, parameters, df_analog)
+    assert ((df_gfm['Vertice Price as % of WAC']).sum() > 0), "Check Vertice price as % of WAC assumptions"
+
+    # calculate volume of market in future
     df_detail = get_scenario_volume(df_detail, parameters)
 
-    ##############################################################
     # adjust volumes for launch year and if there is a partial year
-    ##############################################################
     df_vertice_ndc_volumes, df_gfm = get_scenario_vertice_sales(df_detail, df_gfm, df_analog, parameters)
 
     ##############################################################
